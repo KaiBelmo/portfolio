@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Personal Website",
+    "technologies": "Typescript",
+    "description": "this.",
+    "githubRepo": "github.com",
+    "iconColor": "#3178c6",
+    "borderColor": "#5a93d1"
+  },
+  {
+    "name": "Personal Website (win-95 version)",
+    "technologies": "Vue.js",
+    "description": "Personal portfolio website designed in the style of Windows 95.",
+    "githubRepo": "https://github.com/KaiBelmo/kai-belmo-win95",
+    "iconColor": "#41b883",
+    "borderColor": "#60c498"
+  },
+  {
+    "name": "b1m0-dbg",
+    "technologies": "C programming",
+    "description": "linux debugger.",
+    "githubRepo": "https://github.com/KaiBelmo/b1m0-dbg",
+    "iconColor": "#555555",
+    "borderColor": "#777777"
+  },
+  {
+    "name": "libC--",
+    "technologies": "C programming",
+    "description": "C++ containers but in C.",
+    "githubRepo": "https://github.com/KaiBelmo/libC--",
+    "iconColor": "#555555",
+    "borderColor": "#777777"
+  },
+  {
+    "name": "xchg-rax-rax",
+    "technologies": "Assembly",
+    "description": "Solutions of xchg rax,rax",
+    "githubRepo": "https://github.com/KaiBelmo/xchg-rax-rax",
+    "iconColor": "#6e4c13",
+    "borderColor": "#9e6e1e"
+  },
+  {
+    "name": "...",
+    "technologies": "...",
+    "description": "More projects are coming soon...",
+    "githubRepo": "https://github.com/KaiBelmo/",
+    "iconColor": "#555555",
+    "borderColor": "#777777"
+  }
+]

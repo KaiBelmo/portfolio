@@ -1,0 +1,19 @@
+.section {
+    position: relative;
+}
+
+.section::before {
+    content: "";
+    position: absolute;
+    bottom: -2.5px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #000;
+    transition: all 260ms ease-out;
+}
+
+.section:hover::before {
+    width: 15px;
+    opacity: 0.8;
+}
