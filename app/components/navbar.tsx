@@ -33,7 +33,7 @@ export default function Navbar({ handleLinkClick }: NavProps) {
             ))}
           </div>
           <div>
-            <Link href="" target="_blank" className="w-full">
+            <Link href="https://portfolio-win95.vercel.app" target="_blank" className="w-full">
               <div className="text-center max-sm:hidden">
                 Windows 95 version
               </div>
