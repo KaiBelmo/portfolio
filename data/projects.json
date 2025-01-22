@@ -1,9 +1,25 @@
 [
   {
-    "name": "Personal Website",
-    "technologies": "Typescript",
-    "description": "this.",
-    "githubRepo": "https://github.com/KaiBelmo/portfolio",
+    "name": "Together",
+    "technologies": "Javascript",
+    "description": "Together syncs youtube videos, enabling real-time, shared viewing experiences.",
+    "githubRepo": "https://github.com/KaiBelmo/together",
+    "iconColor": "#f1e05a",
+    "borderColor": "#f1e05a"
+  },
+  {
+    "name": "Actual",
+    "technologies": "TypeScript | Open Source Contribution",
+    "description": "I worked on fixing the CSV parser and resolving UI problems.",
+    "githubRepo": "https://github.com/actualbudget/actual/",
+    "iconColor": "#3178c6",
+    "borderColor": "#5a93d1"
+  },
+  {
+    "name": "Code racer",
+    "technologies": "TypeScript | Open Source Contribution",
+    "description": "I implemented the code racing feature.",
+    "githubRepo": "https://github.com/webdevcody/code-racer/commits?author=KaiBelmo/",
     "iconColor": "#3178c6",
     "borderColor": "#5a93d1"
   },
@@ -22,22 +38,6 @@
     "githubRepo": "https://github.com/KaiBelmo/b1m0-dbg",
     "iconColor": "#555555",
     "borderColor": "#777777"
-  },
-  {
-    "name": "libC--",
-    "technologies": "C programming",
-    "description": "C++ containers but in C.",
-    "githubRepo": "https://github.com/KaiBelmo/libC--",
-    "iconColor": "#555555",
-    "borderColor": "#777777"
-  },
-  {
-    "name": "xchg-rax-rax",
-    "technologies": "Assembly",
-    "description": "Solutions of xchg rax,rax",
-    "githubRepo": "https://github.com/KaiBelmo/xchg-rax-rax",
-    "iconColor": "#6e4c13",
-    "borderColor": "#9e6e1e"
   },
   {
     "name": "...",

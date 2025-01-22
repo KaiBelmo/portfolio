@@ -23,7 +23,7 @@ export default function projectCard({
             {name}
           </span>
         </h3>
-        <p className="font-normal text-sm mt-1.5 max-lg:h-5 overflow-y-auto max-md:text-sm text-[#98a2ae] max-md:text-[#656d76]">
+        <p className="font-normal text-sm mt-1.5 h-5 overflow-y-auto max-md:text-sm text-[#98a2ae] max-md:text-[#656d76]">
           {description}
         </p>
         <div className="flex items-center mt-2 font-normal text-xs max-lg:text-xs text-[#98a2ae] max-md:text-[#656d76]">
