@@ -10,7 +10,7 @@ export default function PortfolioIntro() {
   return (
     <section
       id="whoami"
-      className="relative min-h-[85vh] container mx-auto px-6 md:py-24"
+      className="relative min-h-[85vh] container mx-auto px-6 py-36 md:py-24"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         <div className="flex flex-col gap-6 md:gap-8">
