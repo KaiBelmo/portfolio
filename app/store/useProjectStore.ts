@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { projects as initProjectState } from "@/data/projects";
 import { Project } from "@/types/project";
-import { FetchGithubStars } from "../api/github/stars/route";
+import { GET as FetchGithubStars } from "../api/github/stars/route";
 import { GithubStarsResponse } from "@/types/github";
 
 interface ProjectState {
@@ -25,6 +25,7 @@ export const useProjectsStore = create<ProjectState>((set, get) => ({
     },
     fetchStars: async () => {
         try {
+            // const res = await FetchGithubStars();
             const res = await FetchGithubStars();
             if (!(res instanceof Response && res.ok)) {
                 throw new Error("API handler failed");
