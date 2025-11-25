@@ -108,7 +108,7 @@ export default function PortfolioIntro() {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="flex justify-center -mt-16"
+          className="hidden lg:flex justify-center -mt-16"
         >
           <HeroSvg />
         </motion.div>
