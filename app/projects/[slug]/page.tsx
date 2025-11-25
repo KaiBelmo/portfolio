@@ -24,13 +24,5 @@ export default function ProjectDetailPage({
     notFound();
   }
 
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-lg">Loading project...</div>
-      </div>
-    }>
-      <ProjectDetailPageContent project={project} />
-    </Suspense>
-  );
+  return <ProjectDetailPageContent project={project} />;
 }
