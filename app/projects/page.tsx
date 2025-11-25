@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import ProjectCard from "@/app/_components/ui/projectCard";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,7 +12,7 @@ import AnimationWrapper from "@/app/_components/AnimationWrapper";
 
 type ProjectType = string;
 
-export default function ProjectsPage() {
+function ProjectsPageContent() {
   const { projects, isItFetched, fetchStars } = useProjectsStore();
 
   useEffect(() => {
@@ -310,5 +310,28 @@ export default function ProjectsPage() {
         </motion.main>
       </AnimatePresence>
     </AnimationWrapper>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow p-4">
+                <div className="h-6 bg-gray-200 rounded w-2/3 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <ProjectsPageContent />
+    </Suspense>
   );
 }
