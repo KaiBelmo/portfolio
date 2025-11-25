@@ -1,0 +1,32 @@
+.floatingRepo1, .floatingRepo2, .floatingRepo3 {
+  animation: float 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.floatingRepo1 {
+  animation-delay: 0s;
+}
+
+.floatingRepo2 {
+  animation-delay: -2s;
+}
+
+.floatingRepo3 {
+  animation-delay: -4s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+/* Add responsive styles if needed */
+@media (max-width: 768px) {
+  .floatingRepo1, .floatingRepo2, .floatingRepo3 {
+    animation: float -25s ease-in-out infinite;
+  }
+}

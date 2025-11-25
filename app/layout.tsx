@@ -1,45 +1,47 @@
-import { Metadata } from "next";
 import "./globals.css";
-import "@/assets/css/font.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import Header from "./_components/ui/header";
+import CustomCursor from "./_components/ui/CustomCursor";
+import StarsBackground from "./_components/ui/StarsBackground";
+
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mohamed Ali | Software Engineer",
-  description:
-    "software engineer with expertise in both front-end and low-level programming, I specialize in JavaScript, TypeScript, React.js, and other frontend-focused libraries.",
-  icons: {
-    icon: "/favicon.svg",
-  },
-  openGraph: {
-    type: "website",
-    url: "https://nothing.com",
-    title: "Mohamed Ali | Software Engineer",
-    description:
-      "software engineer with expertise in both front-end and low-level programming, I specialize in JavaScript, TypeScript, React.js, and other frontend-focused libraries.",
-    siteName: "My Website",
-    images: [
-      {
-        url: "/og-image.png",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: "@belmo01",
-    images: "/og-image.png",
-  },
+  title: "Kai Belmo | Portfolio",
+  description: "Portfolio of Kai Belmo",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body
-        className={`font-poppins bg-[#f6f5f4] h-screen overflow-hidden max-md:overflow-y-scroll`}
-      >
-        <div>{children}</div>
+      <body className={inter.className}>
+        {/* custom cursor visible only on desktop */}
+        <div className="hidden lg:block">
+          <CustomCursor />
+        </div>
+
+        {/* Stars background: hidden on mobile/tablet via the component's tailwind class */}
+        <StarsBackground />
+
+        <div className="relative z-10">
+
+
+        {/* keep header and content normal — stars are fixed and behind everything (-z-10) */}
+        <Header />
+
+        <main>{children}</main>
+        </div>
       </body>
     </html>
   );
