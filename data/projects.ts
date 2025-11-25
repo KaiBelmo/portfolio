@@ -10,7 +10,7 @@ export const projects: Project[] = [
     category: ["Full stack", "WebRTC", "Socket.io"],
     typeOfProject: "Thesis Project",
     date: "2025-09-25",
-    imageLink: "/lessshare-screen.png",
+    imageLink: "/lessshare-screen.PNG",
     imagePosition: "center",
     description: "A browser-based decentralized file-sharing platform that enables secure peer-to-peer transfers without relying on centralized servers. Built with WebRTC and Vue.js, the system ensures privacy, speed, and full user control over shared data.",
     asciinemaId: "lessShare", // This should match the filename in /public/casts/ (without .cast extension)
@@ -56,7 +56,7 @@ export const projects: Project[] = [
     category: ["Data Structures", "STL"],
     typeOfProject: "Personal Project",
     date: "2022-01-30",
-    imageLink: "/libc-screen.png",
+    imageLink: "/libc-screen.PNG",
     imagePosition: "left",
     asciinemaId: "libc", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 8, // Show frame at 8 seconds as cover
@@ -75,7 +75,7 @@ export const projects: Project[] = [
     category: ["Debugger", "ELF Parser", "C"],
     typeOfProject: "Personal Project",
     date: "2020-08-02",
-    imageLink: "/b1m0-dbg-screen.png",
+    imageLink: "/b1m0-dbg-screen.PNG",
     imagePosition: "left",
     asciinemaId: "b1m0-dbg", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 8, // Show frame at 8 seconds as cover
@@ -94,7 +94,7 @@ export const projects: Project[] = [
     category: ["JavaScript", "Chrome extension"],
     typeOfProject: "Personal Project",
     date: "2023-06-30", // You'll need to update this date
-    imageLink: "/no404-screen.png", // Placeholder path
+    imageLink: "/no404-screen.PNG", // Placeholder path
     imagePosition: "left", // You can change this
     asciinemaId: "no404", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 9,
@@ -113,7 +113,7 @@ export const projects: Project[] = [
     category: ["Full stack", "WebSockets"],
     typeOfProject: "University Project",
     date: "2023-02-21",
-    imageLink: "/together-screen.png",
+    imageLink: "/together-screen.PNG",
     imagePosition: "center",
     asciinemaId: "together", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 13, // Show frame at 8 seconds as cover
@@ -136,7 +136,7 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Open Source Contribution",
     date: "2023-07-09",
-    imageLink: "/coderacer-screen.png",
+    imageLink: "/coderacer-screen.PNG",
     imagePosition: "left",
     description: "Code Racer is a multiplayer coding game where developers can compete against each other to solve programming challenges in real-time. Sharpen your coding skills, challenge your peers, and have fun while racing against the clock!",
     coverSeconds: 6, // Show frame at 6 seconds as cover
@@ -158,7 +158,7 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Open Source Contribution",
     date: "2023-11-04",
-    imageLink: "/actual-screen.png",
+    imageLink: "/actual-screen.PNG",
     imagePosition: "left",
     description: "Actual is a local-first personal finance tool. It's built to be fast and fully private, with optional syncing.",
     coverSeconds: 3,
