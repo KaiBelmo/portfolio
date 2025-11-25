@@ -24,5 +24,9 @@ export default function ProjectDetailPage({
     notFound();
   }
 
-  return <ProjectDetailPageContent project={project} />;
+  return (
+    <Suspense fallback={null}>
+      <ProjectDetailPageContent project={project} />
+    </Suspense>
+  );
 }
