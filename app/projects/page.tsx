@@ -1,6 +1,6 @@
 'use client';
 import Link from "next/link";
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import ProjectCard from "@/app/_components/ui/projectCard";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,23 +62,40 @@ const itemVariants = {
 type ProjectType = string;
 function ProjectsPageContent() {
   const { projects, isItFetched, fetchStars } = useProjectsStore();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const hasMounted = useRef(false);
+
+  // Get initial page from URL instantly (no default 1 flash)
+  const initialPage = (() => {
+    const p = parseInt(searchParams.get('page') || '1', 10);
+    return isNaN(p) ? 1 : p;
+  })();
+  
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+
+  // Prevent animation only on first render
+  useEffect(() => {
+    hasMounted.current = true;
+    return () => {
+      hasMounted.current = false;
+    };
+  }, []);
+
+  // Fetch stars on mount
   useEffect(() => {
     if (!isItFetched) fetchStars();
   }, [isItFetched, fetchStars]);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(1);
 
-  // Get initial page from URL or default to 1
+  // Sync URL changes (Back/Forward navigation)
   useEffect(() => {
     const page = parseInt(searchParams.get('page') || '1', 10);
-    if (page && !isNaN(page) && page !== currentPage) {
+    if (page !== currentPage && !isNaN(page)) {
       setCurrentPage(page);
     }
   }, [searchParams]);
   const [selectedType, setSelectedType] = useState<ProjectType | 'all'>('all');
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const pathname = usePathname();
   const projectsPerPage = 3;
   // Get all unique project types
   const allProjectTypes = useMemo(() =>
@@ -96,6 +113,7 @@ function ProjectsPageContent() {
   const endIndex = startIndex + projectsPerPage;
   const currentProjects = filteredProjects.slice(startIndex, endIndex);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Handle page change with URL update
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     const params = new URLSearchParams(searchParams.toString());
@@ -103,27 +121,17 @@ function ProjectsPageContent() {
     window.history.pushState(null, '', `?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  // Handle browser back/forward navigation
-  useEffect(() => {
-    const handlePopState = () => {
-      const page = parseInt(new URLSearchParams(window.location.search).get('page') || '1', 10);
-      if (!isNaN(page) && page !== currentPage) {
-        setCurrentPage(page);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [currentPage]);
   return (
     <AnimationWrapper pageKey={`${pathname}?page=${currentPage}`}>
       <AnimatePresence mode="wait">
         <motion.main
           key={currentPage}
           className="container mx-auto px-4 sm:px-6 py-8 sm:py-12"
-          initial={{ opacity: 0, y: 20 }}
+          // Prevents initial flicker page=1 → page=3
+          initial={hasMounted.current ? { opacity: 0, y: 25 } : false}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          exit={{ opacity: 0, y: -25 }}
+          transition={{ duration: 0.35 }}
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-14 md:mt-6">
             <motion.h1
