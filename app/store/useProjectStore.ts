@@ -25,19 +25,25 @@ export const useProjectsStore = create<ProjectState>((set, get) => ({
     },
     fetchStars: async () => {
         try {
-            // const res = await FetchGithubStars();
             const res = await FetchGithubStars();
-            if (!(res instanceof Response && res.ok)) {
-                throw new Error("API handler failed");
+            const data = await res.json();
+            const starsMap = new Map<string, string>();
+            if (Array.isArray(data)) {
+                data.forEach((item: any) => {
+                    if (item && item.id && item.stars !== undefined) {
+                        starsMap.set(item.id, item.stars.toString());
+                    }
+                });
+                
+                if (starsMap.size > 0) {
+                    get().updateStars(starsMap);
+                }
             }
-
-            const data: GithubStarsResponse = await res.json();
-            console.log("GitHub stars:", data);
-            const starsMap = new Map(data.map(i => [i.id, i.stars]));
-            get().updateStars(starsMap);
+            
             set({ isItFetched: true });
         } catch (error) {
             console.error("Error fetching GitHub stars:", error);
+            set({ isItFetched: true });
         }
     },
 
