@@ -7,10 +7,9 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  /** lock scroll */
+  /** lock scroll when menu is open */
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    document.body.style.overflow = isOpen ? "hidden" : "";
   }, [isOpen]);
 
   /** close on ESC */
@@ -22,8 +21,6 @@ export default function Header() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
-  const toggle = () => setIsOpen((o) => !o);
-
   const MENU = [
     { title: "Home", href: "/#whoami" },
     { title: "Projects", href: "/projects" },
@@ -32,10 +29,15 @@ export default function Header() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-[500] ${isOpen ? "" : "bg-white/60"}  backdrop-blur-xl`}>
+      <header className={`fixed top-0 left-0 right-0 z-[500] backdrop-blur-xl duration-200 ${isOpen ? "" : "bg-white/60"}`}>
+        {/* Desktop Navbar */}
         <div className="hidden md:flex container mx-auto px-6 py-4 items-center justify-between">
           <div className="flex-1 flex justify-start z-50">
-            <Link href="/#whoami" className="uppercase tracking-[0.2rem] font-serif font-medium text-lg md:text-xl cursor-pointer hover:opacity-80 transition-opacity">
+            <Link
+              href="/#whoami"
+              scroll={false}
+              className="uppercase tracking-[0.2rem] font-serif font-medium text-lg md:text-xl hover:opacity-80 transition-opacity"
+            >
               Kai Belmo
             </Link>
           </div>
@@ -45,6 +47,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
+                scroll={false}
                 className="hover:text-black transition"
               >
                 {item.title}
@@ -53,16 +56,26 @@ export default function Header() {
           </nav>
         </div>
 
+        {/* Mobile Navbar */}
         <div className="md:hidden px-6 py-4 flex items-center justify-between">
           <div className="flex-1 flex justify-start z-50">
-            <p className={`uppercase tracking-[0.2rem] font-serif font-medium text-lg cursor-pointer ${isOpen ? "text-white" : "[text-shadow:0_0_6px_rgba(255,255,255,0.6),_0_0_12px_rgba(255,255,255,0.4)]"}`}>
+            <Link
+              href="/#whoami"
+              scroll={false}
+              onClick={() => setIsOpen(false)}
+              className={`uppercase tracking-[0.2rem] font-serif font-medium text-lg cursor-pointer ${
+                isOpen
+                  ? "text-white"
+                  : "[text-shadow:0_0_6px_rgba(255,255,255,0.6),_0_0_12px_rgba(255,255,255,0.4)]"
+              }`}
+            >
               Kai Belmo
-            </p>
+            </Link>
           </div>
-          
+
           <button
             className={`hamburger--thin ${isOpen ? "active" : ""}`}
-            onClick={toggle}
+            onClick={() => setIsOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={isOpen}
           >
@@ -87,8 +100,9 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-2xl font-medium text-white hover:opacity-80"
+              scroll={false}
               onClick={() => setIsOpen(false)}
+              className="text-2xl font-medium text-white hover:opacity-80"
             >
               {item.title}
             </Link>
