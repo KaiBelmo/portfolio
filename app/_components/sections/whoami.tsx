@@ -93,7 +93,7 @@ export default function PortfolioIntro() {
               </span>
             </HoverUnderline>
             <HoverUnderline
-              href=""
+              href="/_resume_me.pdf"
               className="text-gray-500 hover:text-black transition-colors duration-200 group"
             >
               <span className="flex items-center gap-2">
