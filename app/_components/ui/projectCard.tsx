@@ -4,7 +4,6 @@ import { ArrowUpRight, Star } from "lucide-react";
 import type { Project } from "@/types/project";
 import dynamic from "next/dynamic";
 import PlayerWrapper from "./PlayerWrapper";
-import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
 // Dynamically import the AsciinemaPlayer with no SSR
@@ -42,32 +41,6 @@ export default function ProjectCard({
     layout === "alternate" ? index % 2 === 1 : layout === "left";
 
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: [0.16, 1, 0.3, 1],
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
-  };
 
   const formatK = (n: number) =>
     n < 1000 ? n : (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + "k";
@@ -78,13 +51,10 @@ export default function ProjectCard({
   };
 
   return (
-    <motion.div
+    <div
       ref={ref}
       onClick={handleClick}
       className="group relative border-t border-gray-100 py-8 px-5 md:py-10 md:px-9 bg-white hover:bg-gray-50 shadow-sm sm:shadow-lg rounded-xl cursor-pointer active:scale-[0.99] sm:active:scale-100 transition-all"
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={cardVariants}
     >
       <div className="w-full">
         <div
@@ -93,20 +63,8 @@ export default function ProjectCard({
           } gap-8 lg:gap-12`}
         >
           {/* Text */}
-          <motion.div
-            className="flex-1 space-y-4"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-              },
-            }}
-          >
-            <motion.div
-              className="flex items-center justify-between"
-              variants={itemVariants}
-            >
+          <div className="flex-1 space-y-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h3 className="text-2xl font-medium text-gray-900 group-hover:underline decoration-1 underline-offset-4">
                   {name}
@@ -120,62 +78,34 @@ export default function ProjectCard({
                   <span>{formatK(parseInt(stars))}</span>
                 </div>
               )}
-            </motion.div>
+            </div>
 
-            <motion.div
-              className="text-gray-600 text-base leading-relaxed line-clamp-3"
-              variants={itemVariants}
-              title={description}
-            >
+            <div className="text-gray-600 text-base leading-relaxed line-clamp-3" title={description}>
               {description}
-            </motion.div>
+            </div>
 
             {/* Categories */}
-            <motion.div
-              className="flex flex-wrap items-center gap-2 pt-2"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-              }}
-            >
+            <div className="flex flex-wrap items-center gap-2 pt-2">
               {category.map((el) => (
-                <motion.span
+                <span
                   key={el}
                   className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-50 rounded-full border border-gray-200/60"
-                  variants={itemVariants}
                 >
                   {el}
-                </motion.span>
+                </span>
               ))}
-            </motion.div>
+            </div>
 
             {/* Metadata */}
-            <motion.div
-              className="text-sm text-gray-400 pt-2 flex items-center gap-2"
-              variants={itemVariants}
-            >
+            <div className="text-sm text-gray-400 pt-2 flex items-center gap-2">
               <span className="font-medium text-gray-500">{typeOfProject}</span>
               <span className="text-gray-300">•</span>
               <span>{date}</span>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Media */}
-          <motion.div
-            className="w-full lg:w-3/5 h-auto min-h-[200px] hidden md:block"
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  delay: 0.2,
-                  duration: 0.6,
-                  ease: [0.16, 1, 0.3, 1],
-                },
-              },
-            }}
-          >
+          <div className="w-full lg:w-3/5 h-auto min-h-[200px] hidden md:block">
             {typeOfProject === "Open Source Contribution" ? (
               <div className="w-full h-full min-h-[240px] flex items-center justify-center bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-center space-y-4 p-8">
@@ -230,9 +160,9 @@ export default function ProjectCard({
                 </div>
               </PlayerWrapper>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

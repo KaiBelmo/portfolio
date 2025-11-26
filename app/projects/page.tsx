@@ -1,5 +1,4 @@
 'use client';
-
 import Link from "next/link";
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
@@ -8,21 +7,68 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useProjectsStore } from "@/app/store/useProjectStore";
 import AnimationWrapper from "@/app/_components/AnimationWrapper";
 
+// Animation variants for the projects list
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,  // Reduced stagger for quicker sequence
+      delayChildren: 0,    // Small initial delay
+      when: "beforeChildren" // Ensure parent animates first
+    }
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      staggerChildren: 0.1,
+      staggerDirection: -1,  // Reverse order on exit
+      when: "afterChildren"  // Animate children first on exit
+    }
+  }
+};
+
+// Animation variants for individual project items
+const itemVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 20,
+    scale: 0.98  // Slight scale down when hidden
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      damping: 15,
+      stiffness: 200,
+      mass: 0.5,
+      duration: 0.6
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    scale: 0.98,
+    transition: {
+      duration: 0.2,
+      ease: "easeIn"
+    }
+  }
+};
+
 // Get all unique project types
-
 type ProjectType = string;
-
 function ProjectsPageContent() {
   const { projects, isItFetched, fetchStars } = useProjectsStore();
-
   useEffect(() => {
     if (!isItFetched) fetchStars();
   }, [isItFetched, fetchStars]);
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Get initial page from URL or default to 1
   useEffect(() => {
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -34,26 +80,22 @@ function ProjectsPageContent() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
   const projectsPerPage = 3;
-
   // Get all unique project types
-  const allProjectTypes = useMemo(() => 
+  const allProjectTypes = useMemo(() =>
     Array.from(new Set(projects.map(project => project.typeOfProject)))
-  , [projects]);
-
+    , [projects]);
   // Filter projects based on selected type
   const filteredProjects = useMemo(() => {
     return selectedType === 'all'
       ? projects
       : projects.filter(project => project.typeOfProject === selectedType);
   }, [selectedType, projects]);
-
   // Calculate pagination
   const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
   const startIndex = (currentPage - 1) * projectsPerPage;
   const endIndex = startIndex + projectsPerPage;
   const currentProjects = filteredProjects.slice(startIndex, endIndex);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     const params = new URLSearchParams(searchParams.toString());
@@ -61,7 +103,6 @@ function ProjectsPageContent() {
     window.history.pushState(null, '', `?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
@@ -70,11 +111,9 @@ function ProjectsPageContent() {
         setCurrentPage(page);
       }
     };
-
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentPage]);
-
   return (
     <AnimationWrapper pageKey={`${pathname}?page=${currentPage}`}>
       <AnimatePresence mode="wait">
@@ -95,12 +134,11 @@ function ProjectsPageContent() {
             >
               {selectedType === 'all' ? 'All Projects' : `${selectedType}s`}
             </motion.h1>
-
             <motion.div
               className="relative"
               initial={{ opacity: 0, y: 10 }}
-              animate={{ 
-                opacity: 1, 
+              animate={{
+                opacity: 1,
                 y: 0,
                 transition: {
                   delay: 0.1,
@@ -111,8 +149,8 @@ function ProjectsPageContent() {
             >
               <button
                 onClick={() => setDropdownOpen(prev => !prev)}
-                className="w-full md:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2.5 
-                text-left text-gray-700 hover:border-gray-400 shadow-sm flex items-center 
+                className="w-full md:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2.5
+                text-left text-gray-700 hover:border-gray-400 shadow-sm flex items-center
                 justify-between transition-all duration-200"
               >
                 <span>{selectedType === 'all' ? 'All Project Types' : selectedType}</span>
@@ -126,7 +164,6 @@ function ProjectsPageContent() {
                   <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                 </motion.svg>
               </button>
-
               <AnimatePresence>
                 {dropdownOpen && (
                   <motion.ul
@@ -134,7 +171,7 @@ function ProjectsPageContent() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute mt-2 w-full md:w-[200px] bg-white rounded-lg shadow-xl 
+                    className="absolute mt-2 w-full md:w-[200px] bg-white rounded-lg shadow-xl
                     z-20 overflow-hidden border border-gray-200"
                   >
                     <li
@@ -165,11 +202,10 @@ function ProjectsPageContent() {
               </AnimatePresence>
             </motion.div>
           </div>
-
-          <motion.p 
+          <motion.p
             className="text-gray-600 mt-2"
             initial={{ opacity: 0 }}
-            animate={{ 
+            animate={{
               opacity: 1,
               transition: {
                 delay: 0.2,
@@ -180,7 +216,6 @@ function ProjectsPageContent() {
           >
             Showing {filteredProjects.length === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, filteredProjects.length)} of {filteredProjects.length} {selectedType === 'all' ? 'projects' : `${selectedType.toLowerCase()} projects`}
           </motion.p>
-
           <div className="flex flex-col gap-4 md:gap-10 my-8">
             {currentProjects.length === 0 ? (
               <motion.div
@@ -204,31 +239,33 @@ function ProjectsPageContent() {
                 </button>
               </motion.div>
             ) : (
-              currentProjects.map((project, index) => (
+              <>
                 <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      duration: 0.5,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: index * 0.1
-                    }
-                  }}
+                  className="space-y-4 md:space-y-10"
+                  variants={listVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
                 >
-                  <ProjectCard
-                    projectInfo={project}
-                    index={startIndex + index}
-                    layout="alternate"
-                    currentPage={currentPage}
-                  />
+                  {currentProjects.map((project, index) => (
+                    <motion.div
+                      key={project.id}
+                      variants={itemVariants}
+                      layout // keeps layout animations smooth if ProjectCard uses layout prop
+                    >
+                      <ProjectCard
+                        projectInfo={project}
+                        index={startIndex + index}
+                        layout="alternate"
+                        currentPage={currentPage}
+                      />
+                    </motion.div>
+                  ))}
                 </motion.div>
-              ))
+              </>
             )}
           </div>
-
+          
           {totalPages > 1 && (
             <motion.div
               className="flex flex-wrap justify-center items-center gap-2 mt-6 sm:mt-8 px-2"
