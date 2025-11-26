@@ -6,7 +6,7 @@ export const projects: Project[] = [
     slug: "lessshare",
     name: "LessShare",
     link: "https://lessshare-frontend.vercel.app/",
-    githubLink: "https://github.com/kaibelmo/lessshare-frontend",
+    githubLink: "https://github.com/kaibelmo/lessshare",
     category: ["Full stack", "WebRTC", "Socket.io"],
     typeOfProject: "Thesis Project",
     date: "2025-09-25",
