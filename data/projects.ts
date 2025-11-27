@@ -22,6 +22,51 @@ export const projects: Project[] = [
     ],
     stars: "2"
   },
+    {
+    id: "code-racer",
+    slug: "code-racer",
+    name: "Code Racer",
+    link: "",
+    githubLink: "https://github.com/webdevcody/code-racer",
+    category: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS"
+    ],
+    typeOfProject: "Open Source Contribution",
+    date: "2023-07-09",
+    imageLink: "/coderacer-screen.PNG",
+    imagePosition: "left",
+    description: "Code Racer is a multiplayer coding game where developers can compete against each other to solve programming challenges in real-time. Sharpen your coding skills, challenge your peers, and have fun while racing against the clock!",
+    coverSeconds: 6, // Show frame at 6 seconds as cover
+    features: [
+      "Developed the initial Type Racer mode, including typing logic and restart functionality, laying the foundation for competitive code-typing gameplay.",
+      "Contributed multiple pull requests (#47, #90, #183, #229) addressing features and bugs, strengthening open-source collaboration and community growth."
+    ],
+    stars: "709"
+  },
+  {
+    id: "actual-budget",
+    slug: "actual-budget",
+    name: "Actual",
+    link: "https://actualbudget.org/",
+    githubLink: "https://github.com/actualbudget/actual",
+    category: [
+      "Next.js",
+      "TypeScript",
+    ],
+    typeOfProject: "Open Source Contribution",
+    date: "2023-11-04",
+    imageLink: "/actual-screen.PNG",
+    imagePosition: "left",
+    description: "Actual is a local-first personal finance tool. It's built to be fast and fully private, with optional syncing.",
+    coverSeconds: 3,
+    features: [
+      "Enhanced the CSV importer by adding support for user-selectable delimiters (like ',' or '|'), increasing compatibility with various bank file formats (#1774).",
+      "Fixed styling on the mobile transaction page, improving the user interface and readability on smaller devices (#1820).",
+    ],
+    stars: "23300"
+  },
   {
     id: "portfolio-w95",
     slug: "portfolio-w95",
@@ -123,51 +168,7 @@ export const projects: Project[] = [
     ],
     stars: "1"
   },
-  {
-    id: "code-racer",
-    slug: "code-racer",
-    name: "Code Racer",
-    link: "",
-    githubLink: "https://github.com/webdevcody/code-racer",
-    category: [
-      "Next.js",
-      "TypeScript",
-      "Tailwind CSS"
-    ],
-    typeOfProject: "Open Source Contribution",
-    date: "2023-07-09",
-    imageLink: "/coderacer-screen.PNG",
-    imagePosition: "left",
-    description: "Code Racer is a multiplayer coding game where developers can compete against each other to solve programming challenges in real-time. Sharpen your coding skills, challenge your peers, and have fun while racing against the clock!",
-    coverSeconds: 6, // Show frame at 6 seconds as cover
-    features: [
-      "Developed the initial Type Racer mode, including typing logic and restart functionality, laying the foundation for competitive code-typing gameplay.",
-      "Contributed multiple pull requests (#47, #90, #183, #229) addressing features and bugs, strengthening open-source collaboration and community growth."
-    ],
-    stars: "709"
-  },
-  {
-    id: "actual-budget",
-    slug: "actual-budget",
-    name: "Actual",
-    link: "https://actualbudget.org/",
-    githubLink: "https://github.com/actualbudget/actual",
-    category: [
-      "Next.js",
-      "TypeScript",
-    ],
-    typeOfProject: "Open Source Contribution",
-    date: "2023-11-04",
-    imageLink: "/actual-screen.PNG",
-    imagePosition: "left",
-    description: "Actual is a local-first personal finance tool. It's built to be fast and fully private, with optional syncing.",
-    coverSeconds: 3,
-    features: [
-      "Enhanced the CSV importer by adding support for user-selectable delimiters (like ',' or '|'), increasing compatibility with various bank file formats (#1774).",
-      "Fixed styling on the mobile transaction page, improving the user interface and readability on smaller devices (#1820).",
-    ],
-    stars: "23300"
-  }
+
 ];
 
 export const getProjectBySlug = (slug: string) => {
