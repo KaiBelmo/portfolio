@@ -1,9 +1,9 @@
-'use client';
+"use client";
 import Link from "next/link";
 import { useState, useEffect, useMemo, Suspense, useRef } from "react";
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import ProjectCard from "@/app/_components/ui/projectCard";
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 import { useProjectsStore } from "@/app/store/useProjectStore";
 import AnimationWrapper from "@/app/_components/AnimationWrapper";
 
@@ -13,27 +13,27 @@ const listVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,  // Reduced stagger for quicker sequence
-      delayChildren: 0,    // Small initial delay
-      when: "beforeChildren" // Ensure parent animates first
-    }
+      staggerChildren: 0.15, // Reduced stagger for quicker sequence
+      delayChildren: 0, // Small initial delay
+      when: "beforeChildren", // Ensure parent animates first
+    },
   },
   exit: {
     opacity: 0,
     transition: {
       staggerChildren: 0.1,
-      staggerDirection: -1,  // Reverse order on exit
-      when: "afterChildren"  // Animate children first on exit
-    }
-  }
+      staggerDirection: -1, // Reverse order on exit
+      when: "afterChildren", // Animate children first on exit
+    },
+  },
 };
 
 // Animation variants for individual project items
 const itemVariants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     y: 20,
-    scale: 0.98  // Slight scale down when hidden
+    scale: 0.98, // Slight scale down when hidden
   },
   visible: {
     opacity: 1,
@@ -44,8 +44,8 @@ const itemVariants = {
       damping: 15,
       stiffness: 200,
       mass: 0.5,
-      duration: 0.6
-    }
+      duration: 0.6,
+    },
   },
   exit: {
     opacity: 0,
@@ -53,9 +53,9 @@ const itemVariants = {
     scale: 0.98,
     transition: {
       duration: 0.2,
-      ease: "easeIn"
-    }
-  }
+      ease: "easeIn",
+    },
+  },
 };
 
 // Get all unique project types
@@ -65,13 +65,14 @@ function ProjectsPageContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const hasMounted = useRef(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get initial page from URL instantly (no default 1 flash)
   const initialPage = (() => {
-    const p = parseInt(searchParams.get('page') || '1', 10);
+    const p = parseInt(searchParams.get("page") || "1", 10);
     return isNaN(p) ? 1 : p;
   })();
-  
+
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
 
   // Prevent animation only on first render
@@ -89,24 +90,46 @@ function ProjectsPageContent() {
 
   // Sync URL changes (Back/Forward navigation)
   useEffect(() => {
-    const page = parseInt(searchParams.get('page') || '1', 10);
+    const page = parseInt(searchParams.get("page") || "1", 10);
     if (page !== currentPage && !isNaN(page)) {
       setCurrentPage(page);
     }
   }, [searchParams]);
-  const [selectedType, setSelectedType] = useState<ProjectType | 'all'>('all');
+
+  const [selectedType, setSelectedType] = useState<ProjectType | "all">("all");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const projectsPerPage = 3;
   // Get all unique project types
-  const allProjectTypes = useMemo(() =>
-    Array.from(new Set(projects.map(project => project.typeOfProject)))
-    , [projects]);
+  const allProjectTypes = useMemo(
+    () => Array.from(new Set(projects.map((project) => project.typeOfProject))),
+    [projects]
+  );
   // Filter projects based on selected type
   const filteredProjects = useMemo(() => {
-    return selectedType === 'all'
+    return selectedType === "all"
       ? projects
-      : projects.filter(project => project.typeOfProject === selectedType);
+      : projects.filter((project) => project.typeOfProject === selectedType);
   }, [selectedType, projects]);
+
+  // closes dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
   // Calculate pagination
   const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
   const startIndex = (currentPage - 1) * projectsPerPage;
@@ -117,9 +140,9 @@ function ProjectsPageContent() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    window.history.pushState(null, '', `?${params.toString()}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    params.set("page", page.toString());
+    window.history.pushState(null, "", `?${params.toString()}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
     <AnimationWrapper pageKey={`${pathname}?page=${currentPage}`}>
@@ -140,9 +163,10 @@ function ProjectsPageContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              {selectedType === 'all' ? 'All Projects' : `${selectedType}s`}
+              {selectedType === "all" ? "All Projects" : `${selectedType}s`}
             </motion.h1>
             <motion.div
+              ref={dropdownRef}
               className="relative"
               initial={{ opacity: 0, y: 10 }}
               animate={{
@@ -151,17 +175,19 @@ function ProjectsPageContent() {
                 transition: {
                   delay: 0.1,
                   duration: 0.5,
-                  ease: [0.16, 1, 0.3, 1]
-                }
+                  ease: [0.16, 1, 0.3, 1],
+                },
               }}
             >
               <button
-                onClick={() => setDropdownOpen(prev => !prev)}
+                onClick={() => setDropdownOpen((prev) => !prev)}
                 className="w-full md:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2.5
                 text-left text-gray-700 hover:border-gray-400 shadow-sm flex items-center
                 justify-between transition-all duration-200"
               >
-                <span>{selectedType === 'all' ? 'All Project Types' : selectedType}</span>
+                <span>
+                  {selectedType === "all" ? "All Project Types" : selectedType}
+                </span>
                 <motion.svg
                   animate={{ rotate: dropdownOpen ? 180 : 0 }}
                   transition={{ duration: 0.25 }}
@@ -179,12 +205,11 @@ function ProjectsPageContent() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute mt-2 w-full md:w-[200px] bg-white rounded-lg shadow-xl
-                    z-20 overflow-hidden border border-gray-200"
+                    className="absolute mt-2 w-full md:w-[200px] bg-white rounded-lg shadow-xl z-20 overflow-hidden border border-gray-200"
                   >
                     <li
                       onClick={() => {
-                        setSelectedType('all');
+                        setSelectedType("all");
                         setDropdownOpen(false);
                         setCurrentPage(1);
                       }}
@@ -218,11 +243,16 @@ function ProjectsPageContent() {
               transition: {
                 delay: 0.2,
                 duration: 0.5,
-                ease: [0.16, 1, 0.3, 1]
-              }
+                ease: [0.16, 1, 0.3, 1],
+              },
             }}
           >
-            Showing {filteredProjects.length === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, filteredProjects.length)} of {filteredProjects.length} {selectedType === 'all' ? 'projects' : `${selectedType.toLowerCase()} projects`}
+            Showing {filteredProjects.length === 0 ? 0 : startIndex + 1}-
+            {Math.min(endIndex, filteredProjects.length)} of{" "}
+            {filteredProjects.length}{" "}
+            {selectedType === "all"
+              ? "projects"
+              : `${selectedType.toLowerCase()} projects`}
           </motion.p>
           <div className="flex flex-col gap-4 md:gap-10 my-8">
             {currentProjects.length === 0 ? (
@@ -234,13 +264,15 @@ function ProjectsPageContent() {
                   y: 0,
                   transition: {
                     duration: 0.5,
-                    ease: [0.16, 1, 0.3, 1]
-                  }
+                    ease: [0.16, 1, 0.3, 1],
+                  },
                 }}
               >
-                <p className="text-gray-500 text-lg">No projects found matching the selected type.</p>
+                <p className="text-gray-500 text-lg">
+                  No projects found matching the selected type.
+                </p>
                 <button
-                  onClick={() => setSelectedType('all')}
+                  onClick={() => setSelectedType("all")}
                   className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
                 >
                   Clear filters
@@ -273,7 +305,7 @@ function ProjectsPageContent() {
               </>
             )}
           </div>
-          
+
           {totalPages > 1 && (
             <motion.div
               className="flex flex-wrap justify-center items-center gap-2 mt-6 sm:mt-8 px-2"
@@ -284,8 +316,8 @@ function ProjectsPageContent() {
                 transition: {
                   delay: 0.3,
                   duration: 0.5,
-                  ease: [0.16, 1, 0.3, 1]
-                }
+                  ease: [0.16, 1, 0.3, 1],
+                },
               }}
             >
               <button
@@ -302,8 +334,8 @@ function ProjectsPageContent() {
                   onClick={() => handlePageChange(page)}
                   className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition-colors ${
                     currentPage === page
-                      ? 'bg-black text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                      ? "bg-black text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                   } min-w-[36px] text-center`}
                 >
                   {page}
@@ -328,8 +360,8 @@ function ProjectsPageContent() {
               transition: {
                 delay: 0.4,
                 duration: 0.5,
-                ease: [0.16, 1, 0.3, 1]
-              }
+                ease: [0.16, 1, 0.3, 1],
+              },
             }}
           >
             <Link
@@ -360,22 +392,24 @@ function ProjectsPageContent() {
 
 export default function ProjectsPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-4">
-                <div className="h-6 bg-gray-200 rounded w-2/3 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-              </div>
-            ))}
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-lg shadow p-4">
+                  <div className="h-6 bg-gray-200 rounded w-2/3 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ProjectsPageContent />
     </Suspense>
   );
