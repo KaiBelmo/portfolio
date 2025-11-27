@@ -5,12 +5,14 @@ import Header from "./_components/ui/header";
 import CustomCursor from "./_components/ui/CustomCursor";
 import StarsBackground from "./_components/ui/StarsBackground";
 
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Kai Belmo | Portfolio",
+  title: "Kai Belmo | Software Engineer",
   description: "Portfolio of Kai Belmo",
+  icons: {
+    icon: "/favicon.ico?v=4",
+  },
 };
 
 export const viewport = {
@@ -30,17 +32,10 @@ export default function RootLayout({
         <div className="hidden lg:block">
           <CustomCursor />
         </div>
-
-        {/* Stars background: hidden on mobile/tablet via the component's tailwind class */}
         <StarsBackground />
-
         <div className="relative z-10">
-
-
-        {/* keep header and content normal — stars are fixed and behind everything (-z-10) */}
-        <Header />
-
-        <main>{children}</main>
+          <Header />
+          <main>{children}</main>
         </div>
       </body>
     </html>
