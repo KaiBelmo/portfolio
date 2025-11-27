@@ -97,7 +97,7 @@ export default function ProjectCard({
             </div>
 
             {/* Metadata */}
-            <div className="text-sm text-gray-400 pt-2 flex items-center gap-2">
+            <div className="text-sm text-gray-400 pt-2 flex items-center gap-1 md:gap-2">
               <span className="font-medium text-gray-500">{typeOfProject}</span>
               <span className="text-gray-300">•</span>
               <span>{date}</span>
