@@ -4,9 +4,8 @@ import { ArrowUpRight, Star } from "lucide-react";
 import type { Project } from "@/types/project";
 import dynamic from "next/dynamic";
 import PlayerWrapper from "./PlayerWrapper";
-import { useRef } from "react";
+import { useRef, memo, useCallback } from "react";
 
-// Dynamically import the AsciinemaPlayer with no SSR
 const AsciinemaPlayer = dynamic(() => import("./AsciinemaPlayer"), {
   ssr: false,
 });
@@ -15,14 +14,14 @@ interface ProjectCardProps {
   projectInfo: Project;
   index: number;
   layout?: "right" | "left" | "alternate";
-  currentPage?: number; // <-- NEW
+  currentPage?: number;
 }
 
-export default function ProjectCard({
+export default memo(function ProjectCard({
   projectInfo,
   index,
   layout = "alternate",
-  currentPage = 1, // <-- DEFAULT
+  currentPage = 1,
 }: ProjectCardProps) {
   const {
     name,
@@ -45,10 +44,9 @@ export default function ProjectCard({
   const formatK = (n: number) =>
     n < 1000 ? n : (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + "k";
 
-  // ⭐ FIX: Navigate with page param preserved
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     router.push(`/projects/${slug}?page=${currentPage}`);
-  };
+  }, [router, slug, currentPage]);
 
   return (
     <div
@@ -62,7 +60,6 @@ export default function ProjectCard({
             shouldReverse ? "lg:flex-row-reverse" : "lg:flex-row"
           } gap-8 lg:gap-12`}
         >
-          {/* Text */}
           <div className="flex-1 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -84,7 +81,6 @@ export default function ProjectCard({
               {description}
             </div>
 
-            {/* Categories */}
             <div className="flex flex-wrap items-center gap-2 pt-2">
               {category.map((el) => (
                 <span
@@ -96,7 +92,6 @@ export default function ProjectCard({
               ))}
             </div>
 
-            {/* Metadata */}
             <div className="text-sm text-gray-400 pt-2 flex items-center gap-0.5 md:gap-2">
               <span className="font-medium text-gray-500">{typeOfProject}</span>
               <span className="text-gray-300">•</span>
@@ -104,7 +99,6 @@ export default function ProjectCard({
             </div>
           </div>
 
-          {/* Media */}
           <div className="w-full lg:w-3/5 h-auto min-h-[200px] hidden md:block">
             {typeOfProject === "Open Source Contribution" ? (
               <div className="w-full h-full min-h-[240px] flex items-center justify-center bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
@@ -165,4 +159,4 @@ export default function ProjectCard({
       </div>
     </div>
   );
-}
+});
