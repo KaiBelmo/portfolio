@@ -7,14 +7,18 @@ import { GithubStarsResponse } from "@/types/github";
 interface ProjectState {
     projects: Project[];
     isItFetched: boolean;
+    isLoading: boolean;
+    error: string | null;
     updateStars: (starsMap: Map<string, string>) => void;
-    fetchStars: () => void;
+    fetchStars: () => Promise<void>;
     getSelectedProjects: (max: number) => Project[];
 }
 
 export const useProjectsStore = create<ProjectState>((set, get) => ({
     projects: initProjectState,
     isItFetched: false,
+    isLoading: false,
+    error: null,
     updateStars: (starsMap: Map<string, string>) => {
         set((state) => ({
             projects: state.projects.map(p => {
@@ -24,6 +28,7 @@ export const useProjectsStore = create<ProjectState>((set, get) => ({
         }));
     },
     fetchStars: async () => {
+        set({ isLoading: true, error: null });
         try {
             const res = await FetchGithubStars();
             const data = await res.json();
@@ -40,10 +45,14 @@ export const useProjectsStore = create<ProjectState>((set, get) => ({
                 }
             }
             
-            set({ isItFetched: true });
+            set({ isItFetched: true, isLoading: false });
         } catch (error) {
             console.error("Error fetching GitHub stars:", error);
-            set({ isItFetched: true });
+            set({ 
+                isItFetched: true, 
+                isLoading: false, 
+                error: error instanceof Error ? error.message : "Failed to fetch stars" 
+            });
         }
     },
 
