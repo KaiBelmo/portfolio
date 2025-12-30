@@ -11,21 +11,18 @@ export default function StarsBackground() {
   const [stars, setStars] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log("StarsBackground component mounted");
-    const instances = 15; // Reduced from 36 to 15
+    const instances = 15; 
 
     const generated = Array.from({ length: instances }).map(() => ({
       file: STAR_FILES[Math.floor(Math.random() * STAR_FILES.length)],
       left: rand(0, 100),
       top: rand(0, 100),
-      size: Math.round(rand(12, 35)), // Increased size range
-      duration: rand(6, 12), // Slower animations
-      delay: rand(0, 5), // Reduced delay range
+      size: Math.round(rand(12, 35)),
+      duration: rand(6, 12),
+      delay: rand(0, 5),
       rotateAmount:
-        Math.round(rand(5, 25)) * (Math.random() > 0.5 ? 1 : -1), // Reduced rotation
+        Math.round(rand(5, 25)) * (Math.random() > 0.5 ? 1 : -1),
     }));
-
-    console.log("Generated stars:", generated);
     setStars(generated);
   }, []);
 
