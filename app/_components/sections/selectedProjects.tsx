@@ -1,12 +1,15 @@
+"use client";
+
 import ProjectCard from "@/app/_components/ui/projectCard";
 import { Project } from "@/types/project";
 import Link from "next/link";
+import { memo } from "react";
 
 interface SelectedProjectsProps {
   selectedProjects: Array<Project>;
 }
 
-export default function SelectedProjects({ selectedProjects }: SelectedProjectsProps) {
+export default memo(function SelectedProjects({ selectedProjects }: SelectedProjectsProps) {
   return (
     <section id="projects" className="mb-0 md:mb-36 container mx-auto px-6">
       <h2 className="text-3xl md:text-4xl font-serif tracking-tight mb-4 md:mb-12">
@@ -48,4 +51,4 @@ export default function SelectedProjects({ selectedProjects }: SelectedProjectsP
       </div>
     </section>
   );
-}
+});

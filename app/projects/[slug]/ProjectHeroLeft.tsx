@@ -2,12 +2,13 @@
 import HoverLinkText from "@/app/_components/ui/hoverlinktext";
 import type { Project } from "@/types/project";
 import FeatureWithLinks from "./FeatureWithLinks";
+import { memo } from "react";
 
 interface ProjectHeroLeftProps {
   project: Project;
 }
 
-export default function ProjectHeroLeft({ project }: ProjectHeroLeftProps) {
+export default memo(function ProjectHeroLeft({ project }: ProjectHeroLeftProps) {
   return (
     <div className="space-y-3">
       <div className="block">
@@ -69,4 +70,4 @@ export default function ProjectHeroLeft({ project }: ProjectHeroLeftProps) {
       </div>
     </div>
   );
-}
+});

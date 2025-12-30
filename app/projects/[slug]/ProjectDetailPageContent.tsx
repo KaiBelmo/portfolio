@@ -8,12 +8,13 @@ import ProjectHeroRight from "./ProjectHeroRight";
 import ProjectDemo from "./ProjectDemo";
 import ViewAllProjectsCTA from "./ViewAllProjectsCTA";
 import AnimationWrapper from "@/app/_components/AnimationWrapper";
+import { memo } from "react";
 
 interface ProjectDetailPageContentProps {
   project: Project;
 }
 
-export function ProjectDetailPageContent({ project }: ProjectDetailPageContentProps) {
+export const ProjectDetailPageContent = memo(function ProjectDetailPageContent({ project }: ProjectDetailPageContentProps) {
   const searchParams = useSearchParams();
   const backPage = searchParams?.get('page') || '1';
   const backHref = `/projects?page=${backPage}`;
@@ -36,4 +37,4 @@ export function ProjectDetailPageContent({ project }: ProjectDetailPageContentPr
       </div>
     </AnimationWrapper>
   );
-}
+});

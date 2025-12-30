@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "./_components/ui/header";
 import CustomCursor from "./_components/ui/CustomCursor";
-import StarsBackground from "./_components/ui/StarsBackground";
+import dynamic from "next/dynamic";
+
+const StarsBackground = dynamic(() => import("./_components/ui/StarsBackground"), {
+  ssr: false
+});
 
 const inter = Inter({ subsets: ["latin"] });
 
