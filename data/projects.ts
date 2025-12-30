@@ -2,6 +2,32 @@ import type { Project } from "@/types/project";
 
 export const projects: Project[] = [
   {
+    id: "voidgen",
+    slug: "voidgen",
+    name: "VoidGen",
+    link: "",
+    githubLink: "https://github.com/KaiBelmo/VoidGen",
+    category: [
+      "TypeScript",
+      "Mock API",
+      "REST API"
+    ],
+    typeOfProject: "Personal Project",
+    date: "2025-12-01",
+    imageLink: "/voidgen-screen.PNG",
+    imagePosition: "left",
+    description: "VoidGen is a lightweight, configurable mock API server that generates RESTful endpoints from JSON and other structured data formats. It is designed for frontend development, testing, rapid prototyping, and any scenario where you need a reliable API without building a full backend.",
+    asciinemaId: "voidgen",
+    coverSeconds: 17,
+    features: [
+      "Instant REST API from JSON files (additional data formats planned).",
+      "Supports both singleton and collection resources.",
+      "In-memory data store with automatic reload on file changes.",
+      "Tested with Jest."
+    ],
+    stars: "0"
+  },
+  {
     id: "lessshare",
     slug: "lessshare",
     name: "LessShare",
@@ -22,7 +48,7 @@ export const projects: Project[] = [
     ],
     stars: "2"
   },
-    {
+  {
     id: "code-racer",
     slug: "code-racer",
     name: "Code Racer",
