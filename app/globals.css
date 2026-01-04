@@ -181,3 +181,29 @@ body {
 .hamburger--thin.active .hamburger-line:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+========================================================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #000;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #000 rgba(0, 0, 0, 0.1);
+}
