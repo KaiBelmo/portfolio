@@ -95,6 +95,26 @@ export default function Header() {
           if (e.target === overlayRef.current) setIsOpen(false);
         }}
       >
+        <button
+          onClick={() => setIsOpen(false)}
+          className="absolute top-6 right-6 text-white hover:opacity-80 transition-opacity"
+          aria-label="Close menu"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
         <div className="flex h-full flex-col items-center justify-center space-y-8 px-6 py-16">
           {MENU.map((item) => (
             <Link
