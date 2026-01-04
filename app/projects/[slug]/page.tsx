@@ -28,7 +28,7 @@ export default function ProjectDetailPage({
     <Suspense fallback={
       <div className="min-h-screen bg-white">
         <div className="animate-pulse">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 lg:mt-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-20 lg:mt-24">
             <div className="h-8 bg-gray-200 rounded w-32 mb-8"></div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-4">

@@ -21,7 +21,7 @@ export const ProjectDetailPageContent = memo(function ProjectDetailPageContent({
 
   return (
     <AnimationWrapper pageKey={project.slug} className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 lg:mt-24 pb-10 md:pb-14">
+      <div className="container mx-auto px-7 mt-20 lg:mt-24 pb-10 md:pb-14">
         <BackToProjectsLink href={backHref} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start">
