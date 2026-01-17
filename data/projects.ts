@@ -28,6 +28,28 @@ export const projects: Project[] = [
     stars: "0"
   },
   {
+    id: "actual-budget",
+    slug: "actual-budget",
+    name: "Actual",
+    link: "https://actualbudget.org/",
+    githubLink: "https://github.com/actualbudget/actual",
+    category: [
+      "Next.js",
+      "TypeScript",
+    ],
+    typeOfProject: "Open Source Contribution",
+    date: "2023-11-04",
+    imageLink: "/actual-screen.PNG",
+    imagePosition: "left",
+    description: "Actual is a local-first personal finance tool. It's built to be fast and fully private, with optional syncing.",
+    coverSeconds: 3,
+    features: [
+      "Enhanced the CSV importer by adding support for user-selectable delimiters (like ',' or '|'), increasing compatibility with various bank file formats (#1774).",
+      "Fixed styling and mobile UI issues on the transaction and budget pages, improving readability and usability on smaller devices, including making budget category group rows fully tappable for easier expand/collapse interactions (#1820, #6272).",
+    ],
+    stars: "23300"
+  },
+  {
     id: "lessshare",
     slug: "lessshare",
     name: "LessShare",
@@ -70,28 +92,6 @@ export const projects: Project[] = [
       "Contributed multiple pull requests (#47, #90, #183, #229) addressing features and bugs, strengthening open-source collaboration and community growth."
     ],
     stars: "709"
-  },
-  {
-    id: "actual-budget",
-    slug: "actual-budget",
-    name: "Actual",
-    link: "https://actualbudget.org/",
-    githubLink: "https://github.com/actualbudget/actual",
-    category: [
-      "Next.js",
-      "TypeScript",
-    ],
-    typeOfProject: "Open Source Contribution",
-    date: "2023-11-04",
-    imageLink: "/actual-screen.PNG",
-    imagePosition: "left",
-    description: "Actual is a local-first personal finance tool. It's built to be fast and fully private, with optional syncing.",
-    coverSeconds: 3,
-    features: [
-      "Enhanced the CSV importer by adding support for user-selectable delimiters (like ',' or '|'), increasing compatibility with various bank file formats (#1774).",
-      "Fixed styling on the mobile transaction page, improving the user interface and readability on smaller devices (#1820).",
-    ],
-    stars: "23300"
   },
   {
     id: "portfolio-w95",
