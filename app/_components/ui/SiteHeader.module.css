@@ -402,7 +402,7 @@ html[data-theme="night"] .brandLogo {
     width: 30px;
     height: 30px;
     padding: 5px;
-    box-shadow: 3px 3px 0 var(--accent);
+    box-shadow: 3px 3px 0 color-mix(in srgb, var(--line) 52%, transparent);
   }
 
   .brandLogo {
@@ -443,7 +443,7 @@ html[data-theme="night"] .brandLogo {
     justify-content: center;
     gap: 9px;
     padding: 0 10px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
     color: var(--ink);
     background: transparent;
     box-shadow: none;
@@ -531,8 +531,8 @@ html[data-theme="night"] .brandLogo {
     z-index: 103;
     top: calc(100% + 7px);
     right: 12px;
-    left: auto;
-    width: min(320px, calc(100vw - 24px));
+    left: 12px;
+    width: auto;
     max-height: calc(100dvh - 78px);
     display: flex;
     flex-direction: column;
@@ -540,12 +540,12 @@ html[data-theme="night"] .brandLogo {
     border: 1px solid color-mix(in srgb, var(--line-strong) 82%, transparent);
     background: color-mix(in srgb, var(--canvas) 98%, var(--surface));
     box-shadow:
-      3px 3px 0 color-mix(in srgb, var(--accent) 20%, transparent),
+      3px 3px 0 color-mix(in srgb, var(--line) 30%, transparent),
       0 14px 34px color-mix(in srgb, var(--shadow) 24%, transparent);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    transform-origin: top right;
+    transform-origin: top center;
     will-change: transform, opacity;
   }
 
@@ -688,3 +688,4 @@ html[data-theme="night"] .brandLogo {
     transform: none !important;
   }
 }
+
