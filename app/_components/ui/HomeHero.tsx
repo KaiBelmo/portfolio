@@ -24,6 +24,7 @@ function formatDate(dateStr: string) {
 
 
 export default function HomeHero() {
+  const highlightClass = "not-italic underline decoration-[var(--accent)] decoration-wavy decoration-1 underline-offset-2";
   const {
     theme,
     roomAnimation,
@@ -132,14 +133,14 @@ export default function HomeHero() {
           </p>
 
           <h1
-            className={`${styles.titleOverlap} relative z-[6] mt-[8px] mb-[22px] font-display text-6xl font-bold text-ink tablet:text-3xl compact:text-2xl`}
+            className={`${styles.titleOverlap} relative z-[6] mt-[8px] mb-[22px] font-display text-6xl font-bold text-ink tablet:text-5xl compact:text-4xl`}
             id="home-hero-title"
           >
             Kai is a Chimera Made From Engineering, Art, And Everything Between Them.
           </h1>
 
           <p className="mb-10 max-w-[650px] font-body text-[clamp(1rem,1.3vw,1.15rem)] leading-[1.65] text-muted tablet:text-base">
-            He builds front-ends and back-end servers, while debugging issues, optimizing performance, and exploring his love of math. more on{" "}
+            He builds <span className={highlightClass}>front-ends</span> and <span className={highlightClass}>back-end</span> servers, while debugging issues, optimizing performance, and exploring his love of <span className={highlightClass}>math</span>. more on{" "}
             <Link
               href="/about/"
               className="text-ink underline decoration-transparent underline-offset-[3px] transition-[color,text-decoration-color] duration-[120ms] ease-out hover:text-accent hover:decoration-accent"
