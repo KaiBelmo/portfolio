@@ -60,10 +60,10 @@ export const PGP_KEY_ID = "0x409927BE";
 
 export const HEATMAP_COLORS: CSSProperties[] = [
   { backgroundColor: "color-mix(in srgb, var(--ink) 7%, transparent)" },
-  { backgroundColor: "color-mix(in srgb, var(--accent) 25%, transparent)" },
-  { backgroundColor: "color-mix(in srgb, var(--accent) 45%, transparent)" },
-  { backgroundColor: "color-mix(in srgb, var(--accent) 70%, transparent)" },
-  { backgroundColor: "var(--accent)" },
+  { backgroundColor: "color-mix(in srgb, var(--accent) 18%, transparent)" },
+  { backgroundColor: "color-mix(in srgb, var(--accent) 32%, transparent)" },
+  { backgroundColor: "color-mix(in srgb, var(--accent) 52%, transparent)" },
+  { backgroundColor: "color-mix(in srgb, var(--accent) 72%, var(--canvas))" },
 ];
 
 export const HEATMAP_WEEK_COUNT = 53;
@@ -72,3 +72,4 @@ export const HEATMAP_CELL_GAP = 3;
 export const HEATMAP_LABEL_COLUMN_WIDTH = 38;
 export const HEATMAP_GRID_WIDTH = HEATMAP_WEEK_COUNT * HEATMAP_CELL_SIZE + (HEATMAP_WEEK_COUNT - 1) * HEATMAP_CELL_GAP;
 export const HEATMAP_LAYOUT_WIDTH = HEATMAP_LABEL_COLUMN_WIDTH + 12 + HEATMAP_GRID_WIDTH;
+
