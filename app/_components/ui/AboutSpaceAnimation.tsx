@@ -737,6 +737,25 @@ export default function AboutSpaceAnimation() {
       const moonAlpha = mix;
 
       if (sunAlpha > 0.003) {
+        const glowRadius = baseRadius * (themeRef.current === "morning" ? 2.85 : 2.25);
+        const glow = ctx.createRadialGradient(x, y, baseRadius * 0.18, x, y, glowRadius);
+        glow.addColorStop(0, `rgba(255, 209, 112, ${sunAlpha * (themeRef.current === "morning" ? 0.28 : 0.18)})`);
+        glow.addColorStop(0.46, `rgba(255, 183, 75, ${sunAlpha * (themeRef.current === "morning" ? 0.14 : 0.09)})`);
+        glow.addColorStop(1, "rgba(255, 183, 75, 0)");
+        setAlpha(1);
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, glowRadius, 0, TAU);
+        ctx.fill();
+
+        const core = ctx.createRadialGradient(x, y, 0, x, y, baseRadius * 0.92);
+        core.addColorStop(0, `rgba(255, 227, 141, ${sunAlpha * (themeRef.current === "morning" ? 0.24 : 0.16)})`);
+        core.addColorStop(1, "rgba(255, 178, 70, 0)");
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(x, y, baseRadius * 0.92, 0, TAU);
+        ctx.fill();
+
         setFont(getFont(13, 500));
         setFill(themeRef.current === "morning" ? "rgb(191,122,46)" : "rgb(221,147,67)");
         setAlpha(sunAlpha * (themeRef.current === "morning" ? 0.95 : 0.88));
@@ -881,6 +900,27 @@ export default function AboutSpaceAnimation() {
       const nightMix = smoothstep(light.mix);
       const rotation = sceneTime * 0.085;
       const cloudTime = sceneTime * 0.045;
+      const theme = themeRef.current;
+      if (theme === "morning") {
+        const atmosphereRadius = geometry.planetRadius * 1.72;
+        const atmosphere = ctx.createRadialGradient(
+          planet.x,
+          planet.y,
+          geometry.planetRadius * 0.4,
+          planet.x,
+          planet.y,
+          atmosphereRadius,
+        );
+        atmosphere.addColorStop(0, "rgba(134, 194, 174, 0.07)");
+        atmosphere.addColorStop(0.5, "rgba(134, 194, 174, 0.1)");
+        atmosphere.addColorStop(1, "rgba(91, 153, 134, 0)");
+        setAlpha(1);
+        ctx.fillStyle = atmosphere;
+        ctx.beginPath();
+        ctx.arc(planet.x, planet.y, atmosphereRadius, 0, TAU);
+        ctx.fill();
+      }
+
       setFont(getFont(geometry.planetStep + 3, 650));
       setAlpha(0.99);
 
