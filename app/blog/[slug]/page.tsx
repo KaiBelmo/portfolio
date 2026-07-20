@@ -44,15 +44,15 @@ export default async function BlogPostPage({ params }: Props) {
       </nav>
 
       {/* Article header */}
-      <header className="mb-[60px] border-b border-line pb-[52px]" data-scroll-reveal data-scroll-reveal-state="visible">
+      <header className="mb-[56px] max-w-[920px] border-b border-line pb-[48px]" data-scroll-reveal data-scroll-reveal-state="visible">
         <p className="mb-3.5 font-mono text-[0.66rem] font-extrabold uppercase tracking-[0.09em] text-accent">
-          DEV.TO — ORIGINAL POST
+          DEV.TO Ã¢â‚¬â€ ORIGINAL POST
         </p>
-        <h1 className="m-0 max-w-[900px] text-balance font-display text-[clamp(2.8rem,5.5vw,5.8rem)] leading-[0.94] tracking-[-0.05em]">
+        <h1 className="m-0 max-w-[820px] text-balance font-display text-[clamp(2.45rem,4.7vw,4.9rem)] leading-[1.02] tracking-[-0.025em]">
           {post.title}
         </h1>
 
-        <div className="mt-8 flex flex-wrap items-center gap-6 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted">
+        <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted">
           <time dateTime={post.published_at}>
             {formatPostDate(post.published_at)}
           </time>
@@ -71,9 +71,9 @@ export default async function BlogPostPage({ params }: Props) {
             href={post.source}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto flex items-center gap-1.5 text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)] tablet:ml-0"
+            className="flex basis-full items-center gap-1.5 text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
           >
-            View on DEV.to <span aria-hidden="true">↗</span>
+            View on DEV.to <span aria-hidden="true">Ã¢â€ â€”</span>
           </a>
         </div>
       </header>
@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: Props) {
           href="/blog"
           className="inline-flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
         >
-          <span aria-hidden="true">←</span> Back to all posts
+          <span aria-hidden="true">Ã¢â€ Â</span> Back to all posts
         </Link>
       </div>
     </div>
