@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.kaibelmo.dev";
+const siteUrl = "https://www.kaibelmo.dev";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = ["", "/about", "/projects", "/blog", "/contact"];
