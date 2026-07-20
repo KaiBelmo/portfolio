@@ -6,7 +6,11 @@ import PageTransition from "./_components/system/PageTransition";
 import SiteHeader from "./_components/ui/SiteHeader";
 import { DEFAULT_THEME, THEME_PALETTES } from "@/lib/theme";
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://portfolio-kaibelmo.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.kaibelmo.dev";
+const siteName = "Kai Belmo";
+const title = "Kai Belmo | Software Engineer";
+const description = "Full-stack engineer building expressive web products, developer tools, and low-level experiments.";
+const ogImage = "/og.png";
 
 const bodyFont = Aldrich({
   subsets: ["latin"],
@@ -25,11 +29,37 @@ const displayFont = Pixelify_Sans({
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: THEME_PALETTES.morning.canvas };
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Kai Belmo | Software Engineer",
-  description: "Full-stack engineer building expressive web products, developer tools, and low-level experiments.",
+  title,
+  description,
   applicationName: "Kai Belmo Portfolio",
-  openGraph: { title: "Kai Belmo | Software Engineer", description: "Full-stack engineering, open source, and systems work.", url: siteUrl, siteName: "Kai Belmo", images: [{ url: "/og.png", width: 1200, height: 630, alt: "Kai Belmo software engineering portfolio" }], type: "website" },
+  openGraph: { title, description: "Full-stack engineering, open source, and systems work.", url: "/", siteName, images: [{ url: ogImage, alt: "Kai Belmo software engineering portfolio" }], type: "website" },
+  twitter: { card: "summary_large_image", title, description, images: [ogImage] },
   robots: { index: true, follow: true },
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Kai Belmo",
+  url: siteUrl,
+  jobTitle: "Software Engineer",
+  email: "mailto:contact@kaibelmo.dev",
+  sameAs: [
+    "https://github.com/KaiBelmo",
+    "https://www.linkedin.com/in/belmo",
+    "https://dev.to/b1m0110",
+  ],
+  knowsAbout: ["TypeScript", "React", "Next.js", "Node.js", "systems programming", "developer tools"],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  url: siteUrl,
+  description,
+  inLanguage: "en",
+  publisher: { "@id": `${siteUrl}/#person` },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -59,6 +89,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: initialThemeScript }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([{ ...personJsonLd, "@id": `${siteUrl}/#person` }, websiteJsonLd]) }}
+        />
       </head>
       <body>
         <ThemeProvider>
