@@ -31,7 +31,7 @@ const disciplineMobileSpans: Record<string, string> = {
 };
 
 const filterControlClass =
-  "min-h-11 border border-sys-line bg-[color-mix(in_srgb,var(--sys-bg)_84%,transparent)] px-[13px] py-2 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] aria-pressed:bg-sys-signal aria-pressed:text-sys-bg mobile:h-auto";
+  "min-h-11 border border-sys-line bg-[color-mix(in_srgb,var(--sys-bg)_84%,transparent)] px-[13px] py-2 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] aria-pressed:bg-sys-signal aria-pressed:text-sys-bg";
 const dropdownFrameClass =
   "relative inline-flex min-h-11 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none";
 const dropdownTriggerClass =
@@ -360,7 +360,7 @@ export default function ProjectIndex({
             </>
           )}
           <FilterButton
-            className="mobile:inline-flex mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none mobile:basis-auto mobile:items-center mobile:justify-between mobile:px-4 mobile:py-0 mobile:text-left"
+            className="mobile:inline-flex mobile:min-h-14 mobile:w-full mobile:flex-none mobile:basis-auto mobile:items-center mobile:justify-between mobile:px-4 mobile:py-0 mobile:text-left mobile:text-[1rem]"
             type="button"
             aria-expanded={showTechnologies}
             aria-controls="technology-filters"
@@ -441,7 +441,7 @@ export default function ProjectIndex({
                   data-scroll-reveal
                   data-scroll-reveal-state="visible"
                   suppressHydrationWarning
-                  className={`border-b border-sys-line tablet:min-w-0 tablet:border-0 ${active?.id === project.id ? "bg-sys-signal-soft tablet:bg-transparent" : ""}`}
+                  className="border-b border-sys-line tablet:min-w-0 tablet:border-0"
                   key={project.id}
                   variants={stateListItemVariants}
                   initial="hidden"
@@ -460,11 +460,10 @@ export default function ProjectIndex({
                   ) : (
                     <>
                       <button
-                        className="grid w-full grid-cols-[42px_minmax(0,1fr)_150px] items-center gap-4 border-0 bg-transparent px-3 py-[22px] text-left text-inherit"
+                        className={`grid w-full grid-cols-[42px_minmax(0,1fr)_150px] items-center gap-4 border-0 px-3 py-[22px] text-left text-inherit ${active?.id === project.id ? "bg-sys-signal-soft" : "bg-transparent"}`}
                         type="button"
-                        aria-expanded={expanded}
-                        aria-controls={`project-panel-${project.id}`}
-                        onClick={() => setExpandedId(expanded ? undefined : project.id)}
+                        aria-current={active?.id === project.id}
+                        onClick={() => setActiveId(project.id)}
                       >
                     <span className="font-display text-[0.72rem] text-sys-signal">{String(projectNumber).padStart(2, "0")}</span>
                     <span>
@@ -489,58 +488,8 @@ export default function ProjectIndex({
                     <span className="block text-right text-[0.8rem] text-sys-muted [overflow-wrap:anywhere] tablet:col-start-2 tablet:flex tablet:flex-wrap tablet:items-center tablet:justify-between tablet:gap-x-3 tablet:gap-y-1 tablet:text-left">
                       <span className="mb-5 block tablet:m-0 tablet:min-w-0 tablet:flex-1 tablet:basis-[12rem]">{project.projectType}</span>
                       <span className="mb-5 block font-display text-[0.72rem] text-sys-signal tablet:hidden">{actionLabel(project)} -&gt;</span>
-                      <span className="mb-5 hidden font-display text-[0.72rem] text-sys-signal tablet:m-0 tablet:block tablet:flex-none">{expanded ? "Close" : "Details"} {expanded ? "-" : "+"}</span>
                     </span>
                       </button>
-                      <StateReveal
-                        show={expanded}
-                        id={`project-panel-${project.id}`}
-                        className="overflow-hidden"
-                        duration={0.2}
-                      >
-                    <div className={`relative mb-3.5 h-40 overflow-hidden border border-sys-line bg-sys-bg max-[420px]:h-[138px] frame-${project.visualType}`}>
-                      <ProjectVisual project={project} />
-                    </div>
-                    <div className="mb-3.5 flex flex-wrap gap-2">
-                      <a className={`${projectActionClass} tablet:flex-1 tablet:basis-[150px]`} href={projectHref(project)} target="_blank" rel="noreferrer">
-                        {actionLabel(project)}
-                        <ExternalLink size={14} aria-hidden="true" />
-                      </a>
-                      {project.link && !isOpenSource(project) ? (
-                        <a className={iconActionClass} href={project.githubLink} target="_blank" rel="noreferrer" aria-label={`${project.name} GitHub repository`}>
-                          {projectGithubIcon}
-                        </a>
-                      ) : null}
-                    </div>
-                    <div className="border-t border-sys-line">
-                      {isOpenSource(project) && (
-                        <>
-                          <DataRow label="My Contribution" value={project.homepageEvidence} stacked noUppercase />
-                          {project.pullRequests && project.pullRequests.length > 0 && (
-                            <div className="py-2">
-                              <span className="block font-display text-[0.65rem] uppercase tracking-wider text-sys-muted mb-2">Pull Requests ({project.pullRequests.length})</span>
-                              <ul className="flex flex-col gap-1">
-                                {project.pullRequests.map((pr) => (
-                                  <li key={pr.number}>
-                                    <a
-                                      href={pr.url}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="flex items-baseline justify-between gap-2 text-xs hover:text-sys-signal hover:underline transition-colors"
-                                    >
-                                      <span className="font-display text-sys-signal">{pr.number}</span>
-                                      {pr.title && <span className="min-w-0 flex-1 text-right text-sys-cream/70 text-[0.68rem] [overflow-wrap:anywhere]">{pr.title}</span>}
-                                      <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">open</span>
-                                    </a>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                      </StateReveal>
                     </>
                   )}
                 </motion.article>
@@ -548,7 +497,7 @@ export default function ProjectIndex({
             })}
             </>
             {isMobileLayout && filtered.length > mobileProjectPageSize && (
-              <nav className="fixed inset-x-4 bottom-4 z-[120] grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 border border-sys-line-strong bg-sys-bg/95 p-2 backdrop-blur mobile:grid" aria-label="Project pages">
+              <nav className="sticky bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[60] mt-4 grid grid-cols-[52px_minmax(0,1fr)_52px] items-center gap-2 border border-sys-line-strong bg-sys-bg/95 p-2 backdrop-blur mobile:grid" aria-label="Project pages">
                 <button
                   className="inline-flex min-h-11 items-center justify-center border border-sys-line-strong text-sys-cream disabled:cursor-not-allowed disabled:opacity-40"
                   type="button"
@@ -584,7 +533,7 @@ export default function ProjectIndex({
               transition={{ duration: reduceMotion ? 0 : 0.16, ease: stateAnimationEase }}
             >
               <SystemFrame title="RECORD PREVIEW" classification={active.classification || "CONFIDENTIAL"}>
-                <div className={`relative h-[180px] overflow-hidden border-b border-sys-line bg-sys-bg frame-${active.visualType}`}>
+                <div className={`relative overflow-hidden border-b border-sys-line bg-sys-bg frame-${active.visualType}`}>
                   <ProjectVisual project={active} priority />
                 </div>
                 <div className="p-[22px]">
