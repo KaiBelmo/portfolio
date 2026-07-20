@@ -109,10 +109,10 @@
   transform: translate(-50%, -50%);
 }
 
-.hotspotAbout { left: 31.2%; top: 33%; }
-.hotspotProjects { left: 40.7%; top: 54.8%; }
+.hotspotAbout { left: 39%; top: 43%; }
+.hotspotProjects { left: 51.5%; top: 50%; }
 .hotspotBlog { left: 55.1%; top: 21.4%; }
-.hotspotContact { left: 18%; top: 53.4%; }
+.hotspotContact { left: 19.5%; top: 53.4%; }
 
 .hotspotDot {
   width: 8px;
