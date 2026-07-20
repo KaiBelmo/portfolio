@@ -133,7 +133,7 @@ export default function HomeHero() {
           </p>
 
           <h1
-            className={`${styles.titleOverlap} relative z-[6] mt-[8px] mb-[22px] font-display text-6xl font-bold text-ink tablet:text-5xl compact:text-4xl`}
+            className={`${styles.titleOverlap} relative z-[6] mt-[8px] mb-[22px] font-display text-6xl font-bold text-ink tablet:text-4xl compact:text-3xl`}
             id="home-hero-title"
           >
             Kai is a Chimera Made From Engineering, Art, And Everything Between Them.
