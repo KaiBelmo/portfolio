@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
@@ -103,7 +104,8 @@ export default function SiteHeader() {
 
   useEffect(() => {
     restoreFocusRef.current = false;
-    setOpen(false);
+    const frameId = window.requestAnimationFrame(() => setOpen(false));
+    return () => window.cancelAnimationFrame(frameId);
   }, [pathname]);
 
   useEffect(() => {
@@ -130,6 +132,7 @@ export default function SiteHeader() {
 
   useEffect(() => {
     if (!open) return;
+    const toggle = toggleRef.current;
     const frameId = window.requestAnimationFrame(() => firstLinkRef.current?.focus());
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -158,7 +161,7 @@ export default function SiteHeader() {
     return () => {
       window.cancelAnimationFrame(frameId);
       window.removeEventListener("keydown", onKeyDown);
-      if (restoreFocusRef.current) toggleRef.current?.focus();
+      if (restoreFocusRef.current) toggle?.focus();
       restoreFocusRef.current = true;
     };
   }, [open]);
@@ -175,7 +178,7 @@ export default function SiteHeader() {
     >
       <Link className={styles.siteBrand} href="/" onClick={() => closeMenu(false)}>
         <span className={styles.brandLogoBox} aria-hidden="true">
-          <img className={styles.brandLogo} src="/assets/logo.svg" alt="" />
+          <Image className={styles.brandLogo} src="/assets/logo.svg" alt="" width={18} height={18} priority />
         </span>
         <span className={styles.brandCopy}>
           <strong>Kai Belmo</strong>
@@ -210,7 +213,7 @@ export default function SiteHeader() {
         aria-label="Primary navigation"
       >
         <div className={styles.navLinks}>
-          {links.map(([to, label], index) => {
+          {links.map(([to, label]) => {
             const isActive = pathname === to || (to !== "/" && pathname.startsWith(to));
             return (
               <div key={to} className={styles.navItem}>
