@@ -10,7 +10,7 @@ import { rafCoordinator } from "@/lib/raf-coordinator";
 import styles from "./RoomScene.module.css";
 
 const hotspots = [
-  { href: "/about", label: "About", detail: "the poster", className: styles.hotspotAbout },
+  { href: "/about", label: "About", detail: "me", className: styles.hotspotAbout },
   { href: "/projects", label: "Projects", detail: "the laptop", className: styles.hotspotProjects },
   { href: "/blog", label: "Blog", detail: "the bookshelf", className: styles.hotspotBlog },
   { href: "/contact", label: "Contact", detail: "the coffee", className: styles.hotspotContact },
