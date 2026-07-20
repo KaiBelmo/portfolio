@@ -5,6 +5,7 @@ import { ChevronDown, ExternalLink } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ComponentPropsWithoutRef } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Project } from "@/types/project";
 import { GithubIcon } from "@/app/contact/contactData";
 import ProjectVisual from "../ui/ProjectVisual";
@@ -12,6 +13,12 @@ import MobileProjectCard from "../ui/MobileProjectCard";
 import SystemFrame from "../system/SystemFrame";
 import RecordHeader from "../system/RecordHeader";
 import DataRow from "../system/DataRow";
+import StateReveal from "../ui/StateReveal";
+import {
+  stateAnimationEase,
+  stateListItemVariants,
+  stateTransition,
+} from "../ui/stateAnimations";
 
 const disciplines = ["All", "Web Apps", "Real-time", "Low-level", "Open source"];
 const disciplineMobileSpans: Record<string, string> = {
@@ -60,6 +67,7 @@ function YearDropdown({
   onChange: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const reduceMotion = !!useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const options = ["All", ...years];
   const displayValue = value === "All" ? label : value;
@@ -85,26 +93,37 @@ function YearDropdown({
           aria-hidden="true"
         />
       </button>
-      {open && (
-        <div className={dropdownMenuClass} role="listbox" aria-label={label}>
-          {options.map((item) => (
-            <button
-              key={item}
-              className={dropdownOptionClass}
-              type="button"
-              role="option"
-              aria-selected={value === item}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => {
-                onChange(item);
-                setOpen(false);
-              }}
-            >
-              {item === "All" ? label : item}
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            className={dropdownMenuClass}
+            role="listbox"
+            aria-label={label}
+            initial={reduceMotion ? false : { opacity: 0, y: -4, scaleY: 0.98 }}
+            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+            exit={{ opacity: 0, y: -4, scaleY: 0.98 }}
+            transition={stateTransition(reduceMotion, 0.16)}
+            style={{ transformOrigin: "top" }}
+          >
+            {options.map((item) => (
+              <button
+                key={item}
+                className={dropdownOptionClass}
+                type="button"
+                role="option"
+                aria-selected={value === item}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onChange(item);
+                  setOpen(false);
+                }}
+              >
+                {item === "All" ? label : item}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -136,6 +155,7 @@ export default function ProjectIndex({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const reduceMotion = !!useReducedMotion();
   const initialDiscipline = searchParams.get("discipline") || "All";
   
   const [discipline, setDiscipline] = useState(
@@ -252,13 +272,15 @@ export default function ProjectIndex({
         <span aria-hidden="true">{showMobileFilters ? "-" : "+"}</span>
       </button>
 
-      <div
+      <motion.div
         id="project-filter-panel"
         className={`relative z-50 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-[18px] gap-y-2.5 border-y border-sys-line-strong py-3.5 tablet:grid-cols-1 mobile:border-0 mobile:pt-0 ${showMobileFilters ? "mobile:grid" : "mobile:hidden"}`}
         aria-label="Filter projects"
         data-scroll-reveal
         data-scroll-reveal-state="visible"
         suppressHydrationWarning
+        layout={!reduceMotion}
+        transition={stateTransition(reduceMotion)}
       >
         {/* Discipline buttons - natural width, wrap on mobile */}
         <div className="flex flex-wrap gap-2 mobile:grid mobile:grid-cols-6" aria-label="Discipline">
@@ -319,59 +341,68 @@ export default function ProjectIndex({
         </div>
 
         {/* Technology chips - natural width, wrap */}
-        {showTechnologies && (
-          <div className="col-span-full flex flex-wrap gap-2 pt-0.5" id="technology-filters">
-            <p className="m-0 mb-1 w-full font-display text-[0.68rem] tracking-[0.03em] text-sys-muted opacity-70">
-              Ctrl+click to select multiple - shows projects matching any selected tech
-            </p>
-            {technologies.map((item) => (
-              <FilterButton
-                type="button"
-                key={item}
-                className={`mobile:flex-none mobile:shrink-0 ${disciplineMobileSpans[item] || "mobile:col-span-3"}`}
-                aria-pressed={technology.includes(item)}
-                onClick={(e) => {
-                  if (e.ctrlKey || e.metaKey) {
-                    setTechnology((prev) =>
-                      prev.includes(item)
-                        ? prev.filter((t) => t !== item)
-                        : [...prev, item]
-                    );
-                  } else {
-                    setTechnology((prev) =>
-                      prev.length === 1 && prev[0] === item ? [] : [item]
-                    );
-                  }
-                }}
-              >
-                {item}
-              </FilterButton>
-            ))}
-            {technology.length > 0 && (
-              <button
-                type="button"
-                className="min-h-11 border border-sys-line bg-transparent px-2 py-0.5 font-display text-[0.72rem] text-sys-signal"
-                onClick={() => setTechnology([])}
-              >
-                Clear x
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+        <StateReveal
+          show={showTechnologies}
+          className="col-span-full flex flex-wrap gap-2 overflow-hidden pt-0.5"
+          id="technology-filters"
+        >
+          <p className="m-0 mb-1 w-full font-display text-[0.68rem] tracking-[0.03em] text-sys-muted opacity-70">
+            Ctrl+click to select multiple - shows projects matching any selected tech
+          </p>
+          {technologies.map((item) => (
+            <FilterButton
+              type="button"
+              key={item}
+              className={`mobile:flex-none mobile:shrink-0 ${disciplineMobileSpans[item] || "mobile:col-span-3"}`}
+              aria-pressed={technology.includes(item)}
+              onClick={(e) => {
+                if (e.ctrlKey || e.metaKey) {
+                  setTechnology((prev) =>
+                    prev.includes(item)
+                      ? prev.filter((t) => t !== item)
+                      : [...prev, item]
+                  );
+                } else {
+                  setTechnology((prev) =>
+                    prev.length === 1 && prev[0] === item ? [] : [item]
+                  );
+                }
+              }}
+            >
+              {item}
+            </FilterButton>
+          ))}
+          {technology.length > 0 && (
+            <button
+              type="button"
+              className="min-h-11 border border-sys-line bg-transparent px-2 py-0.5 font-display text-[0.72rem] text-sys-signal"
+              onClick={() => setTechnology([])}
+            >
+              Clear x
+            </button>
+          )}
+        </StateReveal>
+      </motion.div>
 
       {filtered.length ? (
         <div className="mt-6 grid grid-cols-[minmax(0,1fr)_minmax(0,460px)] items-start gap-6 tablet:grid-cols-1 tablet:min-w-0 mobile:mt-3">
           <div className="border-t border-sys-line-strong tablet:grid tablet:min-w-0 tablet:gap-[6px] tablet:border-0">
+            <AnimatePresence initial={false} mode="popLayout">
             {filtered.map((project, index) => {
               const expanded = expandedId === project.id;
               return (
-                <article
+                <motion.article
                   data-scroll-reveal
                   data-scroll-reveal-state="visible"
                   suppressHydrationWarning
                   className={`border-b border-sys-line tablet:min-w-0 tablet:border-0 ${active?.id === project.id ? "bg-sys-signal-soft tablet:bg-transparent" : ""}`}
                   key={project.id}
+                  layout={!reduceMotion}
+                  variants={stateListItemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  transition={stateTransition(reduceMotion)}
                   onMouseEnter={() => setActiveId(project.id)}
                   onFocus={() => setActiveId(project.id)}
                 >
@@ -416,11 +447,11 @@ export default function ProjectIndex({
                       <span className="mb-5 hidden font-display text-[0.72rem] text-sys-signal tablet:m-0 tablet:block tablet:flex-none">{expanded ? "Close" : "Details"} {expanded ? "-" : "+"}</span>
                     </span>
                   </button>
-                  {/* FIX: was `className="hidden"` + `hidden={!expanded}` which made the panel
-                       permanently invisible. Now uses conditional Tailwind class. */}
-                  <div
+                  <StateReveal
+                    show={expanded}
                     id={`project-panel-${project.id}`}
-                    className={expanded ? "" : "hidden"}
+                    className="overflow-hidden"
+                    duration={0.2}
                   >
                     <div className={`relative mb-3.5 h-40 overflow-hidden border border-sys-line bg-sys-bg max-[420px]:h-[138px] frame-${project.visualType}`}>
                       <ProjectVisual project={project} />
@@ -464,14 +495,22 @@ export default function ProjectIndex({
                         </>
                       )}
                     </div>
-                  </div>
-                </article>
+                  </StateReveal>
+                </motion.article>
               );
             })}
+            </AnimatePresence>
           </div>
           
           {active && (
-            <aside className="sticky top-[100px] w-full overflow-hidden border border-sys-line-strong tablet:hidden" aria-label={`${active.name} preview`}>
+            <motion.aside
+              key={active.id}
+              className="sticky top-[100px] w-full overflow-hidden border border-sys-line-strong tablet:hidden"
+              aria-label={`${active.name} preview`}
+              initial={reduceMotion ? false : { opacity: 0.72 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: reduceMotion ? 0 : 0.16, ease: stateAnimationEase }}
+            >
               <SystemFrame title="RECORD PREVIEW" classification={active.classification || "CONFIDENTIAL"}>
                 <div className={`relative h-[180px] overflow-hidden border-b border-sys-line bg-sys-bg frame-${active.visualType}`}>
                   <ProjectVisual project={active} priority />
@@ -523,7 +562,7 @@ export default function ProjectIndex({
                   </div>
                 </div>
               </SystemFrame>
-            </aside>
+            </motion.aside>
           )}
         </div>
       ) : (
