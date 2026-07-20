@@ -14,3 +14,9 @@
   --ink: #ffffff !important;
   --accent: #f0e4ad !important;
 }
+
+@media (max-width: 600px) {
+  .spaceAnimation {
+    display: none;
+  }
+}
