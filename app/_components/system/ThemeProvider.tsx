@@ -99,17 +99,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const initialTheme = coerceAvailableTheme(getThemeFromHour());
-      setClockTheme(initialTheme);
-      commitTheme(initialTheme);
-    }, 0);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [commitTheme]);
-
   const clearTransition = useCallback(() => {
     if (paletteCommitTimerRef.current !== null) {
       window.clearTimeout(paletteCommitTimerRef.current);
