@@ -6,7 +6,7 @@ import PageTransition from "./_components/system/PageTransition";
 import SiteHeader from "./_components/ui/SiteHeader";
 import { DEFAULT_THEME, THEME_PALETTES } from "@/lib/theme";
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.kaibelmo.dev";
+const siteUrl = "https://www.kaibelmo.dev";
 const siteName = "Kai Belmo";
 const title = "Kai Belmo | Software Engineer";
 const description = "Full-stack engineer building expressive web products, developer tools, and low-level experiments.";
@@ -65,7 +65,8 @@ const websiteJsonLd = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const initialThemeScript = `
     (() => {
-      const theme = "${DEFAULT_THEME}";
+      const hour = new Date().getHours();
+      const theme = hour >= 5 && hour < 12 ? "morning" : hour >= 12 && hour < 18 ? "afternoon" : "night";
       document.documentElement.dataset.theme = theme;
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) {
@@ -111,3 +112,4 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
+
