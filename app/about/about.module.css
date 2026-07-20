@@ -1,0 +1,16 @@
+/* About page text color tuning per time-of-day theme.
+   Morning: darker text for legibility on light linen.
+   Afternoon: unchanged (inherits global tokens).
+   Night: whiter text for softer contrast on the dark canvas. */
+
+:global([data-theme="morning"]) .shell {
+  --muted: #15302e !important;
+  --ink: #141618 !important;
+  --accent: #7a3f0a !important;
+}
+
+:global([data-theme="night"]) .shell {
+  --muted: #d7dfea !important;
+  --ink: #ffffff !important;
+  --accent: #f0e4ad !important;
+}

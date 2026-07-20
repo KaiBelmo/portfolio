@@ -1,0 +1,247 @@
+.roomScene {
+  --room-x: 0px;
+  --room-y: 0px;
+  position: relative;
+  min-width: 0;
+  justify-self: end;
+  width: min(100%, 900px);
+}
+
+.imageWrap {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: transparent;
+  transform: translate(var(--room-x), var(--room-y));
+}
+
+.roomImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.staticLayer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms linear;
+}
+
+.videoLayer {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  background: transparent;
+  transition: opacity 80ms linear;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Avoid `size` containment: it can collapse the replaced <video> element to
+     0x0. A zero-sized video never composites a frame, so
+     requestVideoFrameCallback never fires, markStarted() never runs, and the
+     video layer stays at opacity:0 -- leaving only the static poster visible
+     during the transition. `layout paint` containment is enough here. */
+  contain: layout paint;
+}
+
+.videoLayer.isReady {
+  opacity: 1;
+}
+
+:global(html[data-theme="morning"]) .morningImage,
+:global(html[data-theme="afternoon"]) .afternoonImage,
+:global(html[data-theme="night"]) .nightImage {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.roomScene.videoIsReady .staticLayer {
+  transition: none;
+}
+
+:global(html) .roomScene.videoIsReady[data-theme-from="morning"] .morningImage,
+:global(html) .roomScene.videoIsReady[data-theme-from="afternoon"] .afternoonImage,
+:global(html) .roomScene.videoIsReady[data-theme-from="night"] .nightImage {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease-in-out 200ms;
+}
+
+:global(html) .roomScene.videoIsReady[data-theme-to="morning"] .morningImage,
+:global(html) .roomScene.videoIsReady[data-theme-to="afternoon"] .afternoonImage,
+:global(html) .roomScene.videoIsReady[data-theme-to="night"] .nightImage {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 250ms ease-in-out;
+}
+
+.roomScene.isTimeTravelling .roomImage {
+  transform: none;
+  filter: none;
+  transition: none;
+}
+
+.roomScene.isTimeTravelling .hotspot {
+  visibility: hidden;
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 5;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  transform: translate(-50%, -50%);
+}
+
+.hotspotAbout { left: 31.2%; top: 33%; }
+.hotspotProjects { left: 40.7%; top: 54.8%; }
+.hotspotBlog { left: 55.1%; top: 21.4%; }
+.hotspotContact { left: 18%; top: 53.4%; }
+
+.hotspotDot {
+  width: 8px;
+  height: 8px;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 var(--accent);
+  animation: hotspot-pulse 2.4s steps(2, end) infinite;
+}
+
+.hotspotCard {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  min-width: 114px;
+  padding: 9px 10px 8px;
+  display: grid;
+  gap: 3px;
+  opacity: 0;
+  pointer-events: none;
+  color: var(--surface);
+  background: var(--ink);
+  box-shadow: 4px 4px 0 var(--accent);
+  transform: translateY(4px) scale(0.97);
+  transform-origin: bottom left;
+  transition: opacity 140ms ease-in, transform 140ms ease-in;
+}
+
+.hotspotCard strong {
+  font-family: var(--display);
+  font-size: .82rem;
+}
+
+.hotspotCard small {
+  color: color-mix(in srgb, var(--surface) 72%, transparent);
+  font-family: var(--mono);
+  font-size: .52rem;
+  text-transform: uppercase;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hotspot:hover .hotspotCard {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: opacity 140ms ease-out, transform 140ms ease-out;
+  }
+}
+
+.hotspot:focus-visible .hotspotCard {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 140ms ease-out, transform 140ms ease-out;
+}
+
+.hotspot:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+@keyframes hotspot-pulse {
+  0%, 72% { opacity: .55; }
+  73%, 100% { opacity: 1; }
+}
+
+.roomScene.isCompact {
+  width: 220px;
+}
+
+.roomScene.isCompact .imageWrap {
+  filter: drop-shadow(10px 12px 0 var(--shadow));
+  border: 1px solid color-mix(in srgb, var(--line-strong) 64%, transparent);
+}
+
+.roomScene.isCompact .roomImage {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roomImage,
+  .hotspotCard {
+    transition: none;
+  }
+
+  .hotspotDot {
+    animation: none;
+  }
+
+  .sceneGlare {
+    display: none;
+  }
+}
+
+/* Cursor-tracked glare overlay */
+.sceneGlare {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+    color-mix(in srgb, white 70%, var(--accent) 30%),
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transition: opacity var(--tilt-glare-fade) var(--tilt-glare-ease);
+  z-index: 8;
+}
+
+:global(.is-hover) .sceneGlare {
+  opacity: var(--tilt-glare-opacity);
+}
+
+:global(html[data-theme="morning"]) .sceneGlare {
+  background: radial-gradient(
+    circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+    color-mix(in srgb, var(--ink) 34%, var(--accent) 66%),
+    transparent 62%
+  );
+  mix-blend-mode: multiply;
+}
+
+:global(html[data-theme="night"]) .sceneGlare {
+  background: radial-gradient(
+    circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
+    color-mix(in srgb, white 86%, var(--accent) 14%),
+    transparent 62%
+  );
+}
+
+:global(html[data-theme="night"].is-hover) .sceneGlare {
+  opacity: 0.01;
+}

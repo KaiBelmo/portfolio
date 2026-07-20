@@ -17,7 +17,6 @@ export const projects: Project[] = [
     imageLink: "/voidgen-screen.PNG",
     imagePosition: "left",
     description: "VoidGen is a lightweight, configurable mock API server that generates RESTful endpoints from JSON and other structured data formats. It is designed for frontend development, testing, rapid prototyping, and any scenario where you need a reliable API without building a full backend.",
-    asciinemaId: "voidgen",
     coverSeconds: 17,
     features: [
       "Instant REST API from JSON files (additional data formats planned).",
@@ -26,6 +25,52 @@ export const projects: Project[] = [
       "Tested with Jest."
     ],
     stars: "0"
+  },
+  {
+    id: "infill",
+    slug: "infill",
+    name: "Infill",
+    link: "https://useinfill.com/",
+    githubLink: "https://github.com/KaiBelmo/infill",
+    category: [
+      "Browser extension",
+      "TypeScript",
+      "Forms"
+    ],
+    typeOfProject: "Personal Project",
+    date: "2026-07-11",
+    imageLink: "/og.png",
+    imagePosition: "left",
+    description: "Infill is an open-source browser extension that helps users fill forms faster while staying in control of what gets written into the page. It scans form fields, suggests mappings from saved profile facts, and avoids filling sensitive inputs unless the user explicitly approves the action.",
+    features: [
+      "Scans the active tab for fillable form fields and suggests mappings from saved profile facts.",
+      "Keeps the user in control by surfacing suggestions before filling and blocking sensitive-field autofill by default.",
+      "Supports extension-local profile storage with optional encrypted sync through a backend passphrase flow."
+    ],
+    stars: "0"
+  },
+  {
+    id: "portfolio-current",
+    slug: "portfolio-current",
+    name: "Portfolio",
+    link: "https://portfolio-kaibelmo.vercel.app/",
+    githubLink: "https://github.com/KaiBelmo/portfolio",
+    category: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS"
+    ],
+    typeOfProject: "Personal Project",
+    date: "2026-01-17",
+    imageLink: "/og.png",
+    imagePosition: "center",
+    description: "My current portfolio website, built with Next.js and TypeScript. It combines a project archive, blog, GitHub star integration, pull-request parsing, terminal-style presentation, and downloadable résumé access in a single responsive site.",
+    features: [
+      "Project index with GitHub star fetching and direct repository linking.",
+      "Pull request parsing that turns referenced PR numbers into repository-specific links.",
+      "Responsive portfolio and blog experience with custom system-style visuals and motion."
+    ],
+    stars: "6"
   },
   {
     id: "actual-budget",
@@ -55,13 +100,12 @@ export const projects: Project[] = [
     name: "LessShare",
     link: "https://lessshare-frontend.vercel.app/",
     githubLink: "https://github.com/kaibelmo/lessshare",
-    category: ["Full stack", "WebRTC", "Socket.io"],
+    category: ["Vue.js", "WebRTC", "Socket.io"],
     typeOfProject: "Thesis Project",
     date: "2025-09-25",
     imageLink: "/lessshare-screen.PNG",
     imagePosition: "center",
     description: "A browser-based decentralized file-sharing platform that enables secure peer-to-peer transfers without relying on centralized servers. Built with WebRTC and Vue.js, the system ensures privacy, speed, and full user control over shared data.",
-    asciinemaId: "lessShare", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 7,
     features: [
       "Direct Peer-to-Peer File Transfer — Uses WebRTC DataChannels for real-time, serverless communication between browsers.",
@@ -109,7 +153,6 @@ export const projects: Project[] = [
     imageLink: "/wind95-screen.PNG",
     imagePosition: "left",
     description: "A creative experiment blending retro aesthetics with modern web engineering. This portfolio reimagines the Windows 95 desktop experience using Vue.js, TypeScript, and Canvas, focusing on interactive UI elements, smooth state management with Pinia, and pixel-perfect nostalgia.",
-    asciinemaId: "win95",
     coverSeconds: 8, // Show frame at 8 seconds as cover
     features: [
       "Component-based retro UI toolkit built from scratch.",
@@ -129,7 +172,6 @@ export const projects: Project[] = [
     date: "2022-01-30",
     imageLink: "/libc-screen.PNG",
     imagePosition: "left",
-    asciinemaId: "libc", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 8, // Show frame at 8 seconds as cover
     features: [
       "STL-compatible, header-only container library featuring vector, list, deque, etc...",
@@ -148,7 +190,6 @@ export const projects: Project[] = [
     date: "2020-08-02",
     imageLink: "/b1m0-dbg-screen.PNG",
     imagePosition: "left",
-    asciinemaId: "b1m0-dbg", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 8, // Show frame at 8 seconds as cover
     features: [
       "Developed a custom Linux debugger (b1m0-dbg) from scratch for x86_64 architecture, focusing on educational purposes to deepen understanding of low-level system programming, ELF file formats, and process debugging.",
@@ -167,7 +208,6 @@ export const projects: Project[] = [
     date: "2023-06-30", // You'll need to update this date
     imageLink: "/no404-screen.PNG", // Placeholder path
     imagePosition: "left", // You can change this
-    asciinemaId: "no404", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 9,
     features: [
       "Developed a lightweight Chrome extension, no404, that automatically detects visited websites and offers one-click access to their archived versions on the Internet Archive, simplifying retrieval of content from broken or removed pages.",
@@ -186,7 +226,6 @@ export const projects: Project[] = [
     date: "2023-02-21",
     imageLink: "/together-screen.PNG",
     imagePosition: "center",
-    asciinemaId: "together", // This should match the filename in /public/casts/ (without .cast extension)
     coverSeconds: 13, // Show frame at 8 seconds as cover
     features: [
       "Real-time Video Synchronization — Uses WebSockets to keep video playback in sync across all participants in a room.",
@@ -197,9 +236,167 @@ export const projects: Project[] = [
 
 ];
 
-export const getProjectBySlug = (slug: string) => {
-  return projects.find((project) => project.slug === slug);
+const projectIndexMetadata: Record<string, Partial<Project>> = {
+  voidgen: {
+    disciplines: ["Web Apps"],
+    technologies: ["TypeScript", "REST API", "Jest"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "Generates REST endpoints from structured JSON with an in-memory store and automatic reload.",
+    owned: "JSON-to-REST generation, hot reload behavior, in-memory state, and test coverage.",
+    hardProblem: "Keeping generated endpoints useful while the source data changes during development.",
+    result: "A tested mock API tool for frontend prototyping and integration work.",
+    visualType: "terminal",
+    classification: "UNCLASSIFIED / DEV-TOOL",
+    imageVariant: "phosphor",
+  },
+  infill: {
+    disciplines: ["Web Apps"],
+    technologies: ["TypeScript", "Browser extension", "Forms"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "Scans pages for fillable fields, suggests mappings from saved profile facts, and blocks sensitive autofill unless approved.",
+    owned: "Field discovery, profile-based mapping, approval flow, and extension-side storage behavior.",
+    hardProblem: "Speeding up form completion without silently writing risky or incorrect data into arbitrary pages.",
+    result: "A browser extension that keeps the user in control while reducing repetitive form entry work.",
+    visualType: "browser",
+    classification: "UNCLASSIFIED / EXTENSION",
+    imageVariant: "monochrome",
+  },
+  "portfolio-current": {
+    disciplines: ["Web Apps"],
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "Combines projects, blog content, GitHub stars, PR parsing, resume access, and system-style presentation in one site.",
+    owned: "Site architecture, project data model, GitHub integrations, motion, and the custom visual system.",
+    hardProblem: "Making a portfolio feel distinct while still keeping the content structure, navigation, and metadata readable.",
+    result: "A maintainable portfolio codebase with live project metadata and a cohesive presentation layer.",
+    visualType: "application",
+    classification: "PERSONAL / ACTIVE",
+    imageVariant: "monochrome",
+  },
+  "actual-budget": {
+    disciplines: ["Open source", "Web Apps"],
+    technologies: ["TypeScript", "Next.js", "CSV"],
+    projectType: "Open-source contribution",
+    role: "Contributor",
+    homepageEvidence: "Extended CSV importing and improved transaction and budget interactions on mobile.",
+    owned: "User-selectable CSV delimiters and targeted mobile usability fixes.",
+    hardProblem: "Supporting varied bank exports without weakening an established import workflow.",
+    result: "Contributions recorded in issues and pull requests #1774, #1820, and #6272.",
+    visualType: "application",
+    classification: "PUBLIC / OPEN-SOURCE",
+    imageVariant: "monochrome",
+    pullRequests: [
+      { number: "#1774", url: "https://github.com/actualbudget/actual/pull/1774", title: "CSV delimiter selection" },
+      { number: "#1820", url: "https://github.com/actualbudget/actual/pull/1820", title: "Mobile UI fixes" },
+      { number: "#6272", url: "https://github.com/actualbudget/actual/pull/6272", title: "Budget row tappable fix" },
+    ],
+  },
+  lessshare: {
+    disciplines: ["Real-time", "Web Apps"],
+    technologies: ["WebRTC", "Vue.js", "Socket.io"],
+    projectType: "Thesis project",
+    role: "Solo developer",
+    homepageEvidence: "Direct browser-to-browser file transfer using WebRTC DataChannels.",
+    owned: "Signaling, transfer flow, adaptive chunking, and the product interface.",
+    hardProblem: "Coordinating reliable large-file transfer between browser peers.",
+    result: "A working serverless transfer flow with real-time progress monitoring.",
+    visualType: "browser",
+    classification: "ACADEMIC / THESIS",
+    imageVariant: "monochrome",
+  },
+  "code-racer": {
+    disciplines: ["Open source", "Real-time"],
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS"],
+    projectType: "Open-source contribution",
+    role: "Contributor",
+    homepageEvidence: "Built the initial Type Racer mode and contributed multiple feature and bug-fix pull requests.",
+    owned: "Typing logic, restart behavior, and follow-up product fixes.",
+    hardProblem: "Introducing competitive typing behavior into an existing multiplayer codebase.",
+    result: "Foundation for the project's Type Racer gameplay mode.",
+    visualType: "terminal",
+    classification: "PUBLIC / OPEN-SOURCE",
+    imageVariant: "phosphor",
+    pullRequests: [
+      { number: "#47",  url: "https://github.com/webdevcody/code-racer/pull/47",  title: "Type Racer mode" },
+      { number: "#90",  url: "https://github.com/webdevcody/code-racer/pull/90",  title: "Restart functionality" },
+      { number: "#183", url: "https://github.com/webdevcody/code-racer/pull/183", title: "Feature fix" },
+      { number: "#229", url: "https://github.com/webdevcody/code-racer/pull/229", title: "Bug fix" },
+    ],
+  },
+  "portfolio-w95": {
+    disciplines: ["Web Apps"],
+    technologies: ["Vue.js", "TypeScript", "Canvas", "Pinia"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "Recreated an interactive Windows 95 desktop with draggable applications and selection behavior.",
+    owned: "Desktop interaction model, reusable retro UI components, and application state.",
+    hardProblem: "Reproducing desktop interactions within browser input and layout constraints.",
+    result: "A responsive, component-based interactive desktop experience.",
+    visualType: "application",
+    classification: "PERSONAL / R&D",
+    imageVariant: "monochrome",
+  },
+  libC: {
+    disciplines: ["Low-level"],
+    technologies: ["C++", "Data structures", "STL"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "Implements header-only, STL-compatible containers including vector, list, and deque.",
+    owned: "Container APIs, iterators, allocation behavior, and data-structure implementation.",
+    hardProblem: "Matching familiar STL interfaces while managing memory explicitly.",
+    result: "A working collection of reusable C++ container implementations.",
+    visualType: "terminal",
+    classification: "UNCLASSIFIED / LIBRARY",
+    imageVariant: "phosphor",
+  },
+  "b1m0-dbg": {
+    disciplines: ["Low-level"],
+    technologies: ["C", "Linux", "ELF", "ptrace"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "A from-scratch x86_64 debugger with ELF parsing, syscall tracing, and breakpoints.",
+    owned: "Process control, ELF inspection, registers, breakpoints, and memory introspection.",
+    hardProblem: "Coordinating Linux process state while exposing low-level execution clearly.",
+    result: "A debugger capable of tracing and controlling x86_64 processes.",
+    visualType: "terminal",
+    classification: "RESTRICTED / SYSTEMS",
+    imageVariant: "phosphor",
+  },
+  no404: {
+    disciplines: ["Web Apps"],
+    technologies: ["JavaScript", "Chrome extension"],
+    projectType: "Personal project",
+    role: "Creator",
+    homepageEvidence: "Detects missing pages and offers one-click access to archived versions.",
+    owned: "Page detection, archive lookup flow, and extension interface.",
+    hardProblem: "Turning a failed navigation into a useful recovery path with minimal friction.",
+    result: "A lightweight open-source browser extension for recovering removed content.",
+    visualType: "browser",
+    classification: "UNCLASSIFIED / EXTENSION",
+    imageVariant: "monochrome",
+  },
+  togetherjs: {
+    disciplines: ["Real-time", "Web Apps"],
+    technologies: ["WebSockets", "YouTube API"],
+    projectType: "University project",
+    role: "Developer",
+    homepageEvidence: "Synchronizes YouTube playback for participants sharing a private room.",
+    owned: "Room workflow and real-time playback synchronization.",
+    hardProblem: "Keeping distributed playback state aligned across connected clients.",
+    result: "A room-based synchronized watching experience.",
+    visualType: "browser",
+    classification: "ACADEMIC / R&D",
+    imageVariant: "monochrome",
+  },
 };
+
+projects.forEach((project) => {
+  const meta = projectIndexMetadata[project.id];
+  if (meta) Object.assign(project, meta);
+});
 
 export const getAllProjects = () => {
   return projects;

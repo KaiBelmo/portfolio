@@ -1,0 +1,52 @@
+/* Root hero CSS kept for theme selectors, child selectors, and tilt animation. */
+
+[data-theme="afternoon"] .titleOverlap,
+[data-theme="night"] .titleOverlap {
+  color: white;
+}
+
+.sceneCard {
+  transition: transform var(--tilt-return) var(--tilt-return-ease);
+  transform: rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+}
+
+:global(.is-tilting).sceneCard,
+.sceneCard:global(.is-tilting) {
+  transition: transform var(--tilt-follow) var(--tilt-follow-ease);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sceneCard {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+.scene :global([data-room-scene]) {
+  z-index: 1;
+  width: min(100%, 700px);
+  margin-left: auto;
+}
+
+.scene :global([data-room-image-wrap]) {
+  background: transparent;
+}
+
+.scene :global([data-room-hotspot]) {
+  width: 44px;
+  height: 44px;
+}
+
+@media (min-width: 981px) {
+  .titleOverlap {
+    width: calc(100% + clamp(24px, 3.5vw, 56px));
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .titleOverlap {
+    width: auto;
+  }
+}

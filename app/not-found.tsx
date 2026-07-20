@@ -1,25 +1,26 @@
-import Link from 'next/link';
+import Link from "next/link";
+import SystemFrame from "./_components/system/SystemFrame";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
-      <div className="max-w-2xl mx-auto text-center space-y-6">
-        <h1 className="text-6xl font-bold text-gray-900">404</h1>
-        <h2 className="text-3xl font-semibold text-gray-800">
-          Page Not Found
-        </h2>
-        <p className="text-lg text-gray-600">
-          Oops! The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="pt-6">
-          <Link 
-            href="/" 
-            className="inline-block px-6 py-3 text-base font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-md transition-colors"
-          >
-            Go back home
+    <section className="grid min-h-[70svh] place-items-center border-b border-sys-line-strong p-8 text-center scroll-mt-5">
+      <SystemFrame title="SYSTEM ALERT" classification="EXCEPTION">
+        <div className="py-12 px-6 text-center font-mono">
+          <p className="mb-2 text-[10px] uppercase tracking-wider text-sys-signal">
+            ERROR_CODE: 404_NOT_FOUND
+          </p>
+          <h1 className="mb-4 font-display text-3xl text-sys-cream">
+            PAGE OUTSIDE ADDRESS SPACE
+          </h1>
+          <p className="mx-auto mb-8 max-w-[400px] text-xs text-sys-muted">
+            The requested resource cannot be retrieved from local archives. Verify segment path
+            and request variables.
+          </p>
+          <Link className="inline-flex min-h-11 items-center justify-center border border-sys-signal bg-transparent px-4 py-[9px] font-display text-[0.68rem] uppercase tracking-[0.04em] text-sys-signal hover:bg-sys-signal hover:text-sys-bg" href="/">
+            Return to Core Shell
           </Link>
         </div>
-      </div>
-    </div>
+      </SystemFrame>
+    </section>
   );
 }

@@ -1,0 +1,13 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="143 130 114 100" width="114" height="100">
+	<defs>
+		<filter id="toWhite" x="-20%" y="-20%" width="140%" height="140%">
+			<feFlood flood-color="#ffffff" result="white"/>
+			<feComposite in="white" in2="SourceGraphic" operator="in"/>
+		</filter>
+		<image width="44" height="88" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAABYAQMAAAC0+YeVAAAAAXNSR0IB2cksfwAAAAZQTFRFAAAAAAAApWe5zwAAAAJ0Uk5T/wDltzBKAAAAGElEQVR4nGNkYGBg/vORcZhQQDBKDUYKAPFGOIltsolCAAAAAElFTkSuQmCC"/>
+		<image width="46" height="90" id="img2" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAABaCAMAAADw1JTSAAAAAXNSR0IB2cksfwAAADlQTFRFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvHZQPQAAABN0Uk5TCAAdJyj/tvvo+Af3uP03xvz++lbOLwQAAABjSURBVHic7daxCoAwDIThHtLB0vd/U0GkqKu5IYKDiPzZjvugWxoVG4UgWVuNj2uo2uFwOBz+mE+hHdaqWd5KNr7AGxwOh/+ad8trzn0Dz/Ht5YZ/6veAw+Hwl7lfpTnvR2xPzWuUNH/ixdIAAAAASUVORK5CYII="/>
+	</defs>
+	<rect x="143" y="130" width="114" height="100" rx="18" fill="#242629"/>
+	<use href="#img1" transform="matrix(1,0,0,1,206,137)" filter="url(#toWhite)"/>
+	<use href="#img2" transform="matrix(1,0,0,1,147,136)" filter="url(#toWhite)"/>
+</svg>

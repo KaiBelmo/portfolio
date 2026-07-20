@@ -1,0 +1,89 @@
+/* --------------------------------------------------------------------------
+   Route transition
+   -------------------------------------------------------------------------- */
+
+.t-page-slide {
+  position: relative;
+  width: 100%;
+  min-height: calc(100svh - 132px);
+}
+
+.t-page-slide__page,
+.scroll-reveal-scope {
+  position: relative;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Scroll reveal
+   JS only marks content below the first viewport as pending, so the page never
+   flashes hidden during hydration. The route transition handles above-the-fold
+   content; this animation is for elements encountered while scrolling.
+   -------------------------------------------------------------------------- */
+
+[data-scroll-reveal-state="pending"] {
+  opacity: 0.3;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--scroll-reveal-delay, 0ms),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1) var(--scroll-reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-scroll-reveal-state="visible"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--scroll-reveal-delay, 0ms),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1) var(--scroll-reveal-delay, 0ms);
+}
+
+/* --------------------------------------------------------------------------
+   Keyframe Animations
+   -------------------------------------------------------------------------- */
+
+@keyframes availability-blink {
+  0%, 70% {
+    opacity: 1;
+  }
+  71%, 82% {
+    opacity: 0.45;
+  }
+  83%, 100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-reveal-state] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

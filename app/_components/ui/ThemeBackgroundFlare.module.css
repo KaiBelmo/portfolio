@@ -1,0 +1,21 @@
+/* --------------------------------------------------------------------------
+   Theme Background Flare — Canvas-based stepped pixel reveal
+   Replaces 256+ DOM nodes with single compositor surface
+   -------------------------------------------------------------------------- */
+
+.flare {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  contain: strict;
+}

@@ -2,12 +2,16 @@
 
 # dependencies
 /node_modules
+/.pnpm-store/
 /.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # testing
 /coverage
+/.playwright-cli/
+/.playwright-mcp/
+/output/
 
 # next.js
 /.next/
@@ -26,6 +30,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env.local
 .env*.local
 
 # vercel
@@ -34,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local scratch work
+/scratch/
+/preview/
+
+# generated reports and handoff artifacts
+*.patch
+*.rar
+performance-results.json
+CSS_REFACTORING.md
+PERFORMANCE_AUDIT.md
+PERFORMANCE_OPTIMIZATIONS.md
+STYLING_GUIDE.md
+skills-lock.json

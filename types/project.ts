@@ -1,6 +1,6 @@
 export interface Project {
   id: string;
-  slug: string; // used in route /projects/[slug]
+  slug: string;
   name: string;
   link?: string;
   githubLink: string;
@@ -10,8 +10,19 @@ export interface Project {
   date: string;
   imageLink: string; // For backward compatibility
   imagePosition: 'left' | 'center' | 'right'; // Controls image object position
-  asciinemaId?: string; // ID from asciinema.org for terminal recordings
   coverSeconds?: number; // Seconds into the recording to show as cover/thumbnail
   features?: string[]; // Array of project features/highlights
   stars?: string; // GitHub stars count
+  disciplines?: string[];
+  technologies?: string[];
+  projectType?: string;
+  role?: string;
+  homepageEvidence?: string;
+  owned?: string;
+  hardProblem?: string;
+  result?: string;
+  visualType?: "browser" | "application" | "terminal" | "raw";
+  classification?: string;
+  imageVariant?: string;
+  pullRequests?: { number: string; url: string; title?: string }[];
 }

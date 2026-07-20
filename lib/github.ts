@@ -30,3 +30,33 @@ export const fetchPR = (prNumbers: Array<number>, githubLink: string) => {
   return prLinks;
 
 }
+
+type GithubRequestInit = RequestInit & {
+  next?: { revalidate?: number };
+};
+
+class GithubClient {
+  private readonly token = process.env.GITHUB_TOKEN;
+
+  get isConfigured(): boolean {
+    return Boolean(this.token);
+  }
+
+  async requestJson<T>(url: string, init: GithubRequestInit = {}): Promise<T> {
+    const response = await fetch(url, {
+      ...init,
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "Personal-Website",
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+        ...init.headers,
+      },
+    });
+
+    if (!response.ok) throw new Error(`GitHub API ${response.status}`);
+    return response.json() as Promise<T>;
+  }
+}
+
+// One server-side GitHub client and one shared token configuration.
+export const githubClient = new GithubClient();

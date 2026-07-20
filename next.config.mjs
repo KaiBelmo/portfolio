@@ -1,18 +1,23 @@
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static exports for the App Router
-  output: 'export',
+  turbopack: {
+    root,
+  },
+
+  images: {
+    qualities: [75, 85],
+  },
 
   // Optional: Add a trailing slash to all paths
   trailingSlash: true,
 
-  // Configure images
-  images: {
-    unoptimized: true,
-  },
-
-  // Disable React strict mode for now to avoid double rendering in development
-  reactStrictMode: false,
+  // Keep strict mode enabled so React 19 surfaces unsafe render side effects early.
+  reactStrictMode: true,
 };
 
 export default nextConfig;
