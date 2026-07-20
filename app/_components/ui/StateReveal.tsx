@@ -11,23 +11,22 @@ type StateRevealProps = Omit<HTMLMotionProps<"div">, "animate" | "exit" | "initi
 
 export default function StateReveal({
   show,
-  duration = 0.25, // Increased slightly from 0.18s for a smoother feel
+  duration = 0.4, // Default duration increased slightly
   children,
   ...props
 }: StateRevealProps) {
   const reduceMotion = !!useReducedMotion();
 
   return (
-    <AnimatePresence initial={false}>
+    <AnimatePresence initial={false} mode="wait">
       {show && (
         <motion.div
           {...props}
-          // overflow: hidden is crucial when animating height to prevent content spilling
-          style={{ overflow: "hidden", ...props.style }} 
+          style={{ overflow: "hidden", ...props.style }}
           variants={stateRevealVariants}
           initial="hidden"
           animate="visible"
-          exit="hidden"
+          exit="exit"
           transition={stateTransition(reduceMotion, duration)}
         >
           {children}
