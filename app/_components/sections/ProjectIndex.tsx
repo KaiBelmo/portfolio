@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import type { ComponentPropsWithoutRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Project } from "@/types/project";
@@ -44,6 +44,21 @@ const projectActionClass =
 const iconActionClass =
   "inline-flex min-h-11 flex-[0_0_44px] items-center justify-center border border-sys-line-strong bg-transparent text-sys-cream hover:bg-sys-cream hover:text-sys-bg";
 const projectGithubIcon = <span className="[&>svg]:size-4">{GithubIcon}</span>;
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const update = () => setMatches(mediaQuery.matches);
+
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, [query]);
+
+  return matches;
+}
 
 function filterControlClasses(className?: string) {
   return className ? `${filterControlClass} ${className}` : filterControlClass;
@@ -156,6 +171,7 @@ export default function ProjectIndex({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const reduceMotion = !!useReducedMotion();
+  const isTabletLayout = useMediaQuery("(max-width: 1024px)");
   const initialDiscipline = searchParams.get("discipline") || "All";
   
   const [discipline, setDiscipline] = useState(
@@ -226,7 +242,9 @@ export default function ProjectIndex({
     if (discipline !== "All") params.set("discipline", discipline);
     if (year !== "All") params.set("year", year);
     if (technology.length > 0) params.set("technology", technology.join(","));
-    router.replace(`${pathname}${params.size ? `?${params}` : ""}`, { scroll: false });
+    startTransition(() => {
+      router.replace(`${pathname}${params.size ? `?${params}` : ""}`, { scroll: false });
+    });
   }, [discipline, year, technology, pathname, router]);
 
   const clear = () => {
@@ -387,7 +405,7 @@ export default function ProjectIndex({
       {filtered.length ? (
         <div className="mt-6 grid grid-cols-[minmax(0,1fr)_minmax(0,460px)] items-start gap-6 tablet:grid-cols-1 tablet:min-w-0 mobile:mt-3">
           <div className="border-t border-sys-line-strong tablet:grid tablet:min-w-0 tablet:gap-[6px] tablet:border-0">
-            <AnimatePresence initial={false} mode="popLayout">
+            <>
             {filtered.map((project, index) => {
               const expanded = expandedId === project.id;
               return (
@@ -397,30 +415,29 @@ export default function ProjectIndex({
                   suppressHydrationWarning
                   className={`border-b border-sys-line tablet:min-w-0 tablet:border-0 ${active?.id === project.id ? "bg-sys-signal-soft tablet:bg-transparent" : ""}`}
                   key={project.id}
-                  layout={!reduceMotion}
                   variants={stateListItemVariants}
                   initial="hidden"
                   animate="visible"
-                  exit="exit"
                   transition={stateTransition(reduceMotion)}
                   onMouseEnter={() => setActiveId(project.id)}
                   onFocus={() => setActiveId(project.id)}
                 >
-                  <div className="hidden tablet:block">
+                  {isTabletLayout ? (
                     <MobileProjectCard
-                      project={project}
-                      stars={starsMap[project.id]}
-                      expanded={expanded}
-                      onToggle={() => setExpandedId(expanded ? undefined : project.id)}
-                    />
-                  </div>
-                  <button
-                    className="grid w-full grid-cols-[42px_minmax(0,1fr)_150px] items-center gap-4 border-0 bg-transparent px-3 py-[22px] text-left text-inherit tablet:hidden"
-                    type="button"
-                    aria-expanded={expanded}
-                    aria-controls={`project-panel-${project.id}`}
-                    onClick={() => setExpandedId(expanded ? undefined : project.id)}
-                  >
+                    project={project}
+                    stars={starsMap[project.id]}
+                    expanded={expanded}
+                    onToggle={() => setExpandedId(expanded ? undefined : project.id)}
+                  />
+                  ) : (
+                    <>
+                      <button
+                        className="grid w-full grid-cols-[42px_minmax(0,1fr)_150px] items-center gap-4 border-0 bg-transparent px-3 py-[22px] text-left text-inherit"
+                        type="button"
+                        aria-expanded={expanded}
+                        aria-controls={`project-panel-${project.id}`}
+                        onClick={() => setExpandedId(expanded ? undefined : project.id)}
+                      >
                     <span className="font-display text-[0.72rem] text-sys-signal">{String(index + 1).padStart(2, "0")}</span>
                     <span>
                       <span className="flex items-baseline justify-between gap-3">
@@ -446,13 +463,13 @@ export default function ProjectIndex({
                       <span className="mb-5 block font-display text-[0.72rem] text-sys-signal tablet:hidden">{actionLabel(project)} -&gt;</span>
                       <span className="mb-5 hidden font-display text-[0.72rem] text-sys-signal tablet:m-0 tablet:block tablet:flex-none">{expanded ? "Close" : "Details"} {expanded ? "-" : "+"}</span>
                     </span>
-                  </button>
-                  <StateReveal
-                    show={expanded}
-                    id={`project-panel-${project.id}`}
-                    className="overflow-hidden"
-                    duration={0.2}
-                  >
+                      </button>
+                      <StateReveal
+                        show={expanded}
+                        id={`project-panel-${project.id}`}
+                        className="overflow-hidden"
+                        duration={0.2}
+                      >
                     <div className={`relative mb-3.5 h-40 overflow-hidden border border-sys-line bg-sys-bg max-[420px]:h-[138px] frame-${project.visualType}`}>
                       <ProjectVisual project={project} />
                     </div>
@@ -495,11 +512,13 @@ export default function ProjectIndex({
                         </>
                       )}
                     </div>
-                  </StateReveal>
+                      </StateReveal>
+                    </>
+                  )}
                 </motion.article>
               );
             })}
-            </AnimatePresence>
+            </>
           </div>
           
           {active && (
