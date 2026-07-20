@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Blog | Kai Belmo",
   description:
     "Writing about AI debugging workflows, TypeScript, systems programming, and building calmer software interfaces.",
+  alternates: { canonical: "/blog" },
 };
 
 // Revalidate the page every 24 hours — matches the blog-sync interval
