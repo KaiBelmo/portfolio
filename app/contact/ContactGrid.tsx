@@ -16,18 +16,22 @@ import {
 } from "./contactData";
 import GithubActivityHeatmap from "./GithubActivityHeatmap";
 
+const MOBILE_CARD_CHROME =
+  "mobile:border-[color-mix(in_srgb,var(--line)_38%,transparent)] mobile:bg-[color-mix(in_srgb,var(--canvas)_88%,var(--surface-soft))]";
 const CARD_CLASS =
-  "group relative flex h-full min-h-[210px] flex-col justify-between gap-8 border border-line p-6 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[150px] mobile:gap-4 mobile:p-4";
+  `group relative flex h-full min-h-[210px] flex-col justify-between gap-8 border border-line bg-surface-soft/20 p-6 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[150px] mobile:gap-4 mobile:p-4 ${MOBILE_CARD_CHROME}`;
 const COMPACT_CARD_CLASS =
-  "group relative flex h-full min-h-[160px] flex-col justify-between gap-4 border border-line p-5 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[140px] mobile:p-4";
+  `group relative flex h-full min-h-[160px] flex-col justify-between gap-4 border border-line bg-surface-soft/20 p-5 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[140px] mobile:p-4 ${MOBILE_CARD_CHROME}`;
 const FIRST_ROW_CARD_CLASS =
-  "group relative flex h-full min-h-[132px] flex-col justify-between gap-3 border border-line p-4 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[126px]";
+  `group relative flex h-full min-h-[132px] flex-col justify-between gap-3 border border-line bg-surface-soft/20 p-4 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[126px] ${MOBILE_CARD_CHROME}`;
 const CARD_ICON_CLASS =
-  "text-muted transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent";
+  "text-muted opacity-80 transition-colors duration-300 group-hover:text-accent group-hover:opacity-100 group-focus-visible:text-accent group-focus-visible:opacity-100";
 const CARD_ARROW_CLASS =
   "shrink-0 p-1.5 text-muted opacity-40 transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:text-accent group-hover:opacity-100 group-focus-visible:translate-x-1 group-focus-visible:text-accent group-focus-visible:opacity-100";
-const COMPACT_SECTION_CLASS = "flex h-full min-h-[160px] flex-col justify-between gap-4 border border-line p-5";
-const FIRST_ROW_SECTION_CLASS = "flex h-full min-h-[132px] flex-col justify-between gap-3 border border-line p-4";
+const COMPACT_SECTION_CLASS =
+  `flex h-full min-h-[160px] flex-col justify-between gap-4 border border-line bg-surface-soft/20 p-5 ${MOBILE_CARD_CHROME}`;
+const FIRST_ROW_SECTION_CLASS =
+  `flex h-full min-h-[132px] flex-col justify-between gap-3 border border-line bg-surface-soft/20 p-4 ${MOBILE_CARD_CHROME}`;
 const PGP_ACTION_CLASS =
   "inline-flex min-h-9 items-center justify-center gap-1.5 border border-line px-2.5 py-1.5 font-mono text-[0.58rem] font-bold uppercase tracking-[0.08em] text-ink transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:border-accent focus-visible:text-accent focus-visible:outline-none";
 
@@ -94,8 +98,8 @@ function EmailCard() {
     >
       <div className="flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted">
         <span className="relative flex size-1.5">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-70" />
-          <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-70 mobile:bg-[color-mix(in_srgb,var(--accent)_72%,var(--canvas))]" />
+          <span className="relative inline-flex size-1.5 rounded-full bg-accent mobile:bg-[color-mix(in_srgb,var(--accent)_72%,var(--canvas))]" />
         </span>
         Usually replies soon
       </div>
@@ -222,3 +226,4 @@ export default function ContactGrid({ githubActivity }: { githubActivity: Github
     </div>
   );
 }
+
