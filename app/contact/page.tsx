@@ -1,6 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getGithubActivity } from "@/lib/github-activity";
 import ContactGrid from "./ContactGrid";
+
+export const metadata: Metadata = {
+  title: "Contact | Kai Belmo",
+  description: "Contact Kai Belmo for software engineering work, open-source collaboration, and technical conversations.",
+  alternates: { canonical: "/contact" },
+};
 
 export default async function ContactPage() {
   const githubActivity = await getGithubActivity();
