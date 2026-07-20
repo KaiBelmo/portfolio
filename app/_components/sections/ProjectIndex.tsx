@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import type { ComponentPropsWithoutRef } from "react";
@@ -21,6 +21,7 @@ import {
 } from "../ui/stateAnimations";
 
 const disciplines = ["All", "Web Apps", "Real-time", "Low-level", "Open source"];
+const mobileProjectPageSize = 4;
 const disciplineMobileSpans: Record<string, string> = {
   All: "mobile:col-span-2",
   "Web Apps": "mobile:col-span-4",
@@ -172,6 +173,7 @@ export default function ProjectIndex({
   const searchParams = useSearchParams();
   const reduceMotion = !!useReducedMotion();
   const isTabletLayout = useMediaQuery("(max-width: 1024px)");
+  const isMobileLayout = useMediaQuery("(max-width: 600px)");
   const initialDiscipline = searchParams.get("discipline") || "All";
   
   const [discipline, setDiscipline] = useState(
@@ -183,6 +185,7 @@ export default function ProjectIndex({
   );
   const [showTechnologies, setShowTechnologies] = useState(Boolean(searchParams.get("technology")));
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [mobileProjectPage, setMobileProjectPage] = useState(0);
   const [activeId, setActiveId] = useState(projects[0]?.id);
   const [expandedId, setExpandedId] = useState<string>();
 
@@ -236,6 +239,14 @@ export default function ProjectIndex({
   ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const active = filtered.find((project) => project.id === activeId) || filtered[0];
+  const mobileProjectPageCount = Math.max(1, Math.ceil(filtered.length / mobileProjectPageSize));
+  const currentMobileProjectPage = Math.min(mobileProjectPage, mobileProjectPageCount - 1);
+  const visibleProjects = isMobileLayout
+    ? filtered.slice(
+        currentMobileProjectPage * mobileProjectPageSize,
+        currentMobileProjectPage * mobileProjectPageSize + mobileProjectPageSize
+      )
+    : filtered;
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -251,6 +262,7 @@ export default function ProjectIndex({
     setDiscipline("All");
     setYear("All");
     setTechnology([]);
+    setMobileProjectPage(0);
   };
 
   const mobileFilterLabel = hasActiveFilters
@@ -308,7 +320,10 @@ export default function ProjectIndex({
               type="button"
               className={`mobile:flex-none mobile:shrink-0 ${disciplineMobileSpans[item] || "mobile:col-span-3"}`}
               aria-pressed={discipline === item}
-              onClick={() => setDiscipline(item)}
+              onClick={() => {
+                setDiscipline(item);
+                setMobileProjectPage(0);
+              }}
             >
               {item} <span>[{counts[item]}]</span>
             </FilterButton>
@@ -326,7 +341,10 @@ export default function ProjectIndex({
                   label="All"
                   years={years}
                   value={year}
-                  onChange={setYear}
+                  onChange={(value) => {
+                    setYear(value);
+                    setMobileProjectPage(0);
+                  }}
                 />
               </label>
               <YearDropdown
@@ -334,7 +352,10 @@ export default function ProjectIndex({
                 label="Years"
                 years={years}
                 value={year}
-                onChange={setYear}
+                onChange={(value) => {
+                  setYear(value);
+                  setMobileProjectPage(0);
+                }}
               />
             </>
           )}
@@ -385,6 +406,7 @@ export default function ProjectIndex({
                     prev.length === 1 && prev[0] === item ? [] : [item]
                   );
                 }
+                setMobileProjectPage(0);
               }}
             >
               {item}
@@ -394,7 +416,10 @@ export default function ProjectIndex({
             <button
               type="button"
               className="min-h-11 border border-sys-line bg-transparent px-2 py-0.5 font-display text-[0.72rem] text-sys-signal"
-              onClick={() => setTechnology([])}
+              onClick={() => {
+                setTechnology([]);
+                setMobileProjectPage(0);
+              }}
             >
               Clear x
             </button>
@@ -406,8 +431,11 @@ export default function ProjectIndex({
         <div className="mt-6 grid grid-cols-[minmax(0,1fr)_minmax(0,460px)] items-start gap-6 tablet:grid-cols-1 tablet:min-w-0 mobile:mt-3">
           <div className="border-t border-sys-line-strong tablet:grid tablet:min-w-0 tablet:gap-[6px] tablet:border-0">
             <>
-            {filtered.map((project, index) => {
+            {visibleProjects.map((project, index) => {
               const expanded = expandedId === project.id;
+              const projectNumber = isMobileLayout
+                ? currentMobileProjectPage * mobileProjectPageSize + index + 1
+                : index + 1;
               return (
                 <motion.article
                   data-scroll-reveal
@@ -438,7 +466,7 @@ export default function ProjectIndex({
                         aria-controls={`project-panel-${project.id}`}
                         onClick={() => setExpandedId(expanded ? undefined : project.id)}
                       >
-                    <span className="font-display text-[0.72rem] text-sys-signal">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="font-display text-[0.72rem] text-sys-signal">{String(projectNumber).padStart(2, "0")}</span>
                     <span>
                       <span className="flex items-baseline justify-between gap-3">
                         <span className="inline-flex min-w-0 flex-wrap items-baseline gap-x-2">
@@ -519,6 +547,31 @@ export default function ProjectIndex({
               );
             })}
             </>
+            {isMobileLayout && filtered.length > mobileProjectPageSize && (
+              <nav className="fixed inset-x-4 bottom-4 z-[120] grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2 border border-sys-line-strong bg-sys-bg/95 p-2 backdrop-blur mobile:grid" aria-label="Project pages">
+                <button
+                  className="inline-flex min-h-11 items-center justify-center border border-sys-line-strong text-sys-cream disabled:cursor-not-allowed disabled:opacity-40"
+                  type="button"
+                  disabled={currentMobileProjectPage === 0}
+                  aria-label="Previous projects"
+                  onClick={() => setMobileProjectPage((page) => Math.max(0, page - 1))}
+                >
+                  <ChevronLeft className="size-4" aria-hidden="true" />
+                </button>
+                <span className="text-center font-mono text-[0.62rem] uppercase tracking-[0.08em] text-sys-muted">
+                  {currentMobileProjectPage * mobileProjectPageSize + 1}-{Math.min(filtered.length, (currentMobileProjectPage + 1) * mobileProjectPageSize)} / {filtered.length}
+                </span>
+                <button
+                  className="inline-flex min-h-11 items-center justify-center border border-sys-line-strong text-sys-cream disabled:cursor-not-allowed disabled:opacity-40"
+                  type="button"
+                  disabled={currentMobileProjectPage >= mobileProjectPageCount - 1}
+                  aria-label="Next projects"
+                  onClick={() => setMobileProjectPage((page) => Math.min(mobileProjectPageCount - 1, page + 1))}
+                >
+                  <ChevronRight className="size-4" aria-hidden="true" />
+                </button>
+              </nav>
+            )}
           </div>
           
           {active && (
