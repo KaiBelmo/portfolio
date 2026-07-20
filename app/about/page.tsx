@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const posts = (await getPostsWithRevalidation()).slice(0, 3);
+  const highlightClass = "not-italic underline decoration-[var(--accent)] decoration-wavy decoration-1 underline-offset-2";
 
   return (
     <section className={`route-shell ${styles.shell}`}>
@@ -33,7 +34,7 @@ export default async function AboutPage() {
           &gt; whoami
         </h2>
         <p className="m-0 text-[1.02rem] leading-[1.78] text-muted">
-          I started in competitive programming and low-level programming, where CTF competitions sparked my interest in reverse engineering C programs. While studying Computer Science, I gradually shifted toward software engineering and became focused on building reliable, maintainable systems with strong performance and a good user experience. Since then, I’ve worked with TypeScript, React, Next.js, Vue, NestJS, and Node.js to build real-time applications, user-focused products, and developer tools.
+          I started in <em className={highlightClass}>competitive programming</em> and <em className={highlightClass}>low-level programming</em>, where CTF competitions sparked my interest in <em className={highlightClass}>reverse engineering</em> C programs. While studying Computer Science, I gradually shifted toward <em className={highlightClass}>software engineering</em> and became focused on building reliable, maintainable systems with <em className={highlightClass}>strong performance</em> and a <em className={highlightClass}>good user experience</em>. Since then, I&apos;ve worked with TypeScript, React, Next.js, Vue, NestJS, and Node.js to build real-time applications, user-focused products, and developer tools.
 
         </p>
       </section>
