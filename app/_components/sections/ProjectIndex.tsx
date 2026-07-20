@@ -137,7 +137,7 @@ export default function ProjectIndex({
         Projects I built, contributed to, or developed within an{" "}
         <span className="group relative inline-block">
           <span className="cursor-default text-sys-cream underline decoration-sys-signal decoration-wavy underline-offset-4 outline-offset-2 focus-visible:rounded-[2px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-sys-focus" tabIndex={0}>organization</span>
-          <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-10 w-max max-w-[260px] -translate-x-1/2 translate-y-1 border border-sys-line-strong bg-sys-raised px-3 py-2 text-[0.72rem] leading-[1.5] text-sys-cream opacity-0 transition-[opacity,transform] duration-150 ease-out after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-[5px] after:border-transparent after:border-t-sys-line-strong group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-opacity" role="tooltip">
+          <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-10 w-max max-w-[260px] -translate-x-1/2 translate-y-1 border border-sys-line-strong bg-sys-raised px-3 py-2 text-[0.72rem] leading-[1.5] text-sys-cream opacity-0 transition-[opacity,transform] duration-150 ease-out after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-[5px] after:border-transparent after:border-t-sys-line-strong group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-opacity mobile:left-0 mobile:w-[min(260px,calc(100vw-32px))] mobile:translate-x-0 mobile:after:left-6 mobile:after:translate-x-0" role="tooltip">
             Shared here with the organization&apos;s agreement and blessing
           </span>
           
@@ -274,8 +274,8 @@ export default function ProjectIndex({
                         ))}
                       </span>
                     </span>
-                    <span className="block text-right text-[0.8rem] text-sys-muted [overflow-wrap:anywhere] tablet:col-start-2 tablet:flex tablet:justify-between tablet:gap-3 tablet:text-left">
-                      <span className="mb-5 block tablet:m-0 tablet:max-w-[58%]">{project.projectType}</span>
+                    <span className="block text-right text-[0.8rem] text-sys-muted [overflow-wrap:anywhere] tablet:col-start-2 tablet:flex tablet:flex-wrap tablet:items-center tablet:justify-between tablet:gap-x-3 tablet:gap-y-1 tablet:text-left">
+                      <span className="mb-5 block tablet:m-0 tablet:min-w-0 tablet:flex-1 tablet:basis-[12rem]">{project.projectType}</span>
                       <span className="mb-5 block font-display text-[0.72rem] text-sys-signal tablet:hidden">{actionLabel(project)} →</span>
                       <span className="mb-5 hidden font-display text-[0.72rem] text-sys-signal tablet:m-0 tablet:block tablet:flex-none">{expanded ? "Close" : "Details"} {expanded ? "−" : "+"}</span>
                     </span>
@@ -316,7 +316,7 @@ export default function ProjectIndex({
                                       className="flex items-baseline justify-between gap-2 text-xs hover:text-sys-signal hover:underline transition-colors"
                                     >
                                       <span className="font-display text-sys-signal">{pr.number}</span>
-                                      {pr.title && <span className="text-right text-sys-cream/70 text-[0.68rem]">{pr.title}</span>}
+                                      {pr.title && <span className="min-w-0 flex-1 text-right text-sys-cream/70 text-[0.68rem] [overflow-wrap:anywhere]">{pr.title}</span>}
                                       <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">↗</span>
                                     </a>
                                   </li>
@@ -363,7 +363,7 @@ export default function ProjectIndex({
                                   className="flex items-baseline justify-between gap-2 text-xs hover:text-sys-signal hover:underline transition-colors"
                                 >
                                   <span className="font-display text-sys-signal">{pr.number}</span>
-                                  {pr.title && <span className="text-right text-sys-cream/70 text-[0.68rem]">{pr.title}</span>}
+                                  {pr.title && <span className="min-w-0 flex-1 text-right text-sys-cream/70 text-[0.68rem] [overflow-wrap:anywhere]">{pr.title}</span>}
                                   <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">↗</span>
                                 </a>
                               </li>
