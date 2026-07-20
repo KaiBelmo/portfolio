@@ -8,9 +8,6 @@ export interface Project {
   category: string[];
   typeOfProject: string;
   date: string;
-  imageLink: string; // For backward compatibility
-  imagePosition: 'left' | 'center' | 'right'; // Controls image object position
-  coverSeconds?: number; // Seconds into the recording to show as cover/thumbnail
   features?: string[]; // Array of project features/highlights
   stars?: string; // GitHub stars count
   disciplines?: string[];
