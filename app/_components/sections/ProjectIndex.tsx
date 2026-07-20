@@ -4,21 +4,43 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import type { Project } from "@/types/project";
 import { GithubIcon } from "@/app/contact/contactData";
 import ProjectVisual from "../ui/ProjectVisual";
+import MobileProjectCard from "../ui/MobileProjectCard";
 import SystemFrame from "../system/SystemFrame";
 import RecordHeader from "../system/RecordHeader";
 import DataRow from "../system/DataRow";
 
 const disciplines = ["All", "Web Apps", "Real-time", "Low-level", "Open source"];
+const disciplineMobileSpans: Record<string, string> = {
+  All: "mobile:col-span-2",
+  "Web Apps": "mobile:col-span-4",
+  "Real-time": "mobile:col-span-3",
+  "Low-level": "mobile:col-span-3",
+  "Open source": "mobile:col-span-6",
+};
+
 const filterControlClass =
-  "min-h-11 border border-sys-line bg-[color-mix(in_srgb,var(--sys-bg)_84%,transparent)] px-[13px] py-2 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] aria-pressed:bg-sys-signal aria-pressed:text-sys-bg";
+  "min-h-11 border border-sys-line bg-[color-mix(in_srgb,var(--sys-bg)_84%,transparent)] px-[13px] py-2 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] aria-pressed:bg-sys-signal aria-pressed:text-sys-bg mobile:h-auto";
 const projectActionClass =
   "inline-flex min-h-11 flex-auto items-center justify-center gap-2 border border-sys-signal bg-transparent px-4 py-[9px] text-center font-display text-[0.68rem] uppercase tracking-[0.04em] text-sys-signal hover:bg-sys-signal hover:text-sys-bg";
 const iconActionClass =
   "inline-flex min-h-11 flex-[0_0_44px] items-center justify-center border border-sys-line-strong bg-transparent text-sys-cream hover:bg-sys-cream hover:text-sys-bg";
 const projectGithubIcon = <span className="[&>svg]:size-4">{GithubIcon}</span>;
+
+function filterControlClasses(className?: string) {
+  return className ? `${filterControlClass} ${className}` : filterControlClass;
+}
+
+function FilterButton({ className, ...props }: ComponentPropsWithoutRef<"button">) {
+  return <button className={filterControlClasses(className)} {...props} />;
+}
+
+function FilterSelect({ className, ...props }: ComponentPropsWithoutRef<"select">) {
+  return <select className={filterControlClasses(className)} {...props} />;
+}
 
 function isOpenSource(project: Project) {
   return project.disciplines?.includes("Open source");
@@ -33,6 +55,7 @@ function actionLabel(project: Project) {
 function projectHref(project: Project) {
   return project.link || project.githubLink;
 }
+
 
 export default function ProjectIndex({
   projects,
@@ -56,10 +79,10 @@ export default function ProjectIndex({
     searchParams.get("technology") ? searchParams.get("technology")!.split(",") : []
   );
   const [showTechnologies, setShowTechnologies] = useState(Boolean(searchParams.get("technology")));
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activeId, setActiveId] = useState(projects[0]?.id);
   const [expandedId, setExpandedId] = useState<string>();
 
-  // stars: map of project id → star count string
   const [starsMap, setStarsMap] = useState<Record<string, string>>(() =>
     Object.fromEntries(projects.filter((p) => p.stars).map((p) => [p.id, p.stars!]))
   );
@@ -100,6 +123,8 @@ export default function ProjectIndex({
     );
   }, [projects]);
 
+  const hasActiveFilters = discipline !== "All" || year !== "All" || technology.length > 0;
+
   const filtered = projects.filter(
     (project) =>
       (discipline === "All" || project.disciplines?.includes(discipline)) &&
@@ -123,8 +148,12 @@ export default function ProjectIndex({
     setTechnology([]);
   };
 
+  const mobileFilterLabel = hasActiveFilters
+    ? `Filters (${filtered.length}/${projects.length})`
+    : "Filters";
+
   return (
-    <section className="px-[clamp(20px,5vw,72px)] pb-[clamp(64px,8vw,120px)] pt-[clamp(36px,5vw,72px)] scroll-mt-5 tablet:px-4 tablet:py-[58px]" aria-labelledby="project-index-heading">
+    <section className="route-shell scroll-mt-5" aria-labelledby="project-index-heading">
       <nav className="mb-[10px] flex min-h-11 items-center gap-2.5 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted" aria-label="Breadcrumb">
         <Link href="/" className="flex min-h-11 items-center underline-offset-4 hover:text-accent hover:underline">Room</Link>
         <span aria-hidden="true">/</span>
@@ -145,71 +174,110 @@ export default function ProjectIndex({
         ; and chose to open source.
       </p>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-[18px] gap-y-2.5 border-y border-sys-line-strong py-3.5 tablet:grid-cols-1" aria-label="Filter projects" data-scroll-reveal data-scroll-reveal-state="visible" suppressHydrationWarning>
-        <div className="flex flex-wrap gap-2" aria-label="Discipline">
+      <button
+        className="mb-3 hidden min-h-11 w-full items-center justify-between border border-sys-line-strong bg-transparent px-4 py-2 font-display text-[0.78rem] text-sys-cream mobile:flex"
+        type="button"
+        aria-expanded={showMobileFilters}
+        aria-controls="project-filter-panel"
+        onClick={() => setShowMobileFilters((value) => !value)}
+      >
+        <span>{mobileFilterLabel}</span>
+        <span aria-hidden="true">{showMobileFilters ? "-" : "+"}</span>
+      </button>
+
+      <div
+        id="project-filter-panel"
+        className={`grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-[18px] gap-y-2.5 border-y border-sys-line-strong py-3.5 tablet:grid-cols-1 mobile:border-0 mobile:pt-0 ${showMobileFilters ? "mobile:grid" : "mobile:hidden"}`}
+        aria-label="Filter projects"
+        data-scroll-reveal
+        data-scroll-reveal-state="visible"
+        suppressHydrationWarning
+      >
+        {/* Discipline buttons - natural width, wrap on mobile */}
+        <div className="flex flex-wrap gap-2 mobile:grid mobile:grid-cols-6" aria-label="Discipline">
           {disciplines.map((item) => (
-            <button
+            <FilterButton
               key={item}
               type="button"
-              className={filterControlClass}
+              className={`mobile:flex-none mobile:shrink-0 ${disciplineMobileSpans[item] || "mobile:col-span-3"}`}
               aria-pressed={discipline === item}
               onClick={() => setDiscipline(item)}
             >
               {item} <span>[{counts[item]}]</span>
-            </button>
+            </FilterButton>
           ))}
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2 tablet:justify-start">
+
+        {/* Year / Tech / Clear - compact row on mobile */}
+        <div className="flex flex-wrap items-center justify-end gap-2 tablet:justify-start mobile:w-full">
           {years.length > 1 && (
-            <label className="flex min-h-11 items-center gap-2 font-display text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[220px]">
-              Year{" "}
-              <select className={`${filterControlClass} min-w-24 tablet:flex-1`} value={year} onChange={(event) => setYear(event.target.value)}>
-                <option>All</option>
+            <>
+              <label className="flex min-h-11 items-center gap-2 font-display text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[220px] mobile:hidden">
+                Year{" "}
+                <FilterSelect
+                  className="min-w-24 tablet:flex-1"
+                  value={year}
+                  onChange={(event) => setYear(event.target.value)}
+                >
+                  <option>All</option>
+                  {years.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </FilterSelect>
+              </label>
+              <FilterSelect
+                className="hidden min-w-0 mobile:block mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none mobile:px-4 mobile:py-0"
+                value={year}
+                onChange={(event) => setYear(event.target.value)}
+                aria-label="Year"
+              >
+                <option value="All">Years</option>
                 {years.map((item) => (
                   <option key={item}>{item}</option>
                 ))}
-              </select>
-            </label>
+              </FilterSelect>
+            </>
           )}
-          <button
-            className={filterControlClass}
+          <FilterButton
+            className="mobile:flex-none mobile:basis-auto"
             type="button"
             aria-expanded={showTechnologies}
             aria-controls="technology-filters"
             onClick={() => setShowTechnologies((value) => !value)}
           >
-            Tech filter {showTechnologies ? "−" : "+"}
-          </button>
-          <button
-            className={filterControlClass}
-            type="button"
-            onClick={clear}
-            disabled={discipline === "All" && year === "All" && technology.length === 0}
-          >
-            Clear filters
-          </button>
+            Tech filter {showTechnologies ? "-" : "+"}
+          </FilterButton>
+          {hasActiveFilters && (
+            <FilterButton
+              className="mobile:flex-none mobile:basis-auto"
+              type="button"
+              onClick={clear}
+            >
+              Clear filters
+            </FilterButton>
+          )}
         </div>
+
+        {/* Technology chips - natural width, wrap */}
         {showTechnologies && (
           <div className="col-span-full flex flex-wrap gap-2 pt-0.5" id="technology-filters">
             <p className="m-0 mb-1 w-full font-display text-[0.68rem] tracking-[0.03em] text-sys-muted opacity-70">
-              Ctrl+click to select multiple — shows projects matching any selected tech
+              Ctrl+click to select multiple - shows projects matching any selected tech
             </p>
             {technologies.map((item) => (
-              <button
+              <FilterButton
                 type="button"
                 key={item}
-                className={filterControlClass}
+                className={`mobile:flex-none mobile:shrink-0 ${disciplineMobileSpans[item] || "mobile:col-span-3"}`}
                 aria-pressed={technology.includes(item)}
                 onClick={(e) => {
                   if (e.ctrlKey || e.metaKey) {
-                    // toggle this item in/out of the selection
                     setTechnology((prev) =>
                       prev.includes(item)
                         ? prev.filter((t) => t !== item)
                         : [...prev, item]
                     );
                   } else {
-                    // normal click: select only this one, or deselect if already sole selection
                     setTechnology((prev) =>
                       prev.length === 1 && prev[0] === item ? [] : [item]
                     );
@@ -217,7 +285,7 @@ export default function ProjectIndex({
                 }}
               >
                 {item}
-              </button>
+              </FilterButton>
             ))}
             {technology.length > 0 && (
               <button
@@ -225,7 +293,7 @@ export default function ProjectIndex({
                 className="min-h-11 border border-sys-line bg-transparent px-2 py-0.5 font-display text-[0.72rem] text-sys-signal"
                 onClick={() => setTechnology([])}
               >
-                Clear ×
+                Clear x
               </button>
             )}
           </div>
@@ -233,8 +301,8 @@ export default function ProjectIndex({
       </div>
 
       {filtered.length ? (
-        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_minmax(0,460px)] items-start gap-6 tablet:grid-cols-1 tablet:min-w-0">
-          <div className="border-t border-sys-line-strong tablet:min-w-0 tablet:border-sys-line">
+        <div className="mt-6 grid grid-cols-[minmax(0,1fr)_minmax(0,460px)] items-start gap-6 tablet:grid-cols-1 tablet:min-w-0 mobile:mt-3">
+          <div className="border-t border-sys-line-strong tablet:grid tablet:min-w-0 tablet:gap-[6px] tablet:border-0">
             {filtered.map((project, index) => {
               const expanded = expandedId === project.id;
               return (
@@ -242,13 +310,21 @@ export default function ProjectIndex({
                   data-scroll-reveal
                   data-scroll-reveal-state="visible"
                   suppressHydrationWarning
-                  className={`border-b border-sys-line tablet:min-w-0 ${active?.id === project.id ? "bg-sys-signal-soft tablet:bg-transparent" : ""}`}
+                  className={`border-b border-sys-line tablet:min-w-0 tablet:border-0 ${active?.id === project.id ? "bg-sys-signal-soft tablet:bg-transparent" : ""}`}
                   key={project.id}
                   onMouseEnter={() => setActiveId(project.id)}
                   onFocus={() => setActiveId(project.id)}
                 >
+                  <div className="hidden tablet:block">
+                    <MobileProjectCard
+                      project={project}
+                      stars={starsMap[project.id]}
+                      expanded={expanded}
+                      onToggle={() => setExpandedId(expanded ? undefined : project.id)}
+                    />
+                  </div>
                   <button
-                    className="grid w-full grid-cols-[42px_minmax(0,1fr)_150px] items-center gap-4 border-0 bg-transparent px-3 py-[22px] text-left text-inherit tablet:grid-cols-[30px_1fr] tablet:gap-3 tablet:px-0 tablet:py-[18px] tablet:[&[aria-expanded=true]]:pb-3 tablet:[&>span]:min-w-0"
+                    className="grid w-full grid-cols-[42px_minmax(0,1fr)_150px] items-center gap-4 border-0 bg-transparent px-3 py-[22px] text-left text-inherit tablet:hidden"
                     type="button"
                     aria-expanded={expanded}
                     aria-controls={`project-panel-${project.id}`}
@@ -261,7 +337,7 @@ export default function ProjectIndex({
                           <strong className="font-display text-base [overflow-wrap:anywhere]">{project.name}</strong>
                           {starsMap[project.id] && Number(starsMap[project.id]) > 0 && (
                             <span className="font-mono text-[0.65rem] text-sys-signal" aria-label={`${starsMap[project.id]} GitHub stars`}>
-                              ★ {Number(starsMap[project.id]).toLocaleString()}
+                              * {Number(starsMap[project.id]).toLocaleString()}
                             </span>
                           )}
                         </span>
@@ -276,14 +352,15 @@ export default function ProjectIndex({
                     </span>
                     <span className="block text-right text-[0.8rem] text-sys-muted [overflow-wrap:anywhere] tablet:col-start-2 tablet:flex tablet:flex-wrap tablet:items-center tablet:justify-between tablet:gap-x-3 tablet:gap-y-1 tablet:text-left">
                       <span className="mb-5 block tablet:m-0 tablet:min-w-0 tablet:flex-1 tablet:basis-[12rem]">{project.projectType}</span>
-                      <span className="mb-5 block font-display text-[0.72rem] text-sys-signal tablet:hidden">{actionLabel(project)} →</span>
-                      <span className="mb-5 hidden font-display text-[0.72rem] text-sys-signal tablet:m-0 tablet:block tablet:flex-none">{expanded ? "Close" : "Details"} {expanded ? "−" : "+"}</span>
+                      <span className="mb-5 block font-display text-[0.72rem] text-sys-signal tablet:hidden">{actionLabel(project)} -&gt;</span>
+                      <span className="mb-5 hidden font-display text-[0.72rem] text-sys-signal tablet:m-0 tablet:block tablet:flex-none">{expanded ? "Close" : "Details"} {expanded ? "-" : "+"}</span>
                     </span>
                   </button>
+                  {/* FIX: was `className="hidden"` + `hidden={!expanded}` which made the panel
+                       permanently invisible. Now uses conditional Tailwind class. */}
                   <div
-                    className="hidden tablet:block tablet:pb-[22px] tablet:pl-[42px] max-[420px]:pl-0"
                     id={`project-panel-${project.id}`}
-                    hidden={!expanded}
+                    className={expanded ? "" : "hidden"}
                   >
                     <div className={`relative mb-3.5 h-40 overflow-hidden border border-sys-line bg-sys-bg max-[420px]:h-[138px] frame-${project.visualType}`}>
                       <ProjectVisual project={project} />
@@ -305,7 +382,7 @@ export default function ProjectIndex({
                           <DataRow label="My Contribution" value={project.homepageEvidence} stacked noUppercase />
                           {project.pullRequests && project.pullRequests.length > 0 && (
                             <div className="py-2">
-                              <span className="block font-display text-[0.65rem] uppercase tracking-wider text-sys-muted mb-2">Pull Requests</span>
+                              <span className="block font-display text-[0.65rem] uppercase tracking-wider text-sys-muted mb-2">Pull Requests ({project.pullRequests.length})</span>
                               <ul className="flex flex-col gap-1">
                                 {project.pullRequests.map((pr) => (
                                   <li key={pr.number}>
@@ -317,7 +394,7 @@ export default function ProjectIndex({
                                     >
                                       <span className="font-display text-sys-signal">{pr.number}</span>
                                       {pr.title && <span className="min-w-0 flex-1 text-right text-sys-cream/70 text-[0.68rem] [overflow-wrap:anywhere]">{pr.title}</span>}
-                                      <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">↗</span>
+                                      <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">open</span>
                                     </a>
                                   </li>
                                 ))}
@@ -352,7 +429,7 @@ export default function ProjectIndex({
                       <DataRow label="My Contribution" value={active.homepageEvidence} stacked noUppercase />
                       {active.pullRequests && active.pullRequests.length > 0 && (
                         <div className="py-2">
-                          <span className="block font-display text-[0.65rem] uppercase tracking-wider text-sys-muted mb-2">Pull Requests</span>
+                          <span className="block font-display text-[0.65rem] uppercase tracking-wider text-sys-muted mb-2">Pull Requests ({active.pullRequests.length})</span>
                           <ul className="flex flex-col gap-1">
                             {active.pullRequests.map((pr) => (
                               <li key={pr.number}>
@@ -364,7 +441,7 @@ export default function ProjectIndex({
                                 >
                                   <span className="font-display text-sys-signal">{pr.number}</span>
                                   {pr.title && <span className="min-w-0 flex-1 text-right text-sys-cream/70 text-[0.68rem] [overflow-wrap:anywhere]">{pr.title}</span>}
-                                  <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">↗</span>
+                                  <span className="ml-auto text-sys-muted text-[0.65rem] shrink-0">open</span>
                                 </a>
                               </li>
                             ))}
@@ -400,7 +477,7 @@ export default function ProjectIndex({
       
       {showViewAll && (
         <Link className="mt-6 inline-flex border-b border-sys-signal pb-1 text-sys-signal" href="/projects">
-          Query All {totalProjects} Dossiers →
+          Query All {totalProjects} Dossiers -&gt;
         </Link>
       )}
     </section>
