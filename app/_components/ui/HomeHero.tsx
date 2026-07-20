@@ -196,15 +196,15 @@ export default function HomeHero() {
 
   return (
     <section className="flex overflow-hidden bg-transparent" id="home" aria-labelledby="home-hero-title">
-      <div className="mx-auto grid w-[min(1480px,100%)] grid-cols-[minmax(440px,1fr)_minmax(520px,1.2fr)] items-start gap-[clamp(24px,4vw,48px)] px-[clamp(28px,5vw,76px)] pt-[clamp(64px,6vw,92px)] desktop-md:grid-cols-[minmax(390px,0.9fr)_minmax(470px,1.1fr)] desktop-md:px-[clamp(24px,4vw,52px)] desktop-sm:grid-cols-1 desktop-sm:gap-9 tablet:grid-cols-1 tablet:gap-9 tablet:px-5 tablet:pb-11 tablet:pt-[54px] compact:px-[18px] compact:pb-10 compact:pt-12">
+      <div className={`${styles.heroGrid} mx-auto grid w-[min(1480px,100%)] grid-cols-[minmax(440px,1fr)_minmax(520px,1.2fr)] items-start gap-[clamp(24px,4vw,48px)] px-[clamp(28px,5vw,76px)] pt-[clamp(64px,6vw,92px)] desktop-md:grid-cols-[minmax(390px,0.9fr)_minmax(470px,1.1fr)] desktop-md:px-[clamp(24px,4vw,52px)] desktop-sm:grid-cols-1 desktop-sm:gap-9 tablet:grid-cols-1 tablet:gap-9 tablet:px-5 tablet:pb-11 tablet:pt-[54px] compact:px-[18px] compact:pb-10 compact:pt-12`}>
 
         {/* ── Copy column ─────────────────────────────────────────────── */}
         <div className="relative z-[6] max-w-[700px]">
 
-          <p className="m-0 inline-flex min-h-11 max-w-full items-center gap-2.5 font-mono text-[clamp(0.48rem,0.58vw,0.56rem)] font-normal uppercase leading-[1.2] tracking-[0.06em] text-[color-mix(in_srgb,var(--ink)_82%,#000)] no-underline">
+          <p className="m-0 inline-flex min-h-11 max-w-full flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[clamp(0.48rem,0.58vw,0.56rem)] font-normal uppercase leading-[1.2] tracking-[0.06em] text-[color-mix(in_srgb,var(--ink)_82%,#000)] no-underline">
             <span aria-hidden="true" className="block h-px w-[clamp(22px,2.4vw,34px)] flex-none bg-current" />
             <span>Prefer the retro version?</span>
-            <a className="text-[color-mix(in_srgb,var(--ink)_70%,#fff)] underline underline-offset-[3px] transition-colors duration-[120ms] ease-out hover:text-accent focus-visible:text-accent" href="https://portfolio-win95.vercel.app/" target="_blank" rel="noreferrer">
+            <a className="min-w-0 [overflow-wrap:anywhere] text-[color-mix(in_srgb,var(--ink)_70%,#fff)] underline underline-offset-[3px] transition-colors duration-[120ms] ease-out hover:text-accent focus-visible:text-accent" href="https://portfolio-win95.vercel.app/" target="_blank" rel="noreferrer">
               Open the Windows 95 portfolio.
             </a>
           </p>
@@ -217,7 +217,7 @@ export default function HomeHero() {
           </h1>
 
           <p className="mb-10 max-w-[650px] font-body text-[clamp(1rem,1.3vw,1.15rem)] leading-[1.65] text-muted tablet:text-base">
-            He crafts front-ends, back-end servers, and everything in between, while debugging, optimizing performance, and exploring his love of math. more on{" "}
+            He builds front-ends and back-end servers, while debugging issues, optimizing performance, and exploring his love of math. more on{" "}
             <Link
               href="/about/"
               className="text-ink underline decoration-transparent underline-offset-[3px] transition-[color,text-decoration-color] duration-[120ms] ease-out hover:text-accent hover:decoration-accent"
