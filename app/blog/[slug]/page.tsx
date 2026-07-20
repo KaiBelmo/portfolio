@@ -44,11 +44,11 @@ export default async function BlogPostPage({ params }: Props) {
       </nav>
 
       {/* Article header */}
-      <header className="mb-[56px] max-w-[920px] border-b border-line pb-[48px]" data-scroll-reveal data-scroll-reveal-state="visible">
+      <header className="mb-[56px] border-b border-line pb-[48px]" data-scroll-reveal data-scroll-reveal-state="visible">
         <p className="mb-3.5 font-mono text-[0.66rem] font-extrabold uppercase tracking-[0.09em] text-accent">
           DEV.TO — ORIGINAL POST
         </p>
-        <h1 className="m-0 max-w-[820px] text-balance font-display text-[clamp(2.45rem,4.7vw,4.9rem)] leading-[1.02] tracking-[-0.025em]">
+        <h1 className="m-0 text-balance font-display text-[clamp(2.45rem,4.7vw,4.9rem)] leading-[1.02] tracking-[-0.025em]">
           {post.title}
         </h1>
 
@@ -82,7 +82,7 @@ export default async function BlogPostPage({ params }: Props) {
       <div className="flex gap-16 items-start">
         {/* Markdown body */}
         <article
-          className="blog-prose min-w-0 flex-1 max-w-[720px]"
+          className="blog-prose min-w-0 flex-1"
           dangerouslySetInnerHTML={{ __html: post.contentHtml ?? "" }}
         />
 
