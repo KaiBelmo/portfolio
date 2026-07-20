@@ -33,7 +33,7 @@ export default async function AboutPage() {
           &gt; whoami
         </h2>
         <p className="m-0 text-[1.02rem] leading-[1.78] text-muted">
-          I started in competitive programming and low-level programming, where CTF competitions sparked my interest in reverse engineering C programs. While studying Computer Science, I gradually shifted toward software engineering and became focused on building reliable, maintainable systems with strong performance and a good user experience. Since then, Iâ€™ve worked with TypeScript, React, Next.js, Vue, NestJS, and Node.js to build real-time applications, user-focused products, and developer tools.
+          I started in competitive programming and low-level programming, where CTF competitions sparked my interest in reverse engineering C programs. While studying Computer Science, I gradually shifted toward software engineering and became focused on building reliable, maintainable systems with strong performance and a good user experience. Since then, I’ve worked with TypeScript, React, Next.js, Vue, NestJS, and Node.js to build real-time applications, user-focused products, and developer tools.
 
         </p>
       </section>
@@ -44,7 +44,7 @@ export default async function AboutPage() {
             &gt; recent posts
           </h2>
           <Link className="font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted underline-offset-4 hover:text-accent hover:underline" href="/blog">
-            More blog posts â†—
+            More blog posts ↗
           </Link>
         </div>
         <div className="grid grid-cols-[130px_1fr] gap-y-4 font-mono mobile:grid-cols-1">
@@ -63,7 +63,7 @@ export default async function AboutPage() {
             &gt; recent work
           </h2>
           <Link className="font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted underline-offset-4 hover:text-accent hover:underline" href="/projects">
-            More projects â†—
+            More projects ↗
           </Link>
         </div>
         <div className="grid gap-2">
