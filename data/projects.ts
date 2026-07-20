@@ -14,10 +14,7 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Personal Project",
     date: "2025-12-01",
-    imageLink: "/voidgen-screen.PNG",
-    imagePosition: "left",
     description: "VoidGen is a lightweight, configurable mock API server that generates RESTful endpoints from JSON and other structured data formats. It is designed for frontend development, testing, rapid prototyping, and any scenario where you need a reliable API without building a full backend.",
-    coverSeconds: 17,
     features: [
       "Instant REST API from JSON files (additional data formats planned).",
       "Supports both singleton and collection resources.",
@@ -39,8 +36,6 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Personal Project",
     date: "2026-07-11",
-    imageLink: "/og.png",
-    imagePosition: "left",
     description: "Infill is an open-source browser extension that helps users fill forms faster while staying in control of what gets written into the page. It scans form fields, suggests mappings from saved profile facts, and avoids filling sensitive inputs unless the user explicitly approves the action.",
     features: [
       "Scans the active tab for fillable form fields and suggests mappings from saved profile facts.",
@@ -53,7 +48,7 @@ export const projects: Project[] = [
     id: "portfolio-current",
     slug: "portfolio-current",
     name: "Portfolio",
-    link: "https://portfolio-kaibelmo.vercel.app/",
+    link: "https://www.kaibelmo.dev/",
     githubLink: "https://github.com/KaiBelmo/portfolio",
     category: [
       "Next.js",
@@ -62,8 +57,6 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Personal Project",
     date: "2026-01-17",
-    imageLink: "/og.png",
-    imagePosition: "center",
     description: "My current portfolio website, built with Next.js and TypeScript. It combines a project archive, blog, GitHub star integration, pull-request parsing, terminal-style presentation, and downloadable résumé access in a single responsive site.",
     features: [
       "Project index with GitHub star fetching and direct repository linking.",
@@ -84,10 +77,7 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Open Source Contribution",
     date: "2023-11-04",
-    imageLink: "/actual-screen.PNG",
-    imagePosition: "left",
     description: "Actual is a local-first personal finance tool. It's built to be fast and fully private, with optional syncing.",
-    coverSeconds: 3,
     features: [
       "Enhanced the CSV importer by adding support for user-selectable delimiters (like ',' or '|'), increasing compatibility with various bank file formats (#1774).",
       "Fixed styling and mobile UI issues on the transaction and budget pages, improving readability and usability on smaller devices, including making budget category group rows fully tappable for easier expand/collapse interactions (#1820, #6272).",
@@ -103,10 +93,7 @@ export const projects: Project[] = [
     category: ["Vue.js", "WebRTC", "Socket.io"],
     typeOfProject: "Thesis Project",
     date: "2025-09-25",
-    imageLink: "/lessshare-screen.PNG",
-    imagePosition: "center",
     description: "A browser-based decentralized file-sharing platform that enables secure peer-to-peer transfers without relying on centralized servers. Built with WebRTC and Vue.js, the system ensures privacy, speed, and full user control over shared data.",
-    coverSeconds: 7,
     features: [
       "Direct Peer-to-Peer File Transfer — Uses WebRTC DataChannels for real-time, serverless communication between browsers.",
       "Adaptive Chunking — Efficiently handles large files by splitting them into optimized segments for faster transmission.",
@@ -127,10 +114,7 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Open Source Contribution",
     date: "2023-07-09",
-    imageLink: "/coderacer-screen.PNG",
-    imagePosition: "left",
     description: "Code Racer is a multiplayer coding game where developers can compete against each other to solve programming challenges in real-time. Sharpen your coding skills, challenge your peers, and have fun while racing against the clock!",
-    coverSeconds: 6, // Show frame at 6 seconds as cover
     features: [
       "Developed the initial Type Racer mode, including typing logic and restart functionality, laying the foundation for competitive code-typing gameplay.",
       "Contributed multiple pull requests (#47, #90, #183, #229) addressing features and bugs, strengthening open-source collaboration and community growth."
@@ -150,10 +134,7 @@ export const projects: Project[] = [
     ],
     typeOfProject: "Personal Project",
     date: "2023-01-22",
-    imageLink: "/wind95-screen.PNG",
-    imagePosition: "left",
     description: "A creative experiment blending retro aesthetics with modern web engineering. This portfolio reimagines the Windows 95 desktop experience using Vue.js, TypeScript, and Canvas, focusing on interactive UI elements, smooth state management with Pinia, and pixel-perfect nostalgia.",
-    coverSeconds: 8, // Show frame at 8 seconds as cover
     features: [
       "Component-based retro UI toolkit built from scratch.",
       "Interactive desktop with draggable apps and marquee selection.",
@@ -170,9 +151,6 @@ export const projects: Project[] = [
     category: ["Data Structures", "STL"],
     typeOfProject: "Personal Project",
     date: "2022-01-30",
-    imageLink: "/libc-screen.PNG",
-    imagePosition: "left",
-    coverSeconds: 8, // Show frame at 8 seconds as cover
     features: [
       "STL-compatible, header-only container library featuring vector, list, deque, etc...",
       "Memory-efficient implementation.",
@@ -188,9 +166,6 @@ export const projects: Project[] = [
     category: ["Debugger", "ELF Parser", "C"],
     typeOfProject: "Personal Project",
     date: "2020-08-02",
-    imageLink: "/b1m0-dbg-screen.PNG",
-    imagePosition: "left",
-    coverSeconds: 8, // Show frame at 8 seconds as cover
     features: [
       "Developed a custom Linux debugger (b1m0-dbg) from scratch for x86_64 architecture, focusing on educational purposes to deepen understanding of low-level system programming, ELF file formats, and process debugging.",
       "Implemented core features including ELF parsing (headers and sections), syscall tracing akin to strace, security mitigation checks (RELRO, NX), single-step execution with step-over and step-out, register dumping/modification, breakpoints, and process introspection like memory mappings and command lines.",
@@ -206,9 +181,6 @@ export const projects: Project[] = [
     category: ["JavaScript", "Chrome extension"],
     typeOfProject: "Personal Project",
     date: "2023-06-30", // You'll need to update this date
-    imageLink: "/no404-screen.PNG", // Placeholder path
-    imagePosition: "left", // You can change this
-    coverSeconds: 9,
     features: [
       "Developed a lightweight Chrome extension, no404, that automatically detects visited websites and offers one-click access to their archived versions on the Internet Archive, simplifying retrieval of content from broken or removed pages.",
       "Addressed a common user frustration with 404 errors by creating a free, open-source tool that avoids manual searches, opting not to publish on the Chrome Web Store to skip associated fees.",
@@ -224,9 +196,6 @@ export const projects: Project[] = [
     category: ["Full stack", "WebSockets"],
     typeOfProject: "University Project",
     date: "2023-02-21",
-    imageLink: "/together-screen.PNG",
-    imagePosition: "center",
-    coverSeconds: 13, // Show frame at 8 seconds as cover
     features: [
       "Real-time Video Synchronization — Uses WebSockets to keep video playback in sync across all participants in a room.",
       "Room-based System — Create and join rooms to watch videos together with friends in private sessions.",
