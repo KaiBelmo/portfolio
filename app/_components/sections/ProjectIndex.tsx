@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ChevronDown, ExternalLink } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ComponentPropsWithoutRef } from "react";
 import type { Project } from "@/types/project";
 import { GithubIcon } from "@/app/contact/contactData";
@@ -24,6 +24,14 @@ const disciplineMobileSpans: Record<string, string> = {
 
 const filterControlClass =
   "min-h-11 border border-sys-line bg-[color-mix(in_srgb,var(--sys-bg)_84%,transparent)] px-[13px] py-2 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] aria-pressed:bg-sys-signal aria-pressed:text-sys-bg mobile:h-auto";
+const dropdownFrameClass =
+  "relative inline-flex min-h-11 text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[140px] mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none";
+const dropdownTriggerClass =
+  "inline-flex min-h-11 w-full items-center justify-between gap-3 border border-sys-line bg-[color-mix(in_srgb,var(--sys-bg)_84%,transparent)] px-[13px] py-2 text-left transition-colors hover:border-sys-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sys-focus mobile:h-11 mobile:min-h-0 mobile:px-4 mobile:py-0";
+const dropdownMenuClass =
+  "absolute left-0 top-[calc(100%+4px)] z-[200] max-h-60 w-full overflow-y-auto overscroll-contain border border-sys-line-strong bg-sys-bg py-1 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)] mobile:w-[calc(200%+0.5rem)]";
+const dropdownOptionClass =
+  "block min-h-11 w-full border-l-2 border-transparent px-[13px] py-2 text-left text-sys-cream transition-colors hover:bg-[color-mix(in_srgb,var(--sys-signal)_14%,transparent)] focus-visible:bg-[color-mix(in_srgb,var(--sys-signal)_14%,transparent)] focus-visible:outline-none aria-selected:border-l-sys-signal aria-selected:bg-[color-mix(in_srgb,var(--sys-signal)_12%,var(--sys-bg))] aria-selected:text-sys-signal mobile:px-4";
 const projectActionClass =
   "inline-flex min-h-11 flex-auto items-center justify-center gap-2 border border-sys-signal bg-transparent px-4 py-[9px] text-center font-display text-[0.68rem] uppercase tracking-[0.04em] text-sys-signal hover:bg-sys-signal hover:text-sys-bg";
 const iconActionClass =
@@ -38,8 +46,67 @@ function FilterButton({ className, ...props }: ComponentPropsWithoutRef<"button"
   return <button className={filterControlClasses(className)} {...props} />;
 }
 
-function FilterSelect({ className, ...props }: ComponentPropsWithoutRef<"select">) {
-  return <select className={filterControlClasses(className)} {...props} />;
+function YearDropdown({
+  className,
+  label,
+  years,
+  value,
+  onChange,
+}: {
+  className?: string;
+  label: string;
+  years: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const options = ["All", ...years];
+  const displayValue = value === "All" ? label : value;
+
+  return (
+    <div
+      ref={ref}
+      className={`${dropdownFrameClass} ${open ? "z-[200]" : "z-auto"} ${className || ""}`}
+      onBlur={(event) => {
+        if (!ref.current?.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
+      <button
+        className={dropdownTriggerClass}
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span>{displayValue}</span>
+        <ChevronDown
+          className={`size-4 opacity-80 transition-transform ${open ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+      {open && (
+        <div className={dropdownMenuClass} role="listbox" aria-label={label}>
+          {options.map((item) => (
+            <button
+              key={item}
+              className={dropdownOptionClass}
+              type="button"
+              role="option"
+              aria-selected={value === item}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                onChange(item);
+                setOpen(false);
+              }}
+            >
+              {item === "All" ? label : item}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function isOpenSource(project: Project) {
@@ -187,7 +254,7 @@ export default function ProjectIndex({
 
       <div
         id="project-filter-panel"
-        className={`grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-[18px] gap-y-2.5 border-y border-sys-line-strong py-3.5 tablet:grid-cols-1 mobile:border-0 mobile:pt-0 ${showMobileFilters ? "mobile:grid" : "mobile:hidden"}`}
+        className={`relative z-50 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-[18px] gap-y-2.5 border-y border-sys-line-strong py-3.5 tablet:grid-cols-1 mobile:border-0 mobile:pt-0 ${showMobileFilters ? "mobile:grid" : "mobile:hidden"}`}
         aria-label="Filter projects"
         data-scroll-reveal
         data-scroll-reveal-state="visible"
@@ -209,37 +276,30 @@ export default function ProjectIndex({
         </div>
 
         {/* Year / Tech / Clear - compact row on mobile */}
-        <div className="flex flex-wrap items-center justify-end gap-2 tablet:justify-start mobile:w-full">
+        <div className="flex flex-wrap items-center justify-end gap-2 tablet:justify-start mobile:grid mobile:w-full mobile:grid-cols-2">
           {years.length > 1 && (
             <>
               <label className="flex min-h-11 items-center gap-2 font-display text-[0.76rem] text-sys-cream tablet:flex-1 tablet:basis-[220px] mobile:hidden">
                 Year{" "}
-                <FilterSelect
+                <YearDropdown
                   className="min-w-24 tablet:flex-1"
+                  label="All"
+                  years={years}
                   value={year}
-                  onChange={(event) => setYear(event.target.value)}
-                >
-                  <option>All</option>
-                  {years.map((item) => (
-                    <option key={item}>{item}</option>
-                  ))}
-                </FilterSelect>
+                  onChange={setYear}
+                />
               </label>
-              <FilterSelect
-                className="hidden min-w-0 mobile:block mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none mobile:px-4 mobile:py-0"
+              <YearDropdown
+                className="hidden min-w-0 mobile:flex mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none"
+                label="Years"
+                years={years}
                 value={year}
-                onChange={(event) => setYear(event.target.value)}
-                aria-label="Year"
-              >
-                <option value="All">Years</option>
-                {years.map((item) => (
-                  <option key={item}>{item}</option>
-                ))}
-              </FilterSelect>
+                onChange={setYear}
+              />
             </>
           )}
           <FilterButton
-            className="mobile:flex-none mobile:basis-auto"
+            className="mobile:inline-flex mobile:h-11 mobile:min-h-0 mobile:w-full mobile:flex-none mobile:basis-auto mobile:items-center mobile:justify-between mobile:px-4 mobile:py-0 mobile:text-left"
             type="button"
             aria-expanded={showTechnologies}
             aria-controls="technology-filters"
