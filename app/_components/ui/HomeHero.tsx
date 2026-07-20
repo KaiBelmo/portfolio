@@ -120,7 +120,7 @@ export default function HomeHero() {
     <section className="flex overflow-hidden bg-transparent" id="home" aria-labelledby="home-hero-title">
       <div className={`${styles.heroGrid} mx-auto grid w-[min(1480px,100%)] grid-cols-[minmax(440px,1fr)_minmax(520px,1.2fr)] items-start gap-[clamp(24px,4vw,48px)] px-[clamp(28px,5vw,76px)] pt-[clamp(64px,6vw,92px)] desktop-md:grid-cols-[minmax(390px,0.9fr)_minmax(470px,1.1fr)] desktop-md:px-[clamp(24px,4vw,52px)] desktop-sm:grid-cols-1 desktop-sm:gap-9 tablet:grid-cols-1 tablet:gap-9 tablet:px-5 tablet:pb-11 tablet:pt-[54px] compact:px-[18px] compact:pb-10 compact:pt-12`}>
 
-        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Copy column Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+        {/* Copy column */}
         <div className="relative z-[6] max-w-[700px]">
 
           <p className="m-0 inline-flex min-h-11 max-w-full flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[clamp(0.48rem,0.58vw,0.56rem)] font-normal uppercase leading-[1.2] tracking-[0.06em] text-[color-mix(in_srgb,var(--ink)_82%,#000)] no-underline">
@@ -148,12 +148,12 @@ export default function HomeHero() {
             </Link>
           </p>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Desktop columns Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* Desktop columns */}
           <div className="mt-7 grid grid-cols-2 gap-[clamp(24px,4vw,48px)] tablet:hidden">
 
             {/* Projects */}
             <div className="grid gap-[18px]">
-              <h2 className="mb-2 font-display text-[0.82rem] font-bold uppercase tracking-[0.06em] text-ink">Projects Ã¢â€ â€œ</h2>
+              <h2 className="mb-2 font-display text-[0.82rem] font-bold uppercase tracking-[0.06em] text-ink">Projects ↓</h2>
               <div className="grid gap-[10px]">
                 {featuredProjects.map((project) => (
                   <div key={project.id} className="grid min-h-[2.65rem] gap-1">
@@ -175,7 +175,7 @@ export default function HomeHero() {
 
             {/* Contact */}
             <div className="grid gap-[10px]">
-              <h2 className="mb-2 font-display text-[0.82rem] font-bold uppercase tracking-[0.06em] text-ink">Contact Ã¢â€ â€œ</h2>
+              <h2 className="mb-2 font-display text-[0.82rem] font-bold uppercase tracking-[0.06em] text-ink">Contact ↓</h2>
               <div className="grid gap-[10px]">
                 {[
                   { label: "Email", href: "mailto:contact@kaibelmo.dev", text: "contact@kaibelmo.dev", external: false },
@@ -197,12 +197,12 @@ export default function HomeHero() {
             </div>
           </div>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Mobile columns (Ã¢â€°Â¤800px) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* Mobile columns (≤800px) */}
           <div className="hidden tablet:grid grid-cols-1 gap-4 mt-5">
 
             {/* Mobile projects */}
             <div className="grid gap-2">
-              <h2 className="font-display text-[0.72rem] tracking-[0.08em] uppercase text-muted">Projects Ã¢â€ â€œ</h2>
+              <h2 className="font-display text-[0.72rem] tracking-[0.08em] uppercase text-muted">Projects ↓</h2>
               <div className="grid gap-[6px]">
                 {featuredProjects.map((project) => (
                   <MobileProjectCard
@@ -223,8 +223,8 @@ export default function HomeHero() {
 
             {/* Mobile contact */}
             <div className="grid gap-2">
-              <h2 className="font-display text-[0.72rem] tracking-[0.08em] uppercase text-muted">Contact Ã¢â€ â€œ</h2>
-              <p className="m-0 font-body text-[0.74rem] leading-[1.5] text-muted">Reach out Ã¢â‚¬â€ I usually reply within two working days.</p>
+              <h2 className="font-display text-[0.72rem] tracking-[0.08em] uppercase text-muted">Contact ↓</h2>
+              <p className="m-0 font-body text-[0.74rem] leading-[1.5] text-muted">Reach out — I usually reply within two working days.</p>
               <div className="border border-line">
                 {[
                   { label: "Email", href: "mailto:contact@kaibelmo.dev", text: "contact@kaibelmo.dev", external: false },
@@ -247,7 +247,7 @@ export default function HomeHero() {
           </div>
         </div>
 
-        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Scene aside Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+        {/* Scene aside */}
         <aside
           ref={sceneRef}
           className={`${styles.scene} relative z-[2] -ml-[clamp(0px,1.5vw,12px)] self-start [perspective:var(--tilt-perspective)] desktop-md:-ml-[54px] desktop-sm:ml-0 tablet:hidden`}
@@ -256,7 +256,7 @@ export default function HomeHero() {
           <div ref={cardRef} className={`${styles.sceneCard} relative border-none shadow-[0_8px_24px_color-mix(in_srgb,var(--shadow)_24%,transparent)] [transform-style:preserve-3d]`}>
             <div className="absolute z-[4] top-3.5 right-3.5 grid gap-[3px] px-[11px] py-2 text-surface bg-ink font-mono text-[0.5rem] font-bold tracking-[0.07em] uppercase shadow-pixel-accent">
               <span>Workspace / {roomAnimation ? roomAnimation.to : theme}</span>
-              <span className="text-[color-mix(in_srgb,var(--surface)_66%,transparent)]">{roomAnimation ? "Time-lapse running" : "Explore Ã¢â‚¬â€ hover or tab through objects"}</span>
+              <span className="text-[color-mix(in_srgb,var(--surface)_66%,transparent)]">{roomAnimation ? "Time-lapse running" : "Explore — hover or tab through objects"}</span>
             </div>
             <RoomScene
               theme={theme}
