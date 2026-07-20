@@ -82,7 +82,7 @@ export default function ProjectVisual({
 
   return (
     <div
-      className={`visual-phosphor visual-${project.slug} relative h-full min-h-full w-full overflow-hidden bg-sys-bg px-[26px] pb-7 pt-[62px] text-sys-signal`}
+      className={`visual-phosphor visual-${project.slug} relative h-full min-h-full w-full overflow-hidden bg-sys-bg px-[26px] pb-7 pt-[62px] text-sys-signal mobile:px-4 mobile:pt-[54px]`}
       role="img"
       aria-label={`${project.name} technical code excerpt`}
     >
@@ -92,16 +92,16 @@ export default function ProjectVisual({
         <span />
         <b>{project.name.toLowerCase()} — source</b>
       </div>
-      <pre className="font-mono text-xs md:text-sm">
+      <pre className="whitespace-pre-wrap break-words font-mono text-xs md:text-sm">
         <code>{lines.join("\n")}</code>
       </pre>
-      <div className="absolute inset-x-5 bottom-4 flex justify-between font-mono text-[0.65rem] text-sys-muted">
-        <span>{project.category.join(" / ")}</span>
+      <div className="absolute inset-x-5 bottom-4 flex justify-between gap-3 font-mono text-[0.65rem] text-sys-muted mobile:inset-x-4">
+        <span className="min-w-0 [overflow-wrap:anywhere]">{project.category.join(" / ")}</span>
         <a
           href={`https://github.com/${new URL(project.githubLink).pathname.split("/")[1]}`}
           target="_blank"
           rel="noreferrer"
-          className="transition-colors hover:text-sys-cream hover:underline"
+          className="min-w-0 text-right [overflow-wrap:anywhere] transition-colors hover:text-sys-cream hover:underline"
         >
           {new URL(project.githubLink).hostname}/{new URL(project.githubLink).pathname.split("/")[1]}
         </a>
