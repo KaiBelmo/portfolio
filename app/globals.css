@@ -333,11 +333,13 @@ p {
   width: min(1480px, 100%);
   margin-inline: auto;
   padding-inline: clamp(28px, 5vw, 76px);
+  padding-block: clamp(36px, 5vw, 72px) clamp(64px, 8vw, 120px);
 }
 
 @media (max-width: 800px) {
   .route-shell {
     padding-inline: 20px;
+    padding-block: 58px;
   }
 }
 
