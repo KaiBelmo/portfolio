@@ -13,7 +13,7 @@ export default async function ContactPage() {
   const githubActivity = await getGithubActivity();
 
   return (
-    <section className="px-[clamp(20px,5vw,72px)] pb-[clamp(64px,8vw,120px)] pt-[clamp(36px,5vw,72px)] font-body text-ink tablet:px-4 tablet:py-[58px]">
+    <section className="route-shell font-body text-ink">
       <nav
         className="mb-[10px] flex min-h-11 items-center gap-2.5 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted"
         aria-label="Breadcrumb"
