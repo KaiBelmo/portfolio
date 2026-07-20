@@ -11,10 +11,10 @@ import React, {
 } from "react";
 import { usePathname } from "next/navigation";
 import {
+  DEFAULT_THEME,
   ThemeType,
   getThemeFromHour,
   THEME_PALETTES,
-  DEFAULT_THEME,
 } from "@/lib/theme";
 import {
   RoomThemeAnimation,
@@ -98,6 +98,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         ?.setAttribute("content", THEME_PALETTES[availableTheme].canvas);
     }
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const initialTheme = coerceAvailableTheme(getThemeFromHour());
+      setClockTheme(initialTheme);
+      commitTheme(initialTheme);
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [commitTheme]);
 
   const clearTransition = useCallback(() => {
     if (paletteCommitTimerRef.current !== null) {
