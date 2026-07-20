@@ -17,11 +17,11 @@ import {
 import GithubActivityHeatmap from "./GithubActivityHeatmap";
 
 const CARD_CLASS =
-  "group relative flex h-full min-h-[210px] flex-col justify-between gap-8 border border-line p-6 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none";
+  "group relative flex h-full min-h-[210px] flex-col justify-between gap-8 border border-line p-6 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[150px] mobile:gap-4 mobile:p-4";
 const COMPACT_CARD_CLASS =
-  "group relative flex h-full min-h-[160px] flex-col justify-between gap-4 border border-line p-5 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none";
+  "group relative flex h-full min-h-[160px] flex-col justify-between gap-4 border border-line p-5 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[140px] mobile:p-4";
 const FIRST_ROW_CARD_CLASS =
-  "group relative flex h-full min-h-[132px] flex-col justify-between gap-3 border border-line p-4 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none";
+  "group relative flex h-full min-h-[132px] flex-col justify-between gap-3 border border-line p-4 transition-colors duration-300 ease-out hover:border-accent focus-visible:border-accent focus-visible:outline-none mobile:min-h-[126px]";
 const CARD_ICON_CLASS =
   "text-muted transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent";
 const CARD_ARROW_CLASS =
@@ -68,7 +68,7 @@ function ContactCard({
         {children}
         <div className="flex items-end justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="m-0 text-2xl font-bold text-ink transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent">
+            <h3 className="m-0 text-2xl font-bold text-ink transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent mobile:text-xl">
               {title}
             </h3>
             <p className="m-0 mt-2 truncate font-mono text-[0.88rem] tracking-[0.02em] text-muted">{value}</p>
@@ -191,7 +191,7 @@ function ActivityCard({ activity }: { activity: GithubActivity | null }) {
 
 export default function ContactGrid({ githubActivity }: { githubActivity: GithubActivity | null }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
       <EmailCard />
       <PgpCard />
       <ContactCard
