@@ -662,6 +662,26 @@ p {
   margin: 1.6em 0;
 }
 
+.heatmap-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted) 58%, transparent) transparent;
+}
+
+.heatmap-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.heatmap-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.heatmap-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted) 58%, transparent);
+  border-radius: 999px;
+}
+
 /* --------------------------------------------------------------------------
    Print
    -------------------------------------------------------------------------- */
