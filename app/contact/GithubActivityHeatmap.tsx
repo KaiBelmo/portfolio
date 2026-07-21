@@ -3,15 +3,18 @@ import {
   HEATMAP_CELL_GAP,
   HEATMAP_CELL_SIZE,
   HEATMAP_COLORS,
-  HEATMAP_GRID_WIDTH,
   HEATMAP_LABEL_COLUMN_WIDTH,
-  HEATMAP_LAYOUT_WIDTH,
 } from "./contactData";
 
 type HeatmapMonthLabel = {
   label: string;
   column: number;
 };
+
+// Total number of week-columns the grid is laid out with. Used both for the
+// grid template and to convert a column index into a percentage offset so
+// month labels stay aligned regardless of how wide the grid is rendered.
+const HEATMAP_TOTAL_COLUMNS = 53;
 
 function getHeatmapThresholds(activity: GithubActivity): [number, number, number, number] {
   const counts = activity.days
@@ -73,11 +76,10 @@ function Heatmap({ activity }: { activity: GithubActivity }) {
 
   return (
     <div
-      className="grid w-max grid-flow-col"
+      className="grid w-max grid-flow-col grid-cols-[repeat(53,var(--heatmap-cell))]"
       style={{
-        gridTemplateColumns: `repeat(53, ${HEATMAP_CELL_SIZE}px)`,
-        gridTemplateRows: `repeat(7, ${HEATMAP_CELL_SIZE}px)`,
-        gap: `${HEATMAP_CELL_GAP}px`,
+        gridTemplateRows: "repeat(7, var(--heatmap-cell))",
+        gap: "var(--heatmap-gap)",
       }}
     >
       {activity.days.map((day) => {
@@ -88,12 +90,8 @@ function Heatmap({ activity }: { activity: GithubActivity }) {
             key={day.date}
             title={`${day.contributionCount} contributions on ${day.date}`}
             aria-label={`${day.contributionCount} contributions on ${day.date}`}
-            className="rounded-[2px]"
-            style={{
-              ...HEATMAP_COLORS[intensity],
-              height: `${HEATMAP_CELL_SIZE}px`,
-              width: `${HEATMAP_CELL_SIZE}px`,
-            }}
+            className="h-[var(--heatmap-cell)] w-[var(--heatmap-cell)] rounded-[2px]"
+            style={HEATMAP_COLORS[intensity]}
           />
         );
       })}
@@ -102,43 +100,45 @@ function Heatmap({ activity }: { activity: GithubActivity }) {
 }
 
 export default function GithubActivityHeatmap({ activity }: { activity: GithubActivity | null }) {
+  const heatmapCssVars = {
+    "--heatmap-gap": `${HEATMAP_CELL_GAP}px`,
+    "--heatmap-max-cell": `${HEATMAP_CELL_SIZE}px`,
+    "--heatmap-cell": `clamp(10px, calc((100cqw - var(--heatmap-label-width) - 12px - (${HEATMAP_TOTAL_COLUMNS - 1} * var(--heatmap-gap))) / ${HEATMAP_TOTAL_COLUMNS}), var(--heatmap-max-cell))`,
+    "--heatmap-grid-width": `calc((${HEATMAP_TOTAL_COLUMNS} * var(--heatmap-cell)) + (${HEATMAP_TOTAL_COLUMNS - 1} * var(--heatmap-gap)))`,
+    "--heatmap-label-width": `${HEATMAP_LABEL_COLUMN_WIDTH}px`,
+    "--heatmap-layout-width": `calc(var(--heatmap-label-width) + 12px + var(--heatmap-grid-width))`,
+  } as React.CSSProperties;
+
   return (
-    <div className="overflow-x-auto border-t border-line pt-4">
-      <div style={{ minWidth: `${HEATMAP_LAYOUT_WIDTH}px` }}>
-        <div
-          className="grid items-start gap-x-3"
-          style={{ gridTemplateColumns: `${HEATMAP_LABEL_COLUMN_WIDTH}px ${HEATMAP_GRID_WIDTH}px` }}
-        >
+    <div className="heatmap-scroll border-t border-line pb-5 pt-4 [container-type:inline-size]" style={heatmapCssVars}>
+      <div className="min-w-[var(--heatmap-layout-width)]">
+        <div className="grid items-start gap-x-3 grid-cols-[var(--heatmap-label-width)_var(--heatmap-grid-width)]">
           <span aria-hidden="true" />
-          <div
-            className="relative mb-2 h-4 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted opacity-60"
-            style={{ width: `${HEATMAP_GRID_WIDTH}px` }}
-          >
+          <div className="relative mb-2 h-4 w-[var(--heatmap-grid-width)] font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted opacity-60">
             {getMonthLabels(activity).map(({ label, column }) => (
               <span
                 key={`${label}-${column}`}
                 className="absolute top-0"
-                style={{ left: `${column * (HEATMAP_CELL_SIZE + HEATMAP_CELL_GAP)}px` }}
+                style={{ left: `${(column / HEATMAP_TOTAL_COLUMNS) * 100}%` }}
               >
                 {label}
               </span>
             ))}
           </div>
           <div
-            className="grid pt-[13px] font-mono text-[0.68rem] text-muted"
+            className="grid font-mono text-[0.68rem] text-muted [&>span]:flex [&>span]:items-center"
             style={{
-              gridTemplateRows: `repeat(7, ${HEATMAP_CELL_SIZE}px)`,
-              gap: `${HEATMAP_CELL_GAP}px`,
-              lineHeight: `${HEATMAP_CELL_SIZE}px`,
+              gridTemplateRows: "repeat(7, var(--heatmap-cell))",
+              gap: "var(--heatmap-gap)",
             }}
           >
-            <span />
-            <span>Mon</span>
-            <span />
-            <span>Wed</span>
-            <span />
-            <span>Fri</span>
-            <span />
+            <span>Sun</span>
+            <span aria-hidden="true" />
+            <span>Tue</span>
+            <span aria-hidden="true" />
+            <span>Thu</span>
+            <span aria-hidden="true" />
+            <span>Sat</span>
           </div>
           {activity ? (
             <Heatmap activity={activity} />
