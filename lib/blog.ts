@@ -62,13 +62,33 @@ function articleToPost(article: DevToArticle): BlogPost {
     readingTime: article.reading_time_minutes ?? 1,
   };
 }
+function linkifyBareUrls(content: string): string {
+  let inFence = false;
+
+  return content
+    .split("\n")
+    .map((line) => {
+      if (/^\s*```/.test(line)) {
+        inFence = !inFence;
+        return line;
+      }
+
+      if (inFence) return line;
+
+      return line.replace(
+        /(^|[^\]\(<])\b(https?:\/\/[^\s<>()]+[^\s<>().,!?;:])/g,
+        (_, prefix: string, url: string) => `${prefix}<${url}>`
+      );
+    })
+    .join("\n");
+}
 
 async function renderMarkdown(content: string): Promise<Pick<BlogPost, "contentHtml" | "toc">> {
   const processed = await remark()
     .use(remarkRehype)
     .use(rehypeHighlight)
     .use(rehypeStringify)
-    .process(content);
+    .process(linkifyBareUrls(content));
   const contentHtml = processed.toString();
 
   const mdHeadings: TocEntry[] = [];
