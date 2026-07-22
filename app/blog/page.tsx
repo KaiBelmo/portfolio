@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 };
 
-// Revalidate the page every 24 hours — matches the blog-sync interval
+// Revalidate the page daily to pick up new Dev.to posts
 export const revalidate = 86400;
 
 export default async function BlogPage() {
@@ -46,7 +46,7 @@ export default async function BlogPage() {
                 <time dateTime={post.published_at}>
                   {formatPostDate(post.published_at)}
                 </time>
-                <span aria-hidden="true" className="text-line-strong">·</span>
+                <span aria-hidden="true" className="text-line-strong">|</span>
                 {post.tags.slice(0, 3).map((tag) => (
                   <span key={tag} className="text-accent">{tag}</span>
                 ))}
@@ -66,14 +66,14 @@ export default async function BlogPage() {
               </p>
             </div>
 
-            {/* Read link — bottom-right */}
+            {/* Read link - bottom-right */}
             <Link
               href={`/blog/${post.slug}`}
               className="flex shrink-0 items-center gap-2 pb-0.5 font-mono text-[0.6rem] uppercase tracking-[0.08em] text-ink transition-opacity duration-150 hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)] tablet:self-auto"
               aria-label={`Read ${post.title}`}
             >
               <span>{post.readingTime} min read</span>
-              <span aria-hidden="true">↗</span>
+              <span aria-hidden="true">-&gt;</span>
             </Link>
           </article>
         ))}
