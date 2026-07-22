@@ -52,26 +52,28 @@ export default async function BlogPostPage({ params }: Props) {
           {post.title}
         </h1>
 
-        <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted">
-          <time dateTime={post.published_at}>
-            {formatPostDate(post.published_at)}
-          </time>
-          <span>{post.readingTime} min read</span>
-          <div className="flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="border border-line px-1.5 py-0.5 font-mono text-[0.58rem] uppercase text-accent"
-              >
-                {tag}
-              </span>
-            ))}
+        <div className="mt-9 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted tablet:justify-start tablet:gap-x-4">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-3 tablet:gap-x-4">
+            <time className="shrink-0" dateTime={post.published_at}>
+              {formatPostDate(post.published_at)}
+            </time>
+            <span className="shrink-0">{post.readingTime} min read</span>
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="shrink-0 border border-line px-1.5 py-0.5 font-mono text-[0.58rem] uppercase text-accent"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
           <a
             href={post.source}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex shrink-0 items-center gap-1.5 text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
+            className="inline-flex shrink-0 items-center gap-1.5 text-right text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
           >
             View on DEV.to <span aria-hidden="true">-&gt;</span>
           </a>
