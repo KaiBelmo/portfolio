@@ -7,6 +7,8 @@ import rehypeStringify from "rehype-stringify";
 import remarkRehype from "remark-rehype";
 
 const BLOG_DIR = path.join(process.cwd(), "content/blog/dev-to");
+const DEV_TO_USERNAME = "b1m0110";
+const DEV_TO_API = `https://dev.to/api/articles?username=${DEV_TO_USERNAME}&per_page=30`;
 
 export interface TocEntry {
   id: string;
@@ -26,6 +28,18 @@ export interface BlogPost {
   toc?: TocEntry[];
 }
 
+interface DevToArticle {
+  id: number;
+  title: string;
+  slug: string;
+  description: string | null;
+  published_at: string;
+  tag_list: string[] | string;
+  url: string;
+  body_markdown?: string | null;
+  reading_time_minutes?: number;
+}
+
 function parseTags(raw: unknown): string[] {
   if (Array.isArray(raw)) return raw.map(String);
   if (typeof raw === "string") return raw.split(",").map((t) => t.trim()).filter(Boolean);
@@ -37,8 +51,105 @@ function estimateReadingTime(content: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
+function articleToPost(article: DevToArticle): BlogPost {
+  return {
+    slug: article.slug,
+    title: article.title,
+    published_at: article.published_at,
+    description: article.description ?? "",
+    tags: parseTags(article.tag_list),
+    source: article.url,
+    readingTime: article.reading_time_minutes ?? 1,
+  };
+}
+
+async function renderMarkdown(content: string): Promise<Pick<BlogPost, "contentHtml" | "toc">> {
+  const processed = await remark()
+    .use(remarkRehype)
+    .use(rehypeHighlight)
+    .use(rehypeStringify)
+    .process(content);
+  const contentHtml = processed.toString();
+
+  const mdHeadings: TocEntry[] = [];
+  const mdHeadingRegex = /^(#{2,3})\s+(.+)$/gm;
+  let mdMatch: RegExpExecArray | null;
+  while ((mdMatch = mdHeadingRegex.exec(content)) !== null) {
+    const level = mdMatch[1].length as 2 | 3;
+    const text = mdMatch[2].trim();
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+    mdHeadings.push({ level, id, text });
+  }
+
+  const devToPostPattern = new RegExp(
+    `https://dev\\.to/${DEV_TO_USERNAME}/([\\w-]+)`,
+    "g"
+  );
+  const localizedHtml = contentHtml.replace(devToPostPattern, "/blog/$1");
+
+  let patchedHtml = localizedHtml.replace(
+    /<pre><code class="([^"]*\blanguage-([^"\s]+)[^"]*)">/g,
+    '<pre data-language="$2"><code class="$1">'
+  );
+  let hIdx = 0;
+  patchedHtml = patchedHtml.replace(/<h([23])>(.*?)<\/h[23]>/gi, (_, lvl, inner) => {
+    const entry = mdHeadings[hIdx];
+    hIdx++;
+    if (!entry) return `<h${lvl}>${inner}</h${lvl}>`;
+    return `<h${lvl} id="${entry.id}">${inner}</h${lvl}>`;
+  });
+
+  return { contentHtml: patchedHtml, toc: mdHeadings };
+}
+
+async function fetchDevToArticleList(): Promise<DevToArticle[]> {
+  const res = await fetch(DEV_TO_API, {
+    headers: { "User-Agent": "portfolio-blog/1.0" },
+    next: { revalidate: 86400 },
+  });
+
+  if (!res.ok) {
+    throw new Error(`dev.to API error: ${res.status} ${res.statusText}`);
+  }
+
+  return res.json();
+}
+
+async function fetchDevToArticles(): Promise<BlogPost[]> {
+  const articles = await fetchDevToArticleList();
+  return articles
+    .map(articleToPost)
+    .sort(
+      (a, b) =>
+        new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+    );
+}
+
+async function fetchDevToArticleBySlug(slug: string): Promise<BlogPost | null> {
+  const articles = await fetchDevToArticleList();
+  const summary = articles.find((article) => article.slug === slug);
+  if (!summary) return null;
+
+  const res = await fetch(`https://dev.to/api/articles/${summary.id}`, {
+    headers: { "User-Agent": "portfolio-blog/1.0" },
+    next: { revalidate: 86400 },
+  });
+
+  if (!res.ok) {
+    throw new Error(`dev.to article error: ${res.status} ${res.statusText}`);
+  }
+
+  const article: DevToArticle = await res.json();
+  const rendered = await renderMarkdown(article.body_markdown ?? "");
+  return { ...articleToPost(article), ...rendered };
+}
+
 // ---------------------------------------------------------------------------
-// Disk-based helpers (used at build time and in API routes)
+// Disk-based helpers (used as a bundled fallback when dev.to is unavailable)
 // ---------------------------------------------------------------------------
 
 export function getAllPosts(): BlogPost[] {
@@ -62,7 +173,6 @@ export function getAllPosts(): BlogPost[] {
     };
   });
 
-  // Newest first
   return posts.sort(
     (a, b) =>
       new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
@@ -78,51 +188,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     const { data, content } = matter(raw);
 
     if (data.slug === slug) {
-      const processed = await remark()
-        .use(remarkRehype)
-        .use(rehypeHighlight)
-        .use(rehypeStringify)
-        .process(content);
-      const contentHtml = processed.toString();
-
-      // The markdown pipeline doesn't auto-add ids; parse headings from raw markdown instead.
-      const mdHeadings: TocEntry[] = [];
-      const mdHeadingRegex = /^(#{2,3})\s+(.+)$/gm;
-      let mdMatch: RegExpExecArray | null;
-      while ((mdMatch = mdHeadingRegex.exec(content)) !== null) {
-        const level = mdMatch[1].length as 2 | 3;
-        const text = mdMatch[2].trim();
-        const id = text
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/-+/g, "-");
-        mdHeadings.push({ level, id, text });
-      }
-
-      // Inject ids into the rendered HTML headings so anchor links work
-      // Rewrite dev.to self-links (e.g. https://dev.to/b1m0110/some-slug) to
-      // local /blog/[slug] paths so they navigate within the portfolio.
-      const devToPostPattern = new RegExp(
-        `https://dev\\.to/${DEV_TO_USERNAME}/([\\w-]+)`,
-        "g"
-      );
-      const localizedHtml = contentHtml.replace(
-        devToPostPattern,
-        "/blog/$1"
-      );
-
-      let patchedHtml = localizedHtml.replace(
-        /<pre><code class="([^"]*\blanguage-([^"\s]+)[^"]*)">/g,
-        '<pre data-language="$2"><code class="$1">'
-      );
-      let hIdx = 0;
-      patchedHtml = patchedHtml.replace(/<h([23])>(.*?)<\/h[23]>/gi, (_, lvl, inner) => {
-        const entry = mdHeadings[hIdx];
-        hIdx++;
-        if (!entry) return `<h${lvl}>${inner}</h${lvl}>`;
-        return `<h${lvl} id="${entry.id}">${inner}</h${lvl}>`;
-      });
+      const rendered = await renderMarkdown(content);
 
       return {
         slug: data.slug as string,
@@ -132,8 +198,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
         tags: parseTags(data.tags),
         source: data.source as string,
         readingTime: estimateReadingTime(content),
-        contentHtml: patchedHtml,
-        toc: mdHeadings,
+        ...rendered,
       };
     }
   }
@@ -149,31 +214,20 @@ export function formatPostDate(iso: string): string {
   });
 }
 
-// ---------------------------------------------------------------------------
-// 24-hour revalidated fetch — used by the blog listing page
-// Next.js caches this fetch and revalidates it every 24 hours automatically.
-// On revalidation it also calls the sync route to pull fresh posts from dev.to.
-// ---------------------------------------------------------------------------
-
-const DEV_TO_USERNAME = "b1m0110";
-
 export async function getPostsWithRevalidation(): Promise<BlogPost[]> {
   try {
-    // Trigger a background sync so disk files stay up to date.
-    // We use next: { revalidate: 86400 } so Next only re-runs this once per 24h.
-    const base =
-      process.env.NEXT_PUBLIC_BASE_URL ??
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-
-    await fetch(`${base}/api/blog-sync`, {
-      next: { revalidate: 86400 }, // 24 hours
-    });
+    return await fetchDevToArticles();
   } catch {
-    // Sync failure is non-fatal — we fall back to whatever is on disk
+    return getAllPosts();
   }
+}
 
-  // Read freshest posts from disk (sync route has already updated them if needed)
-  return getAllPosts();
+export async function getPostBySlugWithRevalidation(slug: string): Promise<BlogPost | null> {
+  try {
+    return await fetchDevToArticleBySlug(slug);
+  } catch {
+    return getPostBySlug(slug);
+  }
 }
 
 export { DEV_TO_USERNAME };
