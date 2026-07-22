@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllPosts, getPostBySlug, formatPostDate } from "@/lib/blog";
+import { getAllPosts, getPostBySlugWithRevalidation, formatPostDate } from "@/lib/blog";
 import TableOfContents from "./TableOfContents";
 import type { Metadata } from "next";
 
@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostBySlugWithRevalidation(slug);
   if (!post) return {};
   return {
     title: `${post.title} | Kai Belmo`,
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostBySlugWithRevalidation(slug);
   if (!post) notFound();
 
   return (
@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Article header */}
       <header className="mb-[56px] border-b border-line pb-[48px]" data-scroll-reveal data-scroll-reveal-state="visible">
         <p className="mb-3.5 font-mono text-[0.66rem] font-extrabold uppercase tracking-[0.09em] text-accent">
-          DEV.TO — ORIGINAL POST
+          DEV.TO - ORIGINAL POST
         </p>
         <h1 className="m-0 text-balance font-display text-[clamp(2.45rem,4.7vw,4.9rem)] leading-[1.02] tracking-[-0.025em]">
           {post.title}
@@ -71,9 +71,9 @@ export default async function BlogPostPage({ params }: Props) {
             href={post.source}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex basis-full items-center gap-1.5 text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
+            className="inline-flex shrink-0 items-center gap-1.5 text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
           >
-            View on DEV.to <span aria-hidden="true">↗</span>
+            View on DEV.to <span aria-hidden="true">-&gt;</span>
           </a>
         </div>
       </header>
@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: Props) {
           href="/blog"
           className="inline-flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
         >
-          <span aria-hidden="true">←</span> Back to all posts
+          <span aria-hidden="true">&lt;-</span> Back to all posts
         </Link>
       </div>
     </div>
