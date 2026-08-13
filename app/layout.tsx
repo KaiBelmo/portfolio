@@ -65,7 +65,12 @@ const websiteJsonLd = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const initialThemeScript = `
     (() => {
-      const theme = "${DEFAULT_THEME}";
+      const hour = new Date().getHours();
+      const theme = hour >= 5 && hour < 12
+        ? "morning"
+        : hour >= 12 && hour < 18
+          ? "afternoon"
+          : "night";
       document.documentElement.dataset.theme = theme;
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) {
