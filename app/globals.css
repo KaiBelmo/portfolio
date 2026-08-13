@@ -77,8 +77,7 @@ html[data-theme="night"] {
 
 /* Morning theme — Linen & Timber */
 :root,
-[data-theme="morning"],
-.theme-morning {
+[data-theme="morning"] {
   --canvas: #e7ddcc;
   --surface: #c4b79e;
   --surface-soft: color-mix(in srgb, #c4b79e 58%, #e7ddcc);
@@ -94,7 +93,6 @@ html[data-theme="night"] {
 }
 
 /* Afternoon theme — Terracotta & Aubergine */
-.theme-afternoon,
 [data-theme="afternoon"] {
   --canvas: #232418;
   --surface: #594656;
@@ -111,7 +109,6 @@ html[data-theme="night"] {
 }
 
 /* Night theme — Cobalt & Cyan */
-.theme-night,
 [data-theme="night"] {
   --canvas: #1d2733;
   --surface: #3e4b60;
