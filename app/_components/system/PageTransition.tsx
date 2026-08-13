@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
@@ -89,7 +89,13 @@ export default function PageTransition({
   const pathname = usePathname();
   const routerContext = useContext(LayoutRouterContext);
   const reduceMotion = Boolean(useReducedMotion());
+  const [hasMounted, setHasMounted] = useState(false);
   const tokens = getTokens();
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => setHasMounted(true));
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
 
   const variants: Variants = reduceMotion
     ? {
@@ -123,12 +129,12 @@ export default function PageTransition({
 
   return (
     <div className="t-page-slide">
-      <AnimatePresence mode="wait" initial={!reduceMotion}>
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="t-page-slide__page"
           key={pathname}
           variants={variants}
-          initial={reduceMotion ? false : "initial"}
+          initial={!reduceMotion && hasMounted ? "initial" : false}
           animate="animate"
           exit="exit"
         >
