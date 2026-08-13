@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  useLayoutEffect,
 } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -27,6 +28,9 @@ import {
   supportsTransparentRoomVideo,
 } from "@/lib/theme-animation";
 import ThemeBackgroundFlare from "../ui/ThemeBackgroundFlare";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface ThemeContextType {
   theme: ThemeType;
@@ -276,19 +280,32 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   // Auto-update clock theme every minute
-  useEffect(() => {
-    const timer = window.setInterval(
-      () => {
-        if (themeOverride === null) {
-          setClockTheme(coerceAvailableTheme(getThemeFromHour()));
+  useIsomorphicLayoutEffect(() => {
+    const updateClockTheme = () => {
+      if (themeOverride === null) {
+        const nextTheme = coerceAvailableTheme(getThemeFromHour());
+        setClockTheme(nextTheme);
+
+        // The server must render the stable morning fallback, but the first
+        // client sync should apply the user's local time without animating
+        // from that fallback theme.
+        if (isFirstRenderRef.current && nextTheme !== displayedThemeRef.current) {
+          commitTheme(nextTheme);
         }
-      },
+      }
+    };
+
+    // Resolve the current local hour immediately on mount instead of waiting
+    // for the first interval tick.
+    updateClockTheme();
+    const timer = window.setInterval(
+      updateClockTheme,
       60000,
     );
     return () => {
       window.clearInterval(timer);
     };
-  }, [themeOverride]);
+  }, [commitTheme, themeOverride]);
 
   useEffect(() => {
     if (isFirstRenderRef.current) {
