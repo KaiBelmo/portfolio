@@ -374,14 +374,44 @@ p {
 }
 
 /* --------------------------------------------------------------------------
-   Theme-transition foreground freeze
+   Theme-transition colour fade
+   The palette tokens are registered so the browser interpolates them once,
+   at the root. Every element that reads var(--ink), var(--canvas) and so on
+   fades with them, without a universal selector and without the tree-wide
+   style invalidation that toggling a transition on every element caused.
+   Browsers without @property simply switch instantly.
    -------------------------------------------------------------------------- */
-.app[data-theme-transitioning="true"] * {
-  transition: color 240ms ease-out, background-color 240ms ease-out, border-color 240ms ease-out;
+@property --canvas { syntax: "<color>"; inherits: true; initial-value: #e7ddcc; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: #c4b79e; }
+@property --surface-soft { syntax: "<color>"; inherits: true; initial-value: #d1c7b1; }
+@property --ink { syntax: "<color>"; inherits: true; initial-value: #242629; }
+@property --muted { syntax: "<color>"; inherits: true; initial-value: #244d4b; }
+@property --line { syntax: "<color>"; inherits: true; initial-value: #4f6030; }
+@property --line-strong { syntax: "<color>"; inherits: true; initial-value: #242629; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #a85b12; }
+@property --accent-2 { syntax: "<color>"; inherits: true; initial-value: #4f6030; }
+@property --signal { syntax: "<color>"; inherits: true; initial-value: #244d4b; }
+@property --scene-wash { syntax: "<color>"; inherits: true; initial-value: rgb(142 166 207 / 20%); }
+@property --shadow { syntax: "<color>"; inherits: true; initial-value: rgb(36 38 41 / 20%); }
+
+html {
+  transition:
+    --canvas 240ms ease-out,
+    --surface 240ms ease-out,
+    --surface-soft 240ms ease-out,
+    --ink 240ms ease-out,
+    --muted 240ms ease-out,
+    --line 240ms ease-out,
+    --line-strong 240ms ease-out,
+    --accent 240ms ease-out,
+    --accent-2 240ms ease-out,
+    --signal 240ms ease-out,
+    --scene-wash 240ms ease-out,
+    --shadow 240ms ease-out;
 }
+
 .app[data-theme-transitioning="true"] .pixel-grid,
 .app[data-theme-transitioning="true"] .site-shell::after { opacity: 0; }
-.app[data-theme-transitioning="true"] .site-theme-background { transition: none; }
 
 
 /* --------------------------------------------------------------------------

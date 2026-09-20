@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import ArrowRight from "@/app/_components/ui/ArrowRight";
 import { getAllPosts, getPostBySlugWithRevalidation, formatPostDate } from "@/lib/blog";
 import TableOfContents from "./TableOfContents";
 import type { Metadata } from "next";
@@ -75,7 +76,8 @@ export default async function BlogPostPage({ params }: Props) {
             rel="noopener noreferrer"
             className="inline-flex shrink-0 items-center gap-1.5 text-right text-muted underline-offset-4 hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
           >
-            View on DEV.to <span aria-hidden="true">-&gt;</span>
+            View on DEV.to
+            <ArrowRight />
           </a>
         </div>
       </header>

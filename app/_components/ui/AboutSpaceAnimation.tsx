@@ -1,7 +1,6 @@
 "use client";
 
-import type { KeyboardEvent, PointerEvent } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from "react";
 import { useTheme } from "@/app/_components/system/ThemeProvider";
 import type { ThemeType } from "@/lib/theme";
 
@@ -9,35 +8,195 @@ const TAU = Math.PI * 2;
 const FONT_FAMILY = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 const GLYPH_RAMP = " .,:;-~=+*#%@";
 const MOON_RAMP = " .:-=+*#%@";
+const RING_GLYPHS = [".", "-", "·"] as const;
+const RING_SCALES = [0.92, 1, 1.08] as const;
 
 type RGB = readonly [number, number, number];
 
-const STAR_PALETTE: readonly RGB[] = [
-  [172, 194, 255],
-  [205, 221, 255],
-  [255, 228, 184],
-  [186, 236, 255],
-];
+/** A colour at light factor 0 (`lo`, shadow) and 1 (`hi`, fully lit). */
+type Shade = { lo: RGB; hi: RGB };
 
-const MORNING_STAR_PALETTE: readonly RGB[] = [
-  [38, 43, 43],
-  [68, 78, 54],
-  [132, 77, 24],
-  [47, 83, 78],
-];
+/**
+ * Everything the scene draws, chosen per theme for contrast against that
+ * theme's canvas. The dark themes shade "more light, more ink"; the light
+ * theme inverts the glyph ramp so shadow is where the ink is.
+ */
+type ScenePalette = {
+  invertRamp: boolean;
+  /** Glyph ramp for shaded bodies, sparse to dense. Light themes omit the blank so the sphere stays drawn. */
+  ramp: string;
+  /** Multiplier on star and dust alpha. */
+  inkBoost: number;
+  planetWeight: number;
+  /** Stars shallower than this fade out: a daylight sky shows only the brightest few. */
+  starMinDepth: number;
+  /** The sun is the hero of a morning sky, so it can outgrow its night-time footprint. */
+  sunScale: number;
+  /** A translucent wash inside the planet disc, so a sphere whose lit side is bare paper still reads as a disc. */
+  discWash: RGB | null;
+  discWashAlpha: number;
+  stars: readonly RGB[];
+  dust: readonly [RGB, RGB];
+  ring: readonly [Shade, Shade, Shade];
+  ringAlpha: { front: number; back: number };
+  ocean: Shade;
+  terrain: Shade;
+  cloud: Shade;
+  planetEdge: RGB;
+  atmosphere: RGB | null;
+  atmosphereAlpha: number;
+  sunBody: Shade;
+  sunRays: RGB;
+  sunGlow: RGB;
+  sunGlowAlpha: number;
+  sunCoreAlpha: number;
+  moonHalo: RGB;
+  moonGlyph: Shade;
+  satellite: Shade;
+  cometTrail: RGB;
+  cometHead: RGB;
+  cometSpark: RGB;
+};
 
-const NIGHT_STAR_PALETTE: readonly RGB[] = [
-  [184, 207, 255],
-  [222, 233, 255],
-  [255, 231, 182],
-  [167, 226, 244],
-];
+const SCENE_PALETTES: Record<ThemeType, ScenePalette> = {
+  // Cream canvas. Everything is ink: shadows dark, lit areas lighter but never near the paper.
+  // Cream canvas, drawn like an etching: the highlight is the paper, the
+  // shadow side is hatched in the page's own teal ink, the sun is the one
+  // saturated element, and daylight thins the star field.
+  morning: {
+    invertRamp: true,
+    ramp: " .:-=+*#%@",
+    inkBoost: 1.1,
+    planetWeight: 600,
+    starMinDepth: 0.45,
+    sunScale: 1.25,
+    discWash: [134, 194, 174],
+    discWashAlpha: 0.26,
+    stars: [
+      [36, 38, 41],
+      [36, 77, 75],
+      [168, 91, 18],
+      [56, 62, 64],
+    ],
+    dust: [
+      [36, 77, 75],
+      [79, 96, 48],
+    ],
+    ring: [
+      { lo: [64, 68, 74], hi: [150, 152, 156] },
+      { lo: [150, 80, 16], hi: [214, 150, 80] },
+      { lo: [80, 86, 94], hi: [166, 170, 176] },
+    ],
+    ringAlpha: { front: 0.92, back: 0.6 },
+    ocean: { lo: [36, 77, 75], hi: [36, 77, 75] },
+    terrain: { lo: [79, 96, 48], hi: [79, 96, 48] },
+    cloud: { lo: [92, 126, 120], hi: [92, 126, 120] },
+    planetEdge: [36, 77, 75],
+    atmosphere: [134, 194, 174],
+    atmosphereAlpha: 0.14,
+    sunBody: { lo: [214, 150, 80], hi: [168, 91, 18] },
+    sunRays: [168, 91, 18],
+    sunGlow: [232, 168, 80],
+    sunGlowAlpha: 0.42,
+    sunCoreAlpha: 0.5,
+    moonHalo: [120, 130, 150],
+    moonGlyph: { lo: [96, 104, 120], hi: [40, 48, 60] },
+    satellite: { lo: [36, 77, 75], hi: [150, 172, 168] },
+    cometTrail: [56, 62, 64],
+    cometHead: [168, 91, 18],
+    cometSpark: [36, 38, 41],
+  },
+  // Dark olive canvas. These are the original values the scene was designed on.
+  afternoon: {
+    invertRamp: false,
+    ramp: GLYPH_RAMP,
+    inkBoost: 1,
+    planetWeight: 600,
+    starMinDepth: 0,
+    sunScale: 1,
+    discWash: null,
+    discWashAlpha: 0,
+    stars: [
+      [172, 194, 255],
+      [205, 221, 255],
+      [255, 228, 184],
+      [186, 236, 255],
+    ],
+    dust: [
+      [62, 72, 128],
+      [45, 98, 120],
+    ],
+    ring: [
+      { lo: [42, 46, 52], hi: [140, 148, 166] },
+      { lo: [60, 52, 44], hi: [235, 210, 158] },
+      { lo: [42, 46, 52], hi: [168, 177, 198] },
+    ],
+    ringAlpha: { front: 0.98, back: 0.68 },
+    ocean: { lo: [56, 96, 108], hi: [62, 168, 149] },
+    terrain: { lo: [56, 102, 84], hi: [90, 204, 134] },
+    cloud: { lo: [88, 150, 134], hi: [166, 232, 214] },
+    planetEdge: [64, 174, 162],
+    atmosphere: null,
+    atmosphereAlpha: 0,
+    sunBody: { lo: [230, 125, 50], hi: [255, 245, 165] },
+    sunRays: [221, 147, 67],
+    sunGlow: [255, 209, 112],
+    sunGlowAlpha: 0.18,
+    sunCoreAlpha: 0.16,
+    moonHalo: [184, 207, 255],
+    moonGlyph: { lo: [88, 93, 100], hi: [216, 228, 245] },
+    satellite: { lo: [62, 64, 70], hi: [216, 225, 245] },
+    cometTrail: [230, 240, 255],
+    cometHead: [255, 244, 220],
+    cometSpark: [255, 255, 255],
+  },
+  // Navy canvas. Floors are lifted so silhouettes never sink into the page.
+  night: {
+    invertRamp: false,
+    ramp: GLYPH_RAMP,
+    inkBoost: 1,
+    planetWeight: 600,
+    starMinDepth: 0,
+    sunScale: 1,
+    discWash: null,
+    discWashAlpha: 0,
+    stars: [
+      [184, 207, 255],
+      [222, 233, 255],
+      [255, 231, 182],
+      [167, 226, 244],
+    ],
+    dust: [
+      [88, 108, 166],
+      [78, 128, 160],
+    ],
+    ring: [
+      { lo: [72, 84, 104], hi: [176, 186, 206] },
+      { lo: [96, 84, 60], hi: [240, 214, 160] },
+      { lo: [72, 84, 104], hi: [196, 206, 224] },
+    ],
+    ringAlpha: { front: 1, back: 0.72 },
+    ocean: { lo: [58, 86, 112], hi: [140, 200, 230] },
+    terrain: { lo: [70, 116, 104], hi: [150, 196, 150] },
+    cloud: { lo: [140, 172, 196], hi: [222, 236, 248] },
+    planetEdge: [138, 190, 226],
+    atmosphere: [120, 160, 220],
+    atmosphereAlpha: 0.08,
+    sunBody: { lo: [230, 125, 50], hi: [255, 245, 165] },
+    sunRays: [221, 147, 67],
+    sunGlow: [255, 209, 112],
+    sunGlowAlpha: 0.18,
+    sunCoreAlpha: 0.16,
+    moonHalo: [184, 207, 255],
+    moonGlyph: { lo: [96, 104, 120], hi: [232, 238, 250] },
+    satellite: { lo: [80, 96, 120], hi: [214, 224, 242] },
+    cometTrail: [230, 240, 255],
+    cometHead: [255, 244, 220],
+    cometSpark: [255, 255, 255],
+  },
+};
 
-const RING_BANDS = [
-  { scale: 0.92, glyph: ".", color: [140, 148, 166] as const },
-  { scale: 1, glyph: "-", color: [235, 210, 158] as const },
-  { scale: 1.08, glyph: "·", color: [168, 177, 198] as const },
-];
+const THEMES: readonly ThemeType[] = ["morning", "afternoon", "night"];
 
 type Star = {
   x: number;
@@ -47,9 +206,7 @@ type Star = {
   speed: number;
   drift: number;
   glyph: string;
-  colorCss: string;
-  morningCss: string;
-  nightCss: string;
+  colorIndex: number;
   font: string;
 };
 
@@ -60,11 +217,11 @@ type Dust = {
   speed: number;
   strength: number;
   glyph: string;
-  colorCss: string;
-  morningCss: string;
-  nightCss: string;
+  colorIndex: number;
   font: string;
 };
+
+type ParticleGroup<T> = { font: string; colorIndex: number; items: T[] };
 
 type Comet = {
   x: number;
@@ -101,12 +258,14 @@ type EdgePoint = {
 };
 
 type RingPoint = { x: number; y: number; glyph: string };
-type RingBatch = { color: string; points: RingPoint[] };
+/** Ring points grouped by band and quantised light, so each theme bakes its own colours. */
+type RingBatch = { band: number; light: number; points: RingPoint[] };
 type SunCell = { px: number; py: number; edge: number; phase: number };
 type MoonPoint = { nx: number; ny: number; glyph: string };
-type MoonBatch = { color: string; points: MoonPoint[] };
+type MoonBatch = { level: number; points: MoonPoint[] };
 type SatelliteCell = { px: number; py: number; nx: number; ny: number; nz: number };
 type BakedLayer = { canvas: HTMLCanvasElement; originX: number; originY: number };
+type ThemedLayers = Record<ThemeType, BakedLayer | null>;
 
 type Geometry = {
   planetRadius: number;
@@ -115,14 +274,13 @@ type Geometry = {
   planetEdge: EdgePoint[];
   ringBackBatches: RingBatch[];
   ringFrontBatches: RingBatch[];
-  ringBackLayer: BakedLayer | null;
-  ringFrontLayer: BakedLayer | null;
-  morningRingBackLayer: BakedLayer | null;
-  morningRingFrontLayer: BakedLayer | null;
+  ringBackLayers: ThemedLayers;
+  ringFrontLayers: ThemedLayers;
   celestialRadius: number;
+  moonRadius: number;
   sunCells: SunCell[];
   moonBatches: MoonBatch[];
-  moonLayer: BakedLayer | null;
+  moonLayers: ThemedLayers;
   satelliteRadius: number;
   satelliteCells: SatelliteCell[];
 };
@@ -169,29 +327,19 @@ function quantizedAlpha(alpha: number) {
   return Math.round(clamp(alpha) * 31) / 31;
 }
 
-function rgbCss(color: RGB) {
-  return `rgb(${color[0]},${color[1]},${color[2]})`;
+function rgbaCss(color: RGB, alpha: number) {
+  return `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
 }
 
-function scaleRGB(color: string, amount: number) {
-  const match = color.match(/\d+/g);
-  if (!match || match.length < 3) return color;
-  return quantizedRGB(
-    Number(match[0]) * amount,
-    Number(match[1]) * amount,
-    Number(match[2]) * amount,
-  );
+function mixRGB(a: RGB, b: RGB, amount: number): RGB {
+  return [lerp(a[0], b[0], amount), lerp(a[1], b[1], amount), lerp(a[2], b[2], amount)];
 }
 
-function floorRGB(color: string, floor: RGB) {
-  const match = color.match(/\d+/g);
-  if (!match || match.length < 3) return color;
-  return quantizedRGB(
-    Math.max(Number(match[0]), floor[0]),
-    Math.max(Number(match[1]), floor[1]),
-    Math.max(Number(match[2]), floor[2]),
-  );
+function shadeRGB(shade: Shade, light: number): RGB {
+  return mixRGB(shade.lo, shade.hi, clamp(light));
 }
+
+const emptyLayers = (): ThemedLayers => ({ morning: null, afternoon: null, night: null });
 
 export default function AboutSpaceAnimation() {
   const { theme } = useTheme();
@@ -201,10 +349,14 @@ export default function AboutSpaceAnimation() {
     spawnComet: (origin?: { x: number; y: number; vx?: number; vy?: number }) => void;
     reset: () => void;
     togglePause: () => void;
+    requestFrame: () => void;
   } | null>(null);
 
+  // A theme change while paused must still repaint so the palette crossfade
+  // runs; the frame loop stops itself again once the blend settles.
   useEffect(() => {
     themeRef.current = theme;
+    controlRef.current?.requestFrame();
   }, [theme]);
 
   useEffect(() => {
@@ -236,8 +388,8 @@ export default function AboutSpaceAnimation() {
     let stars: Star[] = [];
     let dust: Dust[] = [];
     let comets: Comet[] = [];
-    let starGroups: { font: string; color: string; morningColor: string; nightColor: string; items: Star[] }[] = [];
-    let dustGroups: { font: string; color: string; morningColor: string; nightColor: string; items: Dust[] }[] = [];
+    let starGroups: ParticleGroup<Star>[] = [];
+    let dustGroups: ParticleGroup<Dust>[] = [];
     let sceneTime = 0;
     let orbitAngle = 0.55;
     let previousTime = performance.now();
@@ -252,6 +404,12 @@ export default function AboutSpaceAnimation() {
     let rafId = 0;
     let resizeRaf = 0;
     let random = mulberry32(hashString("about-space-canvas2d"));
+
+    // Palette crossfade: the previous theme's palette blends into the new
+    // one over a few hundred milliseconds instead of snapping mid-mosaic.
+    let paletteFrom: ThemeType = themeRef.current;
+    let paletteTo: ThemeType = themeRef.current;
+    let paletteMix = 1;
 
     const fontCache = new Map<string, string>();
     const getFont = (size: number, weight = 500) => {
@@ -272,13 +430,11 @@ export default function AboutSpaceAnimation() {
     let activeFont: string | null = null;
     let activeFill: string | null = null;
     let activeAlpha = NaN;
-    let activeShadow = false;
 
     const invalidateState = () => {
       activeFont = null;
       activeFill = null;
       activeAlpha = NaN;
-      activeShadow = false;
     };
 
     const setFont = (font: string) => {
@@ -300,13 +456,25 @@ export default function AboutSpaceAnimation() {
         activeAlpha = quantized;
       }
     };
-    const setShadow = (enabled: boolean) => {
-      if (enabled === activeShadow) return;
-      ctx.shadowColor = "transparent";
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      activeShadow = enabled;
+
+    // Blended palette lookups. `mix` is the crossfade progress for this frame.
+    const fromPalette = () => SCENE_PALETTES[paletteFrom];
+    const toPalette = () => SCENE_PALETTES[paletteTo];
+    const blendRGB = (pick: (palette: ScenePalette) => RGB) =>
+      paletteMix >= 1 ? pick(toPalette()) : mixRGB(pick(fromPalette()), pick(toPalette()), paletteMix);
+    const blendShade = (pick: (palette: ScenePalette) => Shade, light: number) =>
+      paletteMix >= 1
+        ? shadeRGB(pick(toPalette()), light)
+        : mixRGB(shadeRGB(pick(fromPalette()), light), shadeRGB(pick(toPalette()), light), paletteMix);
+    const blendNumber = (pick: (palette: ScenePalette) => number) =>
+      paletteMix >= 1 ? pick(toPalette()) : lerp(pick(fromPalette()), pick(toPalette()), paletteMix);
+    const css = (color: RGB) => quantizedRGB(color[0], color[1], color[2]);
+    const dominantPalette = () => (paletteMix < 0.5 ? fromPalette() : toPalette());
+    const rampGlyph = (ramp: string | null, light: number) => {
+      const palette = dominantPalette();
+      const chosen = ramp ?? palette.ramp;
+      const t = palette.invertRamp ? 1 - light : light;
+      return chosen[Math.floor(clamp(t) * (chosen.length - 1))];
     };
 
     const drawGlyph = (
@@ -338,7 +506,7 @@ export default function AboutSpaceAnimation() {
       return { canvas, ctx: bakeCtx };
     }
 
-    function bakeRingLayer(batches: RingBatch[], colorScale = 1, colorFloor?: RGB): BakedLayer | null {
+    function bakeRingLayer(batches: RingBatch[], palette: ScenePalette): BakedLayer | null {
       let minX = Infinity;
       let minY = Infinity;
       let maxX = -Infinity;
@@ -360,8 +528,7 @@ export default function AboutSpaceAnimation() {
       if (!layer) return null;
 
       for (const batch of batches) {
-        const color = colorScale === 1 ? batch.color : scaleRGB(batch.color, colorScale);
-        layer.ctx.fillStyle = colorFloor ? floorRGB(color, colorFloor) : color;
+        layer.ctx.fillStyle = css(shadeRGB(palette.ring[batch.band], batch.light));
         for (const point of batch.points) {
           layer.ctx.fillText(point.glyph, Math.round(point.x - originX), Math.round(point.y - originY));
         }
@@ -370,15 +537,15 @@ export default function AboutSpaceAnimation() {
       return { canvas: layer.canvas, originX, originY };
     }
 
-    function bakeMoonLayer(batches: MoonBatch[], radius: number): BakedLayer | null {
+    function bakeMoonLayer(batches: MoonBatch[], radius: number, palette: ScenePalette): BakedLayer | null {
       const padding = 18;
       const originX = -radius - padding;
       const originY = -radius - padding;
-      const layer = createBakeContext(radius * 2 + padding * 2, radius * 2 + padding * 2, getFont(14, 650));
+      const layer = createBakeContext(radius * 2 + padding * 2, radius * 2 + padding * 2, getFont(10, 600));
       if (!layer) return null;
 
       for (const batch of batches) {
-        layer.ctx.fillStyle = batch.color;
+        layer.ctx.fillStyle = css(shadeRGB(palette.moonGlyph, batch.level));
         for (const point of batch.points) {
           layer.ctx.fillText(
             point.glyph,
@@ -391,6 +558,12 @@ export default function AboutSpaceAnimation() {
       return { canvas: layer.canvas, originX, originY };
     }
 
+    function bakeForEachTheme(bake: (palette: ScenePalette) => BakedLayer | null): ThemedLayers {
+      const layers = emptyLayers();
+      for (const key of THEMES) layers[key] = bake(SCENE_PALETTES[key]);
+      return layers;
+    }
+
     let geometry: Geometry = {
       planetRadius: 0,
       planetStep: 0,
@@ -398,14 +571,13 @@ export default function AboutSpaceAnimation() {
       planetEdge: [],
       ringBackBatches: [],
       ringFrontBatches: [],
-      ringBackLayer: null,
-      ringFrontLayer: null,
-      morningRingBackLayer: null,
-      morningRingFrontLayer: null,
+      ringBackLayers: emptyLayers(),
+      ringFrontLayers: emptyLayers(),
       celestialRadius: 0,
+      moonRadius: 0,
       sunCells: [],
       moonBatches: [],
-      moonLayer: null,
+      moonLayers: emptyLayers(),
       satelliteRadius: 0,
       satelliteCells: [],
     };
@@ -460,18 +632,19 @@ export default function AboutSpaceAnimation() {
       const cosTilt = Math.cos(tilt);
       const sinTilt = Math.sin(tilt);
 
-      const addRingPoint = (target: Map<string, RingBatch>, color: string, point: RingPoint) => {
-        let batch = target.get(color);
+      const addRingPoint = (target: Map<string, RingBatch>, band: number, light: number, point: RingPoint) => {
+        const key = `${band}:${light}`;
+        let batch = target.get(key);
         if (!batch) {
-          batch = { color, points: [] };
-          target.set(color, batch);
+          batch = { band, light, points: [] };
+          target.set(key, batch);
         }
         batch.points.push(point);
       };
 
-      for (const band of RING_BANDS) {
-        const rx = planetRadius * 1.75 * band.scale;
-        const ry = planetRadius * 0.38 * band.scale;
+      RING_SCALES.forEach((scale, band) => {
+        const rx = planetRadius * 1.75 * scale;
+        const ry = planetRadius * 0.38 * scale;
         const points = Math.max(130, Math.floor(rx * 1.4));
         for (let i = 0; i < points; i += 1) {
           if ((i * 13) % 41 === 0) continue;
@@ -482,18 +655,14 @@ export default function AboutSpaceAnimation() {
           const localX = cosA * rx;
           const localY = sinA * ry;
           const light = clamp(0.5 + Math.cos(angle - 0.45) * 0.34 + (front ? 0.15 : -0.08));
-          const color = quantizedRGB(
-            band.color[0] * light,
-            band.color[1] * light,
-            band.color[2] * light,
-          );
-          addRingPoint(front ? ringFront : ringBack, color, {
+          const quantizedLight = Math.round(light * 12) / 12;
+          addRingPoint(front ? ringFront : ringBack, band, quantizedLight, {
             x: localX * cosTilt - localY * sinTilt,
             y: localX * sinTilt + localY * cosTilt,
-            glyph: Math.abs(sinA) > 0.74 ? "'" : band.glyph,
+            glyph: Math.abs(sinA) > 0.74 ? "'" : RING_GLYPHS[band],
           });
         }
-      }
+      });
 
       const celestialRadius = clamp(Math.min(width, height) * 0.07, 28, 52);
       const sunCells: SunCell[] = [];
@@ -511,12 +680,16 @@ export default function AboutSpaceAnimation() {
         }
       }
 
-      const moonMap = new Map<string, MoonBatch>();
-      const moonStep = 10;
-      for (let py = -celestialRadius; py <= celestialRadius; py += moonStep) {
-        for (let px = -celestialRadius; px <= celestialRadius; px += moonStep) {
-          const nx = px / celestialRadius;
-          const ny = py / celestialRadius;
+      // The moon is a third larger than the sun's footprint and sampled on a
+      // finer grid, so it resolves into a shaded disc rather than a handful of
+      // hash marks.
+      const moonRadius = celestialRadius * 1.3;
+      const moonMap = new Map<number, MoonBatch>();
+      const moonStep = 8;
+      for (let py = -moonRadius; py <= moonRadius; py += moonStep) {
+        for (let px = -moonRadius; px <= moonRadius; px += moonStep) {
+          const nx = px / moonRadius;
+          const ny = py / moonRadius;
           const rr = nx * nx + ny * ny;
           if (rr > 1) continue;
           const nz = Math.sqrt(1 - rr);
@@ -535,12 +708,11 @@ export default function AboutSpaceAnimation() {
                 ? "*"
                 : MOON_RAMP[Math.floor(level * (MOON_RAMP.length - 1))];
           const glyph = rr > 0.76 && level > 0.62 ? "@" : mark;
-          const value = 100 + level * 145;
-          const color = quantizedRGB(value * 0.88, value * 0.93, value);
-          let batch = moonMap.get(color);
+          const quantizedLevel = Math.round(level * 12) / 12;
+          let batch = moonMap.get(quantizedLevel);
           if (!batch) {
-            batch = { color, points: [] };
-            moonMap.set(color, batch);
+            batch = { level: quantizedLevel, points: [] };
+            moonMap.set(quantizedLevel, batch);
           }
           batch.points.push({ nx, ny, glyph });
         }
@@ -570,34 +742,25 @@ export default function AboutSpaceAnimation() {
         planetEdge,
         ringBackBatches,
         ringFrontBatches,
-        ringBackLayer: bakeRingLayer(ringBackBatches, 1, [42, 46, 52]),
-        ringFrontLayer: bakeRingLayer(ringFrontBatches, 1, [42, 46, 52]),
-        morningRingBackLayer: bakeRingLayer(ringBackBatches, 0.52),
-        morningRingFrontLayer: bakeRingLayer(ringFrontBatches, 0.52),
+        ringBackLayers: bakeForEachTheme((palette) => bakeRingLayer(ringBackBatches, palette)),
+        ringFrontLayers: bakeForEachTheme((palette) => bakeRingLayer(ringFrontBatches, palette)),
         celestialRadius,
+        moonRadius,
         sunCells,
         moonBatches,
-        moonLayer: bakeMoonLayer(moonBatches, celestialRadius),
+        moonLayers: bakeForEachTheme((palette) => bakeMoonLayer(moonBatches, moonRadius, palette)),
         satelliteRadius,
         satelliteCells,
       };
     }
 
-    function groupParticles<T extends { colorCss: string; morningCss: string; nightCss: string; font: string }>(
-      items: T[],
-    ): { font: string; color: string; morningColor: string; nightColor: string; items: T[] }[] {
-      const groups = new Map<string, { font: string; color: string; morningColor: string; nightColor: string; items: T[] }>();
+    function groupParticles<T extends { colorIndex: number; font: string }>(items: T[]): ParticleGroup<T>[] {
+      const groups = new Map<string, ParticleGroup<T>>();
       for (const item of items) {
-        const key = `${item.colorCss}|${item.morningCss}|${item.nightCss}|${item.font}`;
+        const key = `${item.colorIndex}|${item.font}`;
         let group = groups.get(key);
         if (!group) {
-          group = {
-            font: item.font,
-            color: item.colorCss,
-            morningColor: item.morningCss,
-            nightColor: item.nightCss,
-            items: [],
-          };
+          group = { font: item.font, colorIndex: item.colorIndex, items: [] };
           groups.set(key, group);
         }
         group.items.push(item);
@@ -612,11 +775,9 @@ export default function AboutSpaceAnimation() {
       comets = [];
 
       const starCount = Math.floor((width * height) / (reducedMotion ? 6500 : 4300));
+      const starColors = SCENE_PALETTES.afternoon.stars.length;
       for (let i = 0; i < starCount; i += 1) {
         const depth = rand(0.18, 1);
-        const color = choose(STAR_PALETTE);
-        const morningColor = choose(MORNING_STAR_PALETTE);
-        const nightColor = choose(NIGHT_STAR_PALETTE);
         const size = Math.round(8 + depth * 7);
         stars.push({
           x: rand(0, width),
@@ -626,17 +787,15 @@ export default function AboutSpaceAnimation() {
           speed: rand(0.35, 1.75),
           drift: rand(-4, 4),
           glyph: depth > 0.8 ? choose(["·", "+", "*"]) : choose([".", "·"]),
-          colorCss: rgbCss(color),
-          morningCss: rgbCss(morningColor),
-          nightCss: rgbCss(nightColor),
+          colorIndex: Math.floor(rand(0, starColors)),
           font: getFont(size, 500),
         });
       }
 
       const cloudCount = Math.floor((width * height) / 9000);
       const clouds = [
-        { x: width * 0.43, y: height * 0.34, rx: width * 0.34, ry: height * 0.15, color: [62, 72, 128] as const, morning: [52, 78, 74] as const, night: [88, 108, 166] as const },
-        { x: width * 0.7, y: height * 0.62, rx: width * 0.25, ry: height * 0.12, color: [45, 98, 120] as const, morning: [70, 82, 50] as const, night: [78, 128, 160] as const },
+        { x: width * 0.43, y: height * 0.34, rx: width * 0.34, ry: height * 0.15, colorIndex: 0 },
+        { x: width * 0.7, y: height * 0.62, rx: width * 0.25, ry: height * 0.12, colorIndex: 1 },
       ];
 
       for (let i = 0; i < cloudCount; i += 1) {
@@ -650,9 +809,7 @@ export default function AboutSpaceAnimation() {
           speed: rand(0.04, 0.14),
           strength: rand(0.15, 0.7),
           glyph: choose([".", ".", ":", "·"]),
-          colorCss: rgbCss(cloud.color),
-          morningCss: rgbCss(cloud.morning),
-          nightCss: rgbCss(cloud.night),
+          colorIndex: cloud.colorIndex,
           font: getFont(12, 500),
         });
       }
@@ -689,36 +846,49 @@ export default function AboutSpaceAnimation() {
       }
     }
 
+    function updatePaletteBlend(dt: number) {
+      const target = themeRef.current;
+      if (target !== paletteTo) {
+        paletteFrom = paletteMix >= 1 ? paletteTo : paletteFrom;
+        paletteTo = target;
+        paletteMix = 0;
+      }
+      if (paletteMix < 1) {
+        paletteMix = Math.min(1, paletteMix + dt / 0.45);
+      }
+    }
+
     function drawBackground(cameraX: number, cameraY: number) {
       setAlpha(1);
       ctx.clearRect(0, 0, width, height);
-      setShadow(themeRef.current === "morning");
+      const inkBoost = blendNumber((palette) => palette.inkBoost);
+      const starMinDepth = blendNumber((palette) => palette.starMinDepth);
 
       for (const group of dustGroups) {
         setFont(group.font);
-        setFill(themeRef.current === "morning" ? group.morningColor : themeRef.current === "night" ? group.nightColor : group.color);
+        setFill(css(blendRGB((palette) => palette.dust[group.colorIndex as 0 | 1])));
         for (const particle of group.items) {
           const wave = sceneTime * particle.speed + particle.phase;
           const pulse = 0.55 + Math.sin(wave) * 0.25;
           const x = (particle.x + cameraX * 0.08 + Math.sin(wave) * 6 + width) % width;
           const y = (particle.y + cameraY * 0.05 + Math.cos(wave * 0.8) * 4 + height) % height;
-          const alpha = particle.strength * pulse * 0.45;
+          const alpha = particle.strength * pulse * 0.45 * inkBoost;
           if (alpha <= 0.003) continue;
           setAlpha(alpha);
           ctx.fillText(particle.glyph, Math.round(x), Math.round(y));
         }
       }
 
-      const activeTheme = themeRef.current;
       for (const group of starGroups) {
         setFont(group.font);
-        setFill(activeTheme === "morning" ? group.morningColor : activeTheme === "night" ? group.nightColor : group.color);
+        setFill(css(blendRGB((palette) => palette.stars[group.colorIndex] ?? palette.stars[0])));
         for (const star of group.items) {
           const pulse = Math.sin(sceneTime * star.speed + star.phase) * 0.5 + 0.5;
           const x = (star.x + sceneTime * star.drift * star.depth + cameraX * star.depth + width) % width;
           const y = (star.y + Math.sin(sceneTime * 0.08 + star.phase) * 4 * star.depth + cameraY * star.depth + height) % height;
           const brightness = 0.35 + pulse * 0.65;
-          const alpha = brightness * (0.52 + star.depth * 0.48);
+          const daylightFade = starMinDepth > 0 ? clamp((star.depth - starMinDepth) / 0.15) : 1;
+          const alpha = brightness * (0.52 + star.depth * 0.48) * inkBoost * daylightFade;
           if (alpha <= 0.003) continue;
           setAlpha(alpha);
           ctx.fillText(pulse > 0.93 && star.depth > 0.76 ? "*" : star.glyph, Math.round(x), Math.round(y));
@@ -726,39 +896,67 @@ export default function AboutSpaceAnimation() {
       }
     }
 
+    function drawThemedLayer(layers: ThemedLayers, x: number, y: number, alpha: number, scale = 1) {
+      const draw = (layer: BakedLayer | null, layerAlpha: number) => {
+        if (!layer || layerAlpha <= 0.003) return;
+        setAlpha(layerAlpha);
+        ctx.drawImage(
+          layer.canvas,
+          Math.round(x + layer.originX * scale),
+          Math.round(y + layer.originY * scale),
+          Math.round(layer.canvas.width * scale),
+          Math.round(layer.canvas.height * scale),
+        );
+      };
+      if (paletteMix >= 1) {
+        draw(layers[paletteTo], alpha);
+        return;
+      }
+      draw(layers[paletteFrom], alpha * (1 - paletteMix));
+      draw(layers[paletteTo], alpha * paletteMix);
+    }
+
     function drawCelestialBody(cameraX: number, cameraY: number) {
       const target = themeRef.current === "night" ? 1 : 0;
       celestialMix = lerp(celestialMix, target, 1 - Math.exp(-(1 / 60) * 2.8));
       const mix = smoothstep(celestialMix);
+      const sunScale = blendNumber((palette) => palette.sunScale);
+      const baseRadius = geometry.celestialRadius * sunScale;
+      const fullGlowRadius = baseRadius * 2.6;
+      // Anchor the sun no higher than its glow needs, so the halo fades out
+      // inside the canvas instead of being clipped flat along the top edge.
       const x = width - Math.min(145, width * 0.15) + cameraX * 0.08;
-      const y = Math.min(185, height * 0.17) + cameraY * 0.05;
-      const baseRadius = geometry.celestialRadius;
+      const y = Math.max(Math.min(185, height * 0.17), fullGlowRadius + 4) + cameraY * 0.05;
       const sunAlpha = 1 - mix;
       const moonAlpha = mix;
 
       if (sunAlpha > 0.003) {
-        const glowRadius = baseRadius * (themeRef.current === "morning" ? 2.85 : 2.25);
+        const glowColor = blendRGB((palette) => palette.sunGlow);
+        const glowAlpha = blendNumber((palette) => palette.sunGlowAlpha);
+        const coreAlpha = blendNumber((palette) => palette.sunCoreAlpha);
+        const glowRadius = Math.min(fullGlowRadius, y - 2, width - x - 2);
         const glow = ctx.createRadialGradient(x, y, baseRadius * 0.18, x, y, glowRadius);
-        glow.addColorStop(0, `rgba(255, 209, 112, ${sunAlpha * (themeRef.current === "morning" ? 0.28 : 0.18)})`);
-        glow.addColorStop(0.46, `rgba(255, 183, 75, ${sunAlpha * (themeRef.current === "morning" ? 0.14 : 0.09)})`);
-        glow.addColorStop(1, "rgba(255, 183, 75, 0)");
+        glow.addColorStop(0, rgbaCss(glowColor, sunAlpha * glowAlpha));
+        glow.addColorStop(0.46, rgbaCss(glowColor, sunAlpha * glowAlpha * 0.5));
+        glow.addColorStop(1, rgbaCss(glowColor, 0));
         setAlpha(1);
         ctx.fillStyle = glow;
+        activeFill = null;
         ctx.beginPath();
         ctx.arc(x, y, glowRadius, 0, TAU);
         ctx.fill();
 
         const core = ctx.createRadialGradient(x, y, 0, x, y, baseRadius * 0.92);
-        core.addColorStop(0, `rgba(255, 227, 141, ${sunAlpha * (themeRef.current === "morning" ? 0.24 : 0.16)})`);
-        core.addColorStop(1, "rgba(255, 178, 70, 0)");
+        core.addColorStop(0, rgbaCss(glowColor, sunAlpha * coreAlpha));
+        core.addColorStop(1, rgbaCss(glowColor, 0));
         ctx.fillStyle = core;
         ctx.beginPath();
         ctx.arc(x, y, baseRadius * 0.92, 0, TAU);
         ctx.fill();
 
         setFont(getFont(13, 500));
-        setFill(themeRef.current === "morning" ? "rgb(191,122,46)" : "rgb(221,147,67)");
-        setAlpha(sunAlpha * (themeRef.current === "morning" ? 0.95 : 0.88));
+        setFill(css(blendRGB((palette) => palette.sunRays)));
+        setAlpha(sunAlpha * 0.92);
         for (let i = 0; i < 34; i += 1) {
           const angle = (i / 34) * TAU + sceneTime * 0.035;
           const wobble = Math.sin(sceneTime * 1.4 + i * 1.73) * 8;
@@ -770,14 +968,16 @@ export default function AboutSpaceAnimation() {
           );
         }
 
-        setFont(getFont(14, 650));
+        // The sun keeps a dense centre in every theme: on paper that is a
+        // solid amber disc, on a dark sky a bright one. Only the colour flips.
+        setFont(getFont(14 * sunScale, 650));
         setAlpha(sunAlpha);
         for (const cell of geometry.sunCells) {
           const noise = 0.5 + 0.5 * Math.sin(cell.phase + sceneTime * 1.6);
           const light = clamp(cell.edge * 0.75 + noise * 0.32);
           const glyph = GLYPH_RAMP[Math.floor(light * (GLYPH_RAMP.length - 1))];
-          setFill(quantizedRGB(230 + light * 25, 125 + light * 120, 50 + light * 115));
-          ctx.fillText(glyph, Math.round(x + cell.px), Math.round(y + cell.py));
+          setFill(css(blendShade((palette) => palette.sunBody, light)));
+          ctx.fillText(glyph, Math.round(x + cell.px * sunScale), Math.round(y + cell.py * sunScale));
         }
       }
 
@@ -785,18 +985,17 @@ export default function AboutSpaceAnimation() {
         const drift = smoothstep(moonAlpha);
         const moonX = x + Math.sin(sceneTime * 0.12) * 2.5 * drift;
         const moonY = y + Math.cos(sceneTime * 0.1) * 1.8 * drift;
-        const moonScale =
-          0.76 +
-          moonAlpha * 0.42 +
-          Math.sin(moonAlpha * Math.PI) * 0.08;
-        const radius = baseRadius * moonScale;
+        // The moon keeps its own footprint; sunScale only applies to the sun.
+        const moonScale = 0.76 + moonAlpha * 0.24 + Math.sin(moonAlpha * Math.PI) * 0.06;
+        const radius = geometry.moonRadius * moonScale;
+        const haloColor = css(blendRGB((palette) => palette.moonHalo));
         setFont(getFont(12, 600));
-        setFill("rgb(184,207,255)");
+        setFill(haloColor);
         setAlpha(moonAlpha * 0.36);
         for (let i = 0; i < 24; i += 1) {
           const angle = (i / 24) * TAU + sceneTime * 0.08;
           const wobble = Math.sin(sceneTime * 1.15 + i * 1.47) * 5;
-          const distance = radius * 1.22 + wobble;
+          const distance = radius * 1.18 + wobble;
           const glyph = i % 8 === 0 ? "+" : i % 5 === 0 ? "*" : i % 3 === 0 ? "'" : ".";
           ctx.fillText(
             glyph,
@@ -808,61 +1007,22 @@ export default function AboutSpaceAnimation() {
         setAlpha(moonAlpha * 0.22);
         for (let i = 0; i < 12; i += 1) {
           const angle = (i / 12) * TAU - sceneTime * 0.045;
-          const distance = radius * (1.48 + Math.sin(sceneTime * 0.8 + i) * 0.05);
+          const distance = radius * (1.42 + Math.sin(sceneTime * 0.8 + i) * 0.05);
           ctx.fillText(
             i % 4 === 0 ? ":" : ".",
             Math.round(moonX + Math.cos(angle) * distance),
             Math.round(moonY + Math.sin(angle) * distance),
           );
         }
-        setAlpha(moonAlpha);
-        const layer = geometry.moonLayer;
-        if (layer) {
-          ctx.drawImage(
-            layer.canvas,
-            Math.round(moonX + layer.originX * moonScale),
-            Math.round(moonY + layer.originY * moonScale),
-            Math.round(layer.canvas.width * moonScale),
-            Math.round(layer.canvas.height * moonScale),
-          );
-        } else {
-          setFont(getFont(14, 650));
-          for (const batch of geometry.moonBatches) {
-            setFill(batch.color);
-            for (const point of batch.points) {
-              ctx.fillText(point.glyph, Math.round(moonX + point.nx * radius), Math.round(moonY + point.ny * radius));
-            }
-          }
-        }
+        drawThemedLayer(geometry.moonLayers, moonX, moonY, moonAlpha, moonScale);
       }
 
       return { x, y, mix, strength: lerp(1, 0.48, mix) };
     }
 
     function drawRing(planet: { x: number; y: number }, front: boolean) {
-      const batches = front ? geometry.ringFrontBatches : geometry.ringBackBatches;
-      const theme = themeRef.current;
-      const ringAlpha = theme === "morning" ? (front ? 1 : 0.86) : theme === "night" ? (front ? 1 : 0.72) : (front ? 0.98 : 0.68);
-      setAlpha(ringAlpha);
-      const layer =
-        theme === "morning"
-          ? front
-            ? geometry.morningRingFrontLayer
-            : geometry.morningRingBackLayer
-          : front
-            ? geometry.ringFrontLayer
-            : geometry.ringBackLayer;
-      if (layer) {
-        ctx.drawImage(layer.canvas, Math.round(planet.x + layer.originX), Math.round(planet.y + layer.originY));
-        return;
-      }
-      setFont(getFont(11, 500));
-      for (const batch of batches) {
-        setFill(theme === "morning" ? scaleRGB(batch.color, 0.52) : batch.color);
-        for (const point of batch.points) {
-          ctx.fillText(point.glyph, Math.round(planet.x + point.x), Math.round(planet.y + point.y));
-        }
-      }
+      const ringAlpha = blendNumber((palette) => (front ? palette.ringAlpha.front : palette.ringAlpha.back));
+      drawThemedLayer(front ? geometry.ringFrontLayers : geometry.ringBackLayers, planet.x, planet.y, ringAlpha);
     }
 
     function drawOrbitingMoon(
@@ -881,10 +1041,8 @@ export default function AboutSpaceAnimation() {
       setAlpha(1);
       for (const cell of geometry.satelliteCells) {
         const shade = clamp(0.08 + Math.max(0, cell.nx * lx + cell.ny * ly + cell.nz * 0.42) * 0.9);
-        const glyph = MOON_RAMP[Math.floor(shade * (MOON_RAMP.length - 1))];
-        const value = 70 + shade * 175;
-        setFill(quantizedRGB(value * 0.88, value * 0.92, value));
-        ctx.fillText(glyph, Math.round(moon.x + cell.px), Math.round(moon.y + cell.py));
+        setFill(css(blendShade((palette) => palette.satellite, shade)));
+        ctx.fillText(rampGlyph(MOON_RAMP, shade), Math.round(moon.x + cell.px), Math.round(moon.y + cell.py));
       }
     }
 
@@ -897,11 +1055,12 @@ export default function AboutSpaceAnimation() {
       const length = Math.hypot(dx, dy) || 1;
       const lx = dx / length;
       const ly = dy / length;
-      const nightMix = smoothstep(light.mix);
       const rotation = sceneTime * 0.085;
       const cloudTime = sceneTime * 0.045;
-      const theme = themeRef.current;
-      if (theme === "morning") {
+
+      const atmosphereAlpha = blendNumber((palette) => palette.atmosphereAlpha);
+      if (atmosphereAlpha > 0.003) {
+        const atmosphereColor = blendRGB((palette) => palette.atmosphere ?? palette.planetEdge);
         const atmosphereRadius = geometry.planetRadius * 1.72;
         const atmosphere = ctx.createRadialGradient(
           planet.x,
@@ -911,17 +1070,44 @@ export default function AboutSpaceAnimation() {
           planet.y,
           atmosphereRadius,
         );
-        atmosphere.addColorStop(0, "rgba(134, 194, 174, 0.07)");
-        atmosphere.addColorStop(0.5, "rgba(134, 194, 174, 0.1)");
-        atmosphere.addColorStop(1, "rgba(91, 153, 134, 0)");
+        atmosphere.addColorStop(0, rgbaCss(atmosphereColor, atmosphereAlpha * 0.7));
+        atmosphere.addColorStop(0.5, rgbaCss(atmosphereColor, atmosphereAlpha));
+        atmosphere.addColorStop(1, rgbaCss(atmosphereColor, 0));
         setAlpha(1);
         ctx.fillStyle = atmosphere;
+        activeFill = null;
         ctx.beginPath();
         ctx.arc(planet.x, planet.y, atmosphereRadius, 0, TAU);
         ctx.fill();
       }
 
-      setFont(getFont(geometry.planetStep + 3, 650));
+      // On paper the lit side of the sphere is bare, so a translucent wash
+      // keeps the disc legible where the hatching stops.
+      const discWashAlpha = blendNumber((palette) => palette.discWashAlpha);
+      if (discWashAlpha > 0.003) {
+        const washColor = blendRGB((palette) => palette.discWash ?? palette.planetEdge);
+        const wash = ctx.createRadialGradient(
+          planet.x - geometry.planetRadius * 0.25,
+          planet.y - geometry.planetRadius * 0.2,
+          0,
+          planet.x,
+          planet.y,
+          geometry.planetRadius + 2,
+        );
+        wash.addColorStop(0, rgbaCss(washColor, discWashAlpha));
+        wash.addColorStop(0.78, rgbaCss(washColor, discWashAlpha * 0.55));
+        wash.addColorStop(1, rgbaCss(washColor, 0));
+        setAlpha(1);
+        ctx.fillStyle = wash;
+        activeFill = null;
+        ctx.beginPath();
+        ctx.arc(planet.x, planet.y, geometry.planetRadius + 2, 0, TAU);
+        ctx.fill();
+      }
+
+      // Glyphs fit their cell: a character one pixel taller than the grid
+      // step at weight 600 shades without neighbours merging into a block.
+      setFont(getFont(geometry.planetStep + 1, dominantPalette().planetWeight));
       setAlpha(0.99);
 
       for (const cell of geometry.planetCells) {
@@ -941,50 +1127,24 @@ export default function AboutSpaceAnimation() {
               0.42,
           ) * 0.32;
         const glyphLight = clamp(softLight + land * 0.11 + cloud * 0.12 + cell.rim * 0.025);
-        const glyph = GLYPH_RAMP[Math.floor(glyphLight * (GLYPH_RAMP.length - 1))];
+        const glyph = rampGlyph(null, glyphLight);
 
-        const oceanR = 20 + glyphLight * 42;
-        const oceanG = 74 + glyphLight * 94;
-        const oceanB = 79 + glyphLight * 70;
-        const terrainR = 38 + glyphLight * 52;
-        const terrainG = 102 + glyphLight * 102;
-        const terrainB = 72 + glyphLight * 62;
-        const cloudR = 88 + glyphLight * 78;
-        const cloudG = 150 + glyphLight * 82;
-        const cloudB = 134 + glyphLight * 80;
-
-        let r = lerp(oceanR, terrainR, land * 0.48);
-        let g = lerp(oceanG, terrainG, land * 0.58);
-        let b = lerp(oceanB, terrainB, land * 0.34);
-        r = lerp(r, cloudR, cloud);
-        g = lerp(g, cloudG, cloud);
-        b = lerp(b, cloudB, cloud);
-
-        if (themeRef.current === "morning") {
-          r *= 0.68;
-          g *= 0.72;
-          b *= 0.68;
-        }
-
-        const nightR = 38 + glyphLight * 66;
-        const nightG = 90 + glyphLight * 96;
-        const nightB = 112 + glyphLight * 116;
-        r = lerp(r, nightR, nightMix * 0.72);
-        g = lerp(g, nightG, nightMix * 0.72);
-        b = lerp(b, nightB, nightMix * 0.72);
-
-        if (themeRef.current !== "morning") {
-          r = Math.max(r, 56);
-          g = Math.max(g, 96);
-          b = Math.max(b, 108);
-        }
+        const ocean = blendShade((palette) => palette.ocean, glyphLight);
+        const terrain = blendShade((palette) => palette.terrain, glyphLight);
+        const cloudColor = blendShade((palette) => palette.cloud, glyphLight);
+        let r = lerp(ocean[0], terrain[0], land * 0.48);
+        let g = lerp(ocean[1], terrain[1], land * 0.58);
+        let b = lerp(ocean[2], terrain[2], land * 0.34);
+        r = lerp(r, cloudColor[0], cloud);
+        g = lerp(g, cloudColor[1], cloud);
+        b = lerp(b, cloudColor[2], cloud);
 
         setFill(quantizedRGB(r, g, b));
         ctx.fillText(glyph, Math.round(planet.x + cell.px), Math.round(planet.y + cell.py));
       }
 
       setFont(getFont(9, 500));
-      setFill(nightMix > 0.5 ? "rgb(138,190,226)" : themeRef.current === "morning" ? "rgb(39,91,82)" : "rgb(64,174,162)");
+      setFill(css(blendRGB((palette) => palette.planetEdge)));
       for (const point of geometry.planetEdge) {
         const facing = clamp(0.22 + point.cos * lx + point.sin * ly);
         if (facing < 0.18 && point.sparse) continue;
@@ -1013,6 +1173,10 @@ export default function AboutSpaceAnimation() {
         spawnComet();
       }
 
+      const trail = css(blendRGB((palette) => palette.cometTrail));
+      const head = css(blendRGB((palette) => palette.cometHead));
+      const spark = css(blendRGB((palette) => palette.cometSpark));
+
       let writeIndex = 0;
       for (const comet of comets) {
         if (!isPaused) {
@@ -1033,15 +1197,15 @@ export default function AboutSpaceAnimation() {
           const ty = comet.y - ny * spacing * i;
           const fade = lifeFade * (1 - (i - 1) / (segments + 1));
           if (i <= 2) {
-            drawGlyph(slash, tx, ty, 15, "rgb(255,255,255)", fade * 0.95, 700);
+            drawGlyph(slash, tx, ty, 15, spark, fade * 0.95, 700);
           } else {
-            drawGlyph(i === 3 ? "." : "·", tx, ty, 13, "rgb(230,240,255)", fade * 0.8, 650);
+            drawGlyph(i === 3 ? "." : "·", tx, ty, 13, trail, fade * 0.8, 650);
           }
         }
 
         const headGlow = 0.35 + lifeFade * 0.45;
-        drawGlyph("✦", comet.x, comet.y, 16, "rgb(255,244,220)", headGlow * 0.75, 700);
-        drawGlyph("*", comet.x, comet.y, 18, "rgb(255,255,255)", lifeFade, 700);
+        drawGlyph("✦", comet.x, comet.y, 16, head, headGlow * 0.75, 700);
+        drawGlyph("*", comet.x, comet.y, 18, spark, lifeFade, 700);
 
         if (comet.life < comet.maxLife) {
           comets[writeIndex++] = comet;
@@ -1066,7 +1230,7 @@ export default function AboutSpaceAnimation() {
       previousTime = performance.now();
     }
 
-    controlRef.current = { spawnComet, reset, togglePause };
+    controlRef.current = { spawnComet, reset, togglePause, requestFrame };
 
     function frame(now: number) {
       rafId = 0;
@@ -1087,6 +1251,8 @@ export default function AboutSpaceAnimation() {
         sceneTime += dt * (reducedMotion ? 0.25 : 1);
         orbitAngle += dt * (reducedMotion ? 0.12 : 0.3);
       }
+
+      updatePaletteBlend(dt);
 
       pointerX = lerp(pointerX, pointerTargetX, 1 - Math.exp(-dt * 4.5));
       pointerY = lerp(pointerY, pointerTargetY, 1 - Math.exp(-dt * 4.5));
@@ -1119,7 +1285,8 @@ export default function AboutSpaceAnimation() {
         Math.abs(pointerX - pointerTargetX) > 0.0005 ||
         Math.abs(pointerY - pointerTargetY) > 0.0005;
       const celestialMoving = Math.abs(celestialMix - (themeRef.current === "night" ? 1 : 0)) > 0.0005;
-      if (!isPaused || pointerMoving || celestialMoving) {
+      const paletteMoving = paletteMix < 1 || themeRef.current !== paletteTo;
+      if (!isPaused || pointerMoving || celestialMoving || paletteMoving) {
         requestFrame();
       }
     }
@@ -1208,12 +1375,3 @@ export default function AboutSpaceAnimation() {
     />
   );
 }
-
-
-
-
-
-
-
-
-

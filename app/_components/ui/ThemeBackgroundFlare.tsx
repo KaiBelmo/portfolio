@@ -261,7 +261,10 @@ export default function ThemeBackgroundFlare() {
 
       // video-based elapsed (accurate while playing, freezes when video pauses)
       const mediaTime = videoMediaTimeRef.current;
-      const videoElapsedMs = Math.max(0, (mediaTime - roomAnimation.startTime) * 1000);
+      const videoElapsedMs = Math.max(
+        0,
+        ((mediaTime - roomAnimation.startTime) / roomAnimation.playbackRate) * 1000,
+      );
 
       // wall-clock elapsed (always advances, catches up when video ends early)
       const wallElapsedMs =

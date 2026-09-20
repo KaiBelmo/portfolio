@@ -4,7 +4,8 @@ import { Aldrich, Pixelify_Sans } from "next/font/google";
 import { ThemeProvider } from "./_components/system/ThemeProvider";
 import PageTransition from "./_components/system/PageTransition";
 import SiteHeader from "./_components/ui/SiteHeader";
-import { DEFAULT_THEME, THEME_PALETTES } from "@/lib/theme";
+import { DEFAULT_THEME, THEME_OPTIONS, THEME_PALETTES } from "@/lib/theme";
+import { MOBILE_MAX_WIDTH, roomPosterImageProps } from "@/lib/theme-animation";
 
 const siteUrl = "https://www.kaibelmo.dev";
 const siteName = "Kai Belmo";
@@ -63,6 +64,16 @@ const websiteJsonLd = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // The server cannot know which poster the visitor's theme needs, but the
+  // bootstrap script decides the theme before first paint, so it also
+  // preloads that poster's exact srcset. The room then paints with the page.
+  const roomPosters = Object.fromEntries(
+    THEME_OPTIONS.map((theme) => {
+      const { srcSet, sizes } = roomPosterImageProps(theme);
+      return [theme, { srcSet, sizes }];
+    }),
+  );
+
   const initialThemeScript = `
     (() => {
       const hour = new Date().getHours();
@@ -80,6 +91,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           night: "${THEME_PALETTES.night.canvas}"
         };
         meta.setAttribute("content", palette[theme]);
+      }
+      if (window.innerWidth > ${MOBILE_MAX_WIDTH}) {
+        const posters = ${JSON.stringify(roomPosters)};
+        const poster = posters[theme];
+        if (poster) {
+          const link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "image";
+          link.setAttribute("fetchpriority", "high");
+          link.setAttribute("imagesrcset", poster.srcSet);
+          link.setAttribute("imagesizes", poster.sizes);
+          document.head.appendChild(link);
+        }
       }
     })();
   `;

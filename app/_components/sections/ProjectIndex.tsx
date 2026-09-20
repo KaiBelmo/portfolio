@@ -10,6 +10,7 @@ import { useMediaQuery } from "./project-index/useMediaQuery";
 import FilterPanel from "./project-index/FilterPanel";
 import ProjectRow from "./project-index/ProjectRow";
 import RecordPreview from "./project-index/RecordPreview";
+import ArrowRight from "../ui/ArrowRight";
 import MobilePagination from "./project-index/MobilePagination";
 
 export default function ProjectIndex({
@@ -245,8 +246,9 @@ export default function ProjectIndex({
       )}
 
       {showViewAll && (
-        <Link className="mt-6 inline-flex border-b border-sys-signal pb-1 text-sys-signal" href="/projects">
-          Query All {totalProjects} Dossiers -&gt;
+        <Link className="mt-6 inline-flex items-center gap-1.5 border-b border-sys-signal pb-1 text-sys-signal" href="/projects">
+          Query All {totalProjects} Dossiers
+          <ArrowRight />
         </Link>
       )}
     </section>

@@ -50,7 +50,7 @@ export default function SiteHeader() {
   const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
   const restoreFocusRef = useRef(true);
   const scrolledRef = useRef(false);
-  const { selectedTheme, setThemeOverride, isAuto, isThemeTransitioning } = useTheme();
+  const { selectedTheme, setThemeOverride, isAuto, isThemeTransitioning, warmThemeAssets } = useTheme();
 
   const menuVariants: Variants = reduceMotion
     ? {
@@ -288,7 +288,10 @@ export default function SiteHeader() {
                         className={selectedTheme === option && !isAuto ? styles.isActive : ""}
                         aria-label={`Use ${option} lighting`}
                         aria-pressed={selectedTheme === option && !isAuto}
-                        onClick={() => setThemeOverride(option)}
+                        onClick={() => {
+                          setThemeOverride(option);
+                          closeMenu(false);
+                        }}
                         disabled={isThemeTransitioning}
                       >
                         {option[0].toUpperCase()}
@@ -299,7 +302,10 @@ export default function SiteHeader() {
                       className={isAuto ? styles.isActive : ""}
                       aria-label="Use automatic lighting"
                       aria-pressed={isAuto}
-                      onClick={() => setThemeOverride(null)}
+                      onClick={() => {
+                        setThemeOverride(null);
+                        closeMenu(false);
+                      }}
                       disabled={isThemeTransitioning}
                     >
                       Auto
@@ -321,6 +327,8 @@ export default function SiteHeader() {
           className={`${styles.lightSwitch} ${isThemeTransitioning ? styles.isTransitioning : ""}`}
           aria-label="Preview room lighting"
           aria-busy={isThemeTransitioning}
+          onPointerEnter={warmThemeAssets}
+          onFocusCapture={warmThemeAssets}
         >
           {themes.map((option) => (
             <button

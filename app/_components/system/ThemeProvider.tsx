@@ -19,18 +19,26 @@ import {
 } from "@/lib/theme";
 import {
   RoomThemeAnimation,
+  canUseRoomVideo,
   coerceAvailableTheme,
   createRoomThemeAnimation,
   isThemeAvailable,
   prefersReducedThemeMotion,
-  preloadRoomThemeAnimation,
-  staticRoomAsset,
-  supportsTransparentRoomVideo,
+  shouldSkipSpeculativePreload,
+  warmRoomPoster,
+  warmRoomTransitionAssets,
 } from "@/lib/theme-animation";
 import ThemeBackgroundFlare from "../ui/ThemeBackgroundFlare";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/** Extra time we wait for a slow clip after the wall-clock timer before finishing anyway. */
+const VIDEO_GRACE_MS = 4000;
+/** Pause after the final palette commit before tearing the transition down. */
+const SETTLE_MS = 300;
+/** Delay before speculative clip warming so it never competes with first paint. */
+const IDLE_WARM_DELAY_MS = 2500;
 
 interface ThemeContextType {
   theme: ThemeType;
@@ -39,28 +47,29 @@ interface ThemeContextType {
   isThemeTransitioning: boolean;
   isRoomAnimationPlaying: boolean;
   roomAnimation: RoomThemeAnimation | null;
+  /** True when the current transition drives the room clip, not only the mosaic. */
+  roomVideoEnabled: boolean;
   animationStartedAt: number;
   videoMediaTimeRef: React.MutableRefObject<number>;
   reportVideoFrame: (mediaTime: number) => void;
   setThemeOverride: (theme: ThemeType | null) => void;
-  startRoomAnimation: (id: number) => void;
+  /** Warms the clips and posters reachable from the current theme. Safe to call often. */
+  warmThemeAssets: () => void;
   finishRoomAnimation: (id: number) => void;
   failRoomAnimation: (id: number) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-function nextPaint(frames = 1) {
-  return new Promise<void>((resolve) => {
-    const tick = (remaining: number) => {
-      window.requestAnimationFrame(() => {
-        if (remaining <= 1) resolve();
-        else tick(remaining - 1);
-      });
-    };
-    tick(frames);
-  });
+interface ActiveTransition {
+  id: number;
+  animation: RoomThemeAnimation;
+  startedAt: number;
+  timerDone: boolean;
+  videoDone: boolean;
+  finishing: boolean;
+  timers: number[];
 }
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -73,17 +82,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
   const [displayedTheme, setDisplayedTheme] = useState<ThemeType>(DEFAULT_THEME);
   const [roomAnimation, setRoomAnimation] = useState<RoomThemeAnimation | null>(null);
+  const [roomVideoEnabled, setRoomVideoEnabled] = useState(false);
   const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
   const [isRoomAnimationPlaying, setIsRoomAnimationPlaying] = useState(false);
   const [animationStartedAt, setAnimationStartedAt] = useState(0);
 
   const displayedThemeRef = useRef(targetTheme);
-  const roomAnimationRef = useRef<RoomThemeAnimation | null>(null);
+  const activeRef = useRef<ActiveTransition | null>(null);
   const transitionIdRef = useRef(0);
-  const transitionRunningRef = useRef(false);
-  const animationStartedAtRef = useRef(0);
-  const paletteCommitTimerRef = useRef<number | null>(null);
-  const finishTimerRef = useRef<number | null>(null);
   const isFirstRenderRef = useRef(true);
   const videoMediaTimeRef = useRef(0);
 
@@ -104,144 +110,141 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const clearTransition = useCallback(() => {
-    if (paletteCommitTimerRef.current !== null) {
-      window.clearTimeout(paletteCommitTimerRef.current);
-      paletteCommitTimerRef.current = null;
-    }
-    if (finishTimerRef.current !== null) {
-      window.clearTimeout(finishTimerRef.current);
-      finishTimerRef.current = null;
-    }
-    roomAnimationRef.current = null;
+    const active = activeRef.current;
+    if (active) active.timers.forEach((timer) => window.clearTimeout(timer));
+    activeRef.current = null;
     setRoomAnimation(null);
+    setRoomVideoEnabled(false);
     setIsRoomAnimationPlaying(false);
     setAnimationStartedAt(0);
     videoMediaTimeRef.current = 0;
-    transitionRunningRef.current = false;
     setIsThemeTransitioning(false);
   }, []);
 
-  const startRoomAnimation = useCallback(
+  // Runs once both the wall-clock timer and the clip (if any) have finished.
+  const completeTransition = useCallback(
     (id: number) => {
-      const active = roomAnimationRef.current;
-      if (!active || active.id !== id) return;
+      const active = activeRef.current;
+      if (!active || active.id !== id || active.finishing) return;
+      active.finishing = true;
 
-      const now = performance.now();
-      animationStartedAtRef.current = now;
-      setAnimationStartedAt(now);
-      setIsRoomAnimationPlaying(true);
-
-      paletteCommitTimerRef.current = window.setTimeout(() => {
-        if (roomAnimationRef.current?.id !== id) return;
-        commitTheme(active.to);
-        paletteCommitTimerRef.current = null;
-      }, active.durationMs / 2);
-    },
-    [commitTheme],
-  );
-
-  const finishRoomAnimation = useCallback(
-    (id: number) => {
-      const active = roomAnimationRef.current;
-      if (!active || active.id !== id) return;
-
-      const elapsed = performance.now() - animationStartedAtRef.current;
-      const maxFlareEndMs = active.flarePhases.reduce(
+      const { animation } = active;
+      const maxFlareEndMs = animation.flarePhases.reduce(
         (max, phase) => Math.max(max, phase.startMs + phase.durationMs),
         0,
       );
-      const delay = Math.max(0, maxFlareEndMs - elapsed);
+      const delay = Math.max(0, maxFlareEndMs - (performance.now() - active.startedAt));
 
-      const complete = () => {
-        const currentActive = roomAnimationRef.current;
-        if (!currentActive || currentActive.id !== id) return;
-        commitTheme(currentActive.to);
-        setTimeout(() => {
-          if (roomAnimationRef.current?.id !== id) return;
-          clearTransition();
-        }, 300);
+      const settle = () => {
+        if (activeRef.current?.id !== id) return;
+        commitTheme(animation.to);
+        active.timers.push(
+          window.setTimeout(() => {
+            if (activeRef.current?.id === id) clearTransition();
+          }, SETTLE_MS),
+        );
       };
 
-      if (delay > 0) {
-        setTimeout(complete, delay);
-      } else {
-        complete();
-      }
+      if (delay > 0) active.timers.push(window.setTimeout(settle, delay));
+      else settle();
     },
     [clearTransition, commitTheme],
   );
 
-  const failRoomAnimation = useCallback(
+  const tryFinish = useCallback(
     (id: number) => {
-      const active = roomAnimationRef.current;
+      const active = activeRef.current;
       if (!active || active.id !== id) return;
-      commitTheme(active.to);
-      clearTransition();
+      if (active.timerDone && active.videoDone) completeTransition(id);
     },
-    [clearTransition, commitTheme],
+    [completeTransition],
   );
+
+  // The clip reporting its end or an error both release the same gate; the
+  // mosaic keeps its own clock either way.
+  const finishRoomAnimation = useCallback(
+    (id: number) => {
+      const active = activeRef.current;
+      if (!active || active.id !== id) return;
+      active.videoDone = true;
+      tryFinish(id);
+    },
+    [tryFinish],
+  );
+  const failRoomAnimation = finishRoomAnimation;
 
   const startThemeTransition = useCallback(
-    async (requestedTheme: ThemeType) => {
+    (requestedTheme: ThemeType) => {
       const nextTheme = coerceAvailableTheme(requestedTheme);
       const from = displayedThemeRef.current;
-      if (from === nextTheme || transitionRunningRef.current) return;
+      if (from === nextTheme || activeRef.current) return;
 
       transitionIdRef.current += 1;
-      const transitionId = transitionIdRef.current;
-      const animation = createRoomThemeAnimation(transitionId, from, nextTheme);
-      const isHomeRoute = pathname === "/";
-      const isMobile =
-        typeof window !== "undefined" && window.innerWidth <= 800;
+      const id = transitionIdRef.current;
+      const animation = createRoomThemeAnimation(id, from, nextTheme);
 
-      const shouldSwitchDirectly =
-        prefersReducedThemeMotion() ||
-        (!isMobile && isHomeRoute && !supportsTransparentRoomVideo()) ||
-        animation === null;
-
-      if (shouldSwitchDirectly) {
+      if (animation === null || prefersReducedThemeMotion()) {
         commitTheme(nextTheme);
         return;
       }
 
-      if (isHomeRoute && !isMobile && typeof window !== "undefined") {
-        const img = new Image();
-        img.src = staticRoomAsset(nextTheme);
-        img.decode().catch(() => {});
-      }
+      // Everything starts on the wall clock immediately. The clip, where it
+      // runs, syncs in whenever its first frame arrives instead of holding
+      // the mosaic back.
+      const usesVideo = pathname === "/" && canUseRoomVideo();
+      const startedAt = performance.now();
+      const active: ActiveTransition = {
+        id,
+        animation,
+        startedAt,
+        timerDone: false,
+        videoDone: !usesVideo,
+        finishing: false,
+        timers: [],
+      };
+      activeRef.current = active;
+      videoMediaTimeRef.current = 0;
 
-      transitionRunningRef.current = true;
+      if (usesVideo) warmRoomPoster(nextTheme);
+
       setIsThemeTransitioning(true);
-      setIsRoomAnimationPlaying(false);
-
-      // On desktop home route, preload the video segment before starting
-      if (isHomeRoute && !isMobile) {
-        try {
-          await preloadRoomThemeAnimation(animation);
-        } catch {
-          if (transitionId !== transitionIdRef.current) return;
-          commitTheme(nextTheme);
-          clearTransition();
-          return;
-        }
-      }
-
-      if (transitionId !== transitionIdRef.current) return;
-
-      roomAnimationRef.current = animation;
       setRoomAnimation(animation);
+      setRoomVideoEnabled(usesVideo);
+      setAnimationStartedAt(startedAt);
+      setIsRoomAnimationPlaying(true);
 
-      // Non-home routes and mobile: drive the flare via wall-clock timer
-      // (no video to sync against)
-      if (!isHomeRoute || isMobile) {
-        startRoomAnimation(animation.id);
-        finishTimerRef.current = window.setTimeout(() => {
-          finishTimerRef.current = null;
-          finishRoomAnimation(animation.id);
-        }, animation.durationMs);
+      const whenStillActive = (callback: () => void) => () => {
+        if (activeRef.current?.id === id) callback();
+      };
+
+      active.timers.push(
+        window.setTimeout(
+          whenStillActive(() => commitTheme(nextTheme)),
+          animation.durationMs / 2,
+        ),
+      );
+      active.timers.push(
+        window.setTimeout(
+          whenStillActive(() => {
+            active.timerDone = true;
+            tryFinish(id);
+          }),
+          animation.durationMs,
+        ),
+      );
+      if (usesVideo) {
+        active.timers.push(
+          window.setTimeout(
+            whenStillActive(() => {
+              active.videoDone = true;
+              tryFinish(id);
+            }),
+            animation.durationMs + VIDEO_GRACE_MS,
+          ),
+        );
       }
     },
-    [clearTransition, commitTheme, finishRoomAnimation, pathname, startRoomAnimation],
+    [commitTheme, pathname, tryFinish],
   );
 
   const setThemeOverride = useCallback(
@@ -249,7 +252,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (nextOverride !== null && !isThemeAvailable(nextOverride)) return;
 
       // Cancel any in-flight transition so the new one can start immediately
-      if (transitionRunningRef.current) {
+      if (activeRef.current) {
         transitionIdRef.current += 1;
         clearTransition();
       }
@@ -257,27 +260,41 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setThemeOverrideState(nextOverride);
       const nextTheme = coerceAvailableTheme(nextOverride ?? getThemeFromHour());
       if (nextOverride === null) setClockTheme(nextTheme);
-      void startThemeTransition(nextTheme);
+      startThemeTransition(nextTheme);
     },
     [clearTransition, startThemeTransition],
   );
 
-  // Eagerly preload both video directions on desktop home route
-  useEffect(() => {
-    const isMobile =
-      typeof window !== "undefined" && window.innerWidth <= 800;
-    if (pathname !== "/" || !supportsTransparentRoomVideo() || isMobile) return;
-
-    const anims = [
-      createRoomThemeAnimation(0, "morning", "afternoon"),
-      createRoomThemeAnimation(0, "afternoon", "night"),
-      createRoomThemeAnimation(0, "night", "morning"),
-      createRoomThemeAnimation(0, "afternoon", "morning"),
-    ];
-    for (const anim of anims) {
-      if (anim) preloadRoomThemeAnimation(anim).catch(() => {});
-    }
+  const warmThemeAssets = useCallback(() => {
+    if (pathname !== "/") return;
+    warmRoomTransitionAssets(displayedThemeRef.current);
   }, [pathname]);
+
+  // Speculative warming: only the clips reachable from the current theme,
+  // only on the desktop home route, only after the page has settled, and
+  // never on a metered connection.
+  useEffect(() => {
+    if (pathname !== "/" || !canUseRoomVideo() || shouldSkipSpeculativePreload()) return;
+
+    let cancelled = false;
+    let idleId = 0;
+    const run = () => {
+      if (!cancelled) warmRoomTransitionAssets(displayedThemeRef.current);
+    };
+    const timerId = window.setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        idleId = window.requestIdleCallback(run, { timeout: 4000 });
+      } else {
+        run();
+      }
+    }, IDLE_WARM_DELAY_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerId);
+      if (idleId && "cancelIdleCallback" in window) window.cancelIdleCallback(idleId);
+    };
+  }, [pathname, displayedTheme]);
 
   // Auto-update clock theme every minute
   useIsomorphicLayoutEffect(() => {
@@ -312,8 +329,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isFirstRenderRef.current = false;
       return;
     }
-    if (themeOverride !== null || transitionRunningRef.current) return;
-    void startThemeTransition(clockTheme);
+    if (themeOverride !== null || activeRef.current) return;
+    startThemeTransition(clockTheme);
   }, [clockTheme, startThemeTransition, themeOverride]);
 
   useEffect(() => {
@@ -326,13 +343,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(
     () => () => {
       transitionIdRef.current += 1;
-      if (paletteCommitTimerRef.current !== null) {
-        window.clearTimeout(paletteCommitTimerRef.current);
-      }
-      if (finishTimerRef.current !== null) {
-        window.clearTimeout(finishTimerRef.current);
-      }
-      roomAnimationRef.current = null;
+      activeRef.current?.timers.forEach((timer) => window.clearTimeout(timer));
+      activeRef.current = null;
     },
     [],
   );
@@ -345,11 +357,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isThemeTransitioning,
       isRoomAnimationPlaying,
       roomAnimation,
+      roomVideoEnabled,
       animationStartedAt,
       videoMediaTimeRef,
       reportVideoFrame,
       setThemeOverride,
-      startRoomAnimation,
+      warmThemeAssets,
       finishRoomAnimation,
       failRoomAnimation,
     }),
@@ -360,10 +373,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isRoomAnimationPlaying,
       isThemeTransitioning,
       roomAnimation,
+      roomVideoEnabled,
       animationStartedAt,
       reportVideoFrame,
       setThemeOverride,
-      startRoomAnimation,
+      warmThemeAssets,
       themeOverride,
     ],
   );

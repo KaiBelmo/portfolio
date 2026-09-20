@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import RoomScene from "./RoomScene";
 import MobileProjectCard from "./MobileProjectCard";
+import ArrowRight from "./ArrowRight";
 import { useTheme } from "../system/ThemeProvider";
+import { useMediaQuery } from "../sections/project-index/useMediaQuery";
+import { MOBILE_MAX_WIDTH } from "@/lib/theme-animation";
 import { projects } from "@/data/projects";
 import styles from "./HomeHero.module.css";
 
@@ -28,11 +31,15 @@ export default function HomeHero() {
   const {
     theme,
     roomAnimation,
-    startRoomAnimation,
+    roomVideoEnabled,
     finishRoomAnimation,
     failRoomAnimation,
     reportVideoFrame,
   } = useTheme();
+
+  // The room is hidden by CSS below this width, but hiding is not enough:
+  // a mounted scene would still fetch posters and play the clip off screen.
+  const isMobile = useMediaQuery(`(max-width: ${MOBILE_MAX_WIDTH}px)`);
 
   const [expandedMobileProjectId, setExpandedMobileProjectId] = useState<string>();
   const sceneRef = useRef<HTMLElement>(null);
@@ -41,7 +48,7 @@ export default function HomeHero() {
   useEffect(() => {
     const scene = sceneRef.current;
     const card = cardRef.current;
-    if (!scene || !card) return;
+    if (isMobile || !scene || !card) return;
 
     const MAX = 8;
     let cachedRect: DOMRect | null = null;
@@ -111,7 +118,7 @@ export default function HomeHero() {
       scene.removeEventListener("pointercancel", reset);
       scene.removeEventListener("pointerleave", onPointerLeave);
     };
-  }, []);
+  }, [isMobile]);
 
   const featuredProjects = ["infill", "voidgen", "lessshare"]
     .map((id) => projects.find((project) => project.id === id))
@@ -215,10 +222,11 @@ export default function HomeHero() {
                 ))}
               </div>
               <Link
-                className="flex items-center justify-center min-h-[40px] border border-accent font-display text-[0.62rem] tracking-[0.04em] uppercase text-accent hover:bg-accent hover:text-canvas transition-colors duration-[120ms]"
+                className="flex items-center justify-center gap-1.5 min-h-[40px] border border-accent font-display text-[0.62rem] tracking-[0.04em] uppercase text-accent hover:bg-accent hover:text-canvas transition-colors duration-[120ms]"
                 href="/projects"
               >
-                All projects -&gt;
+                All projects
+                <ArrowRight />
               </Link>
             </div>
 
@@ -254,6 +262,7 @@ export default function HomeHero() {
           className={`${styles.scene} relative z-[2] -ml-[clamp(0px,1.5vw,12px)] self-start [perspective:var(--tilt-perspective)] desktop-md:-ml-[54px] desktop-sm:ml-0 tablet:hidden`}
           aria-label="Interactive pixel-art workspace"
         >
+          {!isMobile && (
           <div ref={cardRef} className={`${styles.sceneCard} relative border-none shadow-[0_8px_24px_color-mix(in_srgb,var(--shadow)_24%,transparent)] [transform-style:preserve-3d]`}>
             <div className="absolute z-[4] top-3.5 right-3.5 grid gap-[3px] px-[11px] py-2 text-surface bg-ink font-mono text-[0.5rem] font-bold tracking-[0.07em] uppercase shadow-pixel-accent">
               <span>Workspace / {roomAnimation ? roomAnimation.to : theme}</span>
@@ -261,13 +270,13 @@ export default function HomeHero() {
             </div>
             <RoomScene
               theme={theme}
-              animation={roomAnimation}
-              onAnimationStart={startRoomAnimation}
+              animation={roomVideoEnabled ? roomAnimation : null}
               onAnimationComplete={finishRoomAnimation}
               onAnimationError={failRoomAnimation}
               onFrame={reportVideoFrame}
             />
           </div>
+          )}
         </aside>
       </div>
     </section>

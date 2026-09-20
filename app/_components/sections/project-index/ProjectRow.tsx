@@ -5,6 +5,7 @@ import { useReducedMotion } from "framer-motion";
 import type { Project } from "@/types/project";
 import { actionLabel } from "./constants";
 import { stateListItemVariants, stateTransition } from "../../ui/stateAnimations";
+import ArrowRight from "../../ui/ArrowRight";
 
 export default function ProjectRow({
   project,
@@ -73,8 +74,9 @@ export default function ProjectRow({
           <span className="mb-5 block tablet:m-0 tablet:min-w-0 tablet:flex-1 tablet:basis-[12rem]">
             {project.projectType}
           </span>
-          <span className="mb-5 block font-display text-[0.72rem] text-sys-signal tablet:hidden">
-            {actionLabel(project)} -&gt;
+          <span className="mb-5 flex items-center justify-end gap-1.5 font-display text-[0.72rem] text-sys-signal tablet:hidden">
+            {actionLabel(project)}
+            <ArrowRight />
           </span>
         </span>
       </button>

@@ -24,16 +24,27 @@
   image-rendering: pixelated;
 }
 
+/* Posters not in use are display:none, not merely transparent: a lazy image
+   that is never rendered is never fetched, so one poster loads per visit. */
 .staticLayer {
   position: absolute;
   inset: 0;
-  display: block;
+  display: none;
   width: 100%;
   height: 100%;
   object-fit: contain;
   opacity: 0;
   pointer-events: none;
   transition: opacity 80ms linear;
+}
+
+.roomScene[data-theme-from="morning"] .morningImage,
+.roomScene[data-theme-to="morning"] .morningImage,
+.roomScene[data-theme-from="afternoon"] .afternoonImage,
+.roomScene[data-theme-to="afternoon"] .afternoonImage,
+.roomScene[data-theme-from="night"] .nightImage,
+.roomScene[data-theme-to="night"] .nightImage {
+  display: block;
 }
 
 .videoLayer {
@@ -64,6 +75,7 @@
 :global(html[data-theme="morning"]) .morningImage,
 :global(html[data-theme="afternoon"]) .afternoonImage,
 :global(html[data-theme="night"]) .nightImage {
+  display: block;
   opacity: 1;
   pointer-events: auto;
 }
@@ -86,6 +98,23 @@
   opacity: 1;
   pointer-events: auto;
   transition: opacity 250ms ease-in-out;
+}
+
+/* Until the clip's first frame is on screen, hold the departure poster and
+   keep the destination poster hidden even after the palette has committed
+   at the halfway point. The room must not jump ahead of its own time-lapse. */
+:global(html) .roomScene.isTimeTravelling:not(.videoIsReady)[data-theme-from="morning"] .morningImage,
+:global(html) .roomScene.isTimeTravelling:not(.videoIsReady)[data-theme-from="afternoon"] .afternoonImage,
+:global(html) .roomScene.isTimeTravelling:not(.videoIsReady)[data-theme-from="night"] .nightImage {
+  opacity: 1;
+  transition: none;
+}
+
+:global(html) .roomScene.isTimeTravelling:not(.videoIsReady)[data-theme-to="morning"] .morningImage,
+:global(html) .roomScene.isTimeTravelling:not(.videoIsReady)[data-theme-to="afternoon"] .afternoonImage,
+:global(html) .roomScene.isTimeTravelling:not(.videoIsReady)[data-theme-to="night"] .nightImage {
+  opacity: 0;
+  transition: none;
 }
 
 .roomScene.isTimeTravelling .roomImage {

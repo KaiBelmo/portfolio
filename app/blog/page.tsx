@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArrowRight from "@/app/_components/ui/ArrowRight";
 import { getPostsWithRevalidation, formatPostDate } from "@/lib/blog";
 import type { Metadata } from "next";
 
@@ -73,7 +74,7 @@ export default async function BlogPage() {
               aria-label={`Read ${post.title}`}
             >
               <span>{post.readingTime} min read</span>
-              <span aria-hidden="true">-&gt;</span>
+              <ArrowRight />
             </Link>
           </article>
         ))}
