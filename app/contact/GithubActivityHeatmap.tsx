@@ -5,6 +5,7 @@ import {
   HEATMAP_COLORS,
   HEATMAP_LABEL_COLUMN_WIDTH,
 } from "./contactData";
+import HeatmapScroller from "./HeatmapScroller";
 
 type HeatmapMonthLabel = {
   label: string;
@@ -110,7 +111,7 @@ export default function GithubActivityHeatmap({ activity }: { activity: GithubAc
   } as React.CSSProperties;
 
   return (
-    <div className="heatmap-scroll border-t border-line pb-5 pt-4 [container-type:inline-size]" style={heatmapCssVars}>
+    <HeatmapScroller className="heatmap-scroll border-t border-line pb-5 pt-4 [container-type:inline-size]" style={heatmapCssVars}>
       <div className="min-w-[var(--heatmap-layout-width)]">
         <div className="grid items-start gap-x-3 grid-cols-[var(--heatmap-label-width)_var(--heatmap-grid-width)]">
           <span aria-hidden="true" />
@@ -149,6 +150,6 @@ export default function GithubActivityHeatmap({ activity }: { activity: GithubAc
           )}
         </div>
       </div>
-    </div>
+    </HeatmapScroller>
   );
 }
