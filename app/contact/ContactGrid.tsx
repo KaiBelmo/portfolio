@@ -89,7 +89,7 @@ function EmailCard() {
   return (
     <ContactCard
       href={`mailto:${EMAIL}`}
-      className={`${FIRST_ROW_CARD_CLASS} col-span-2 order-1 sm:col-span-1 sm:order-1 lg:col-span-3 lg:order-1`}
+      className={`${FIRST_ROW_CARD_CLASS} col-span-2 order-1 sm:col-span-1 lg:col-span-3`}
       icon={GmailIcon}
       meta="01 · Direct"
       title="Email"
@@ -111,7 +111,7 @@ function PgpCard() {
   return (
     <section
       aria-labelledby="pgp-title"
-      className={`${FIRST_ROW_SECTION_CLASS} col-span-2 order-2 sm:col-span-1 sm:order-2 lg:col-span-3 lg:order-2`}
+      className={`${FIRST_ROW_SECTION_CLASS} col-span-2 order-2 sm:col-span-1 lg:col-span-3`}
       data-scroll-reveal
       data-scroll-reveal-state="visible"
       suppressHydrationWarning
@@ -168,7 +168,7 @@ function ActivityCard({ activity }: { activity: GithubActivity | null }) {
   return (
     <section
       aria-labelledby="activity-title"
-      className={`${COMPACT_SECTION_CLASS} col-span-2 order-5 sm:col-span-2 sm:order-5 lg:col-span-4 lg:order-4`}
+      className={`${COMPACT_SECTION_CLASS} col-span-2 order-4 lg:col-span-4`}
       data-scroll-reveal
       data-scroll-reveal-state="visible"
       suppressHydrationWarning
@@ -195,29 +195,32 @@ function ActivityCard({ activity }: { activity: GithubActivity | null }) {
 
 export default function ContactGrid({ githubActivity }: { githubActivity: GithubActivity | null }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    // Cards read 01 → 06 top-to-bottom at every breakpoint. Below lg the two
+    // wide cards (GitHub, Activity) take the full row and the two social cards
+    // pair up on the last row.
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
       <EmailCard />
       <PgpCard />
       <ContactCard
         href="https://github.com/kaibelmo"
-        className={`${COMPACT_CARD_CLASS} col-span-1 order-3 sm:col-span-1 sm:order-3 lg:col-span-2 lg:order-3`}
+        className={`${COMPACT_CARD_CLASS} col-span-2 order-3 lg:col-span-2`}
         icon={GithubIcon}
         meta="03 · Code"
         title="GitHub"
         value="@kaibelmo"
       />
+      <ActivityCard activity={githubActivity} />
       <ContactCard
         href="https://x.com/belmo01"
-        className={`${CARD_CLASS} col-span-1 order-4 sm:col-span-1 sm:order-4 lg:col-span-4 lg:order-5`}
+        className={`${CARD_CLASS} col-span-1 order-5 compact:col-span-2 lg:col-span-4`}
         icon={XIcon}
         meta="05 · Social"
         title="X"
         value="@belmo01"
       />
-      <ActivityCard activity={githubActivity} />
       <ContactCard
         href="https://www.linkedin.com/in/belmo/"
-        className={`${CARD_CLASS} col-span-2 order-6 sm:col-span-2 sm:order-6 lg:col-span-2 lg:order-6`}
+        className={`${CARD_CLASS} col-span-1 order-6 compact:col-span-2 lg:col-span-2`}
         icon={LinkedInIcon}
         meta="06 · Network"
         title="LinkedIn"
