@@ -762,24 +762,47 @@ html {
   margin: 1.6em 0;
 }
 
+/* Horizontal scrollbar for the contributions heatmap: same square rail as
+   the page scrollbar, slimmer, with the hairline rule along the top edge. */
 .heatmap-scroll {
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--muted) 58%, transparent) transparent;
 }
 
 .heatmap-scroll::-webkit-scrollbar {
-  height: 8px;
+  height: 10px;
 }
 
 .heatmap-scroll::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--scrollbar-track);
+  border-top: 1px solid var(--scrollbar-rule);
 }
 
 .heatmap-scroll::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--muted) 58%, transparent);
-  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+  border: 3px solid var(--scrollbar-track);
+  border-radius: 0;
+}
+
+.heatmap-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.heatmap-scroll::-webkit-scrollbar-thumb:active {
+  background: var(--ink);
+}
+
+.heatmap-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .heatmap-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
 }
 
 /* --------------------------------------------------------------------------
