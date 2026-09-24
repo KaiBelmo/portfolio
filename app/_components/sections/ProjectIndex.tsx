@@ -146,11 +146,14 @@ export default function ProjectIndex({
 
       <h1 id="project-index-heading" className="m-0 mb-4 font-display text-[clamp(3rem,7vw,6.2rem)] font-normal leading-none">Projects</h1>
 
-      <p className="mb-7 text-sm leading-relaxed text-sys-muted">
+      <p className="relative mb-7 text-sm leading-relaxed text-sys-muted">
         Projects I built, contributed to, or developed within an{" "}
-        <span className="group relative inline-block">
+        {/* On small screens the tooltip anchors to the paragraph instead of the
+            word, so it never runs past the viewport regardless of where the
+            word wraps. */}
+        <span className="group relative inline-block mobile:static">
           <span className="cursor-default text-sys-cream underline decoration-sys-signal decoration-wavy underline-offset-4 outline-offset-2 focus-visible:rounded-[2px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-sys-focus" tabIndex={0}>organization</span>
-          <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-10 w-max max-w-[260px] -translate-x-1/2 translate-y-1 border border-sys-line-strong bg-sys-raised px-3 py-2 text-[0.72rem] leading-[1.5] text-sys-cream opacity-0 transition-[opacity,transform] duration-150 ease-out after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-[5px] after:border-transparent after:border-t-sys-line-strong group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-opacity mobile:left-0 mobile:w-[min(260px,calc(100vw-32px))] mobile:translate-x-0 mobile:after:left-6 mobile:after:translate-x-0" role="tooltip">
+          <span className="pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-10 w-max max-w-[260px] -translate-x-1/2 translate-y-1 border border-sys-line-strong bg-sys-raised px-3 py-2 text-[0.72rem] leading-[1.5] text-sys-cream opacity-0 transition-[opacity,transform] duration-150 ease-out after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-[5px] after:border-transparent after:border-t-sys-line-strong group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 motion-reduce:transition-opacity mobile:left-0 mobile:right-0 mobile:w-auto mobile:max-w-none mobile:translate-x-0 mobile:after:hidden" role="tooltip">
             Shared here with the organization&apos;s agreement and blessing
           </span>
         </span>
