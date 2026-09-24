@@ -805,6 +805,44 @@ html {
   }
 }
 
+/* Touch devices hide scrollbars until you drag, so fade the edge that still
+   has content behind it. Driven by a scroll timeline: when the grid fits and
+   nothing scrolls, the timeline is inactive and no fade is applied at all. */
+@property --heatmap-fade-start { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --heatmap-fade-end { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
+@supports (animation-timeline: scroll()) {
+  .heatmap-scroll {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 var(--heatmap-fade-start),
+      #000 calc(100% - var(--heatmap-fade-end)),
+      transparent
+    );
+    animation: heatmap-edge-fade linear both;
+    animation-timeline: scroll(self inline);
+  }
+
+  @keyframes heatmap-edge-fade {
+    from { --heatmap-fade-start: 0px; --heatmap-fade-end: 36px; }
+    to { --heatmap-fade-start: 36px; --heatmap-fade-end: 0px; }
+  }
+}
+
+/* Blog code blocks on narrow screens: less chrome, more columns of code. */
+@media (max-width: 600px) {
+  .blog-prose pre {
+    padding: 1.6em 0.9em 1em;
+    box-shadow: 4px 4px 0 color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .blog-prose pre code {
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Print
    -------------------------------------------------------------------------- */
