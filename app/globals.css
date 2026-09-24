@@ -240,6 +240,66 @@ p {
 }
 
 /* --------------------------------------------------------------------------
+   Scrollbar — themed to the pixel/terminal aesthetic
+   Square thumb, canvas-coloured track with a hairline rule, no arrow buttons.
+   The pseudo-elements live on <html> so they read the interpolated palette
+   tokens and fade with the theme like everything else.
+   -------------------------------------------------------------------------- */
+
+html {
+  --scrollbar-size: 12px;
+  --scrollbar-track: var(--canvas);
+  --scrollbar-thumb: color-mix(in srgb, var(--line) 70%, var(--surface));
+  --scrollbar-thumb-hover: var(--accent);
+  --scrollbar-rule: color-mix(in srgb, var(--line) 55%, transparent);
+}
+
+html::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-left: 1px solid var(--scrollbar-rule);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  /* Inset the thumb so a sliver of track shows on each side, like a pixel rail */
+  border: 3px solid var(--scrollbar-track);
+  border-radius: 0;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+html::-webkit-scrollbar-thumb:active {
+  background: var(--ink);
+}
+
+html::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+html::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/* Firefox and other engines without ::-webkit-scrollbar. Scoped with
+   @supports because setting scrollbar-color in Chromium 121+ switches the
+   scrollbar to the standard renderer and discards the rules above. */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+}
+
+/* --------------------------------------------------------------------------
    Accessibility
    -------------------------------------------------------------------------- */
 
