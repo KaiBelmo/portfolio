@@ -45,9 +45,18 @@
   transition: opacity 80ms linear;
 }
 
+/* The html theme rule covers the video's fade-out after a transition lands on
+   morning: the scene drops its from/to attributes first, and the clip's last
+   frame (morning, with the rim) would otherwise show unclipped for 80ms.
+   The other end's poster sits under the video during the transition and is a
+   few pixels larger than the clip, so it is clipped too, or its edge would
+   peek out around the video as a thin border. */
 .morningImage,
-.roomScene[data-theme-from="morning"] .videoLayer,
-.roomScene[data-theme-to="morning"] .videoLayer {
+.roomScene[data-theme-from="morning"] .staticLayer,
+.roomScene[data-theme-to="morning"] .staticLayer,
+.roomScene[data-theme-from="morning"] .videoClip,
+.roomScene[data-theme-to="morning"] .videoClip,
+:global(html[data-theme="morning"]) .videoClip {
   clip-path: var(--morning-silhouette);
 }
 
@@ -58,6 +67,13 @@
 .roomScene[data-theme-from="night"] .nightImage,
 .roomScene[data-theme-to="night"] .nightImage {
   display: block;
+}
+
+.videoClip {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
 }
 
 .videoLayer {
