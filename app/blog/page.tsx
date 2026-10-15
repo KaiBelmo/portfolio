@@ -26,7 +26,16 @@ export default async function BlogPage() {
 
       <h1 className="m-0 mb-4 font-display text-[clamp(3rem,7vw,6.2rem)] font-normal leading-none">Blog</h1>
       <p className="mb-7 text-sm leading-relaxed text-sys-muted">
-        I write about a mix of topics, sometimes technical and sometimes not; pulled live from dev.to.
+        I write about a mix of topics, sometimes technical and sometimes not; pulled live from{" "}
+        <a
+          href="https://dev.to/b1m0110"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-ink underline underline-offset-4 transition-colors duration-[120ms] hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--sys-focus)]"
+        >
+          dev.to
+        </a>
+        .
       </p>
 
       <hr className="border-line" />
