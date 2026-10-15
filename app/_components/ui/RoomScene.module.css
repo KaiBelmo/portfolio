@@ -234,10 +234,20 @@
   }
 }
 
-/* Cursor-tracked glare overlay */
+/* Cursor-tracked glare overlay. The overlay is a full square, so without a
+   mask it also lights the transparent space around the room and the wrap's
+   overflow clip slices the glow flat at the edges. Masking it with the
+   poster's own alpha keeps the light on the room silhouette only. */
 .sceneGlare {
+  --glare-mask: url("/assets/theme-video/afternoon-poster.webp");
   position: absolute;
   inset: 0;
+  -webkit-mask-image: var(--glare-mask);
+  mask-image: var(--glare-mask);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   opacity: 0;
   background: radial-gradient(
     circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
@@ -255,6 +265,7 @@
 }
 
 :global(html[data-theme="morning"]) .sceneGlare {
+  --glare-mask: url("/assets/theme-video/morning-poster.webp");
   background: radial-gradient(
     circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
     color-mix(in srgb, var(--ink) 34%, var(--accent) 66%),
@@ -264,6 +275,7 @@
 }
 
 :global(html[data-theme="night"]) .sceneGlare {
+  --glare-mask: url("/assets/theme-video/night-poster.webp");
   background: radial-gradient(
     circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
     color-mix(in srgb, white 86%, var(--accent) 14%),
