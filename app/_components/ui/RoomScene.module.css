@@ -8,6 +8,13 @@
 }
 
 .imageWrap {
+  /* The morning art has a dark rim around the room that the afternoon and
+     night art lack. Clipping morning to its own outline, inset 3px on the
+     1254px poster, trims the rim; the video is clipped the same way while a
+     transition starts or ends on morning, so the rim never shows mid-clip. */
+  --morning-silhouette: polygon(
+    6.3% 24.79%, 49.84% 1.7%, 94.02% 23.75%, 94.1% 74.74%, 51.91% 98.85%, 6.3% 73.46%
+  );
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -36,6 +43,12 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 80ms linear;
+}
+
+.morningImage,
+.roomScene[data-theme-from="morning"] .videoLayer,
+.roomScene[data-theme-to="morning"] .videoLayer {
+  clip-path: var(--morning-silhouette);
 }
 
 .roomScene[data-theme-from="morning"] .morningImage,
@@ -264,8 +277,10 @@
   opacity: var(--tilt-glare-opacity);
 }
 
+/* Clipped like the morning poster, so the glare cannot light the trimmed rim. */
 :global(html[data-theme="morning"]) .sceneGlare {
   --glare-mask: url("/assets/theme-video/morning-poster.webp");
+  clip-path: var(--morning-silhouette);
   background: radial-gradient(
     circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%),
     color-mix(in srgb, var(--ink) 34%, var(--accent) 66%),
