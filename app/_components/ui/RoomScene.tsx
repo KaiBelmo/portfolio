@@ -371,21 +371,16 @@ export default function RoomScene({
             "scripts are never executed on the client" warning. */}
         {!isHydrated && <script dangerouslySetInnerHTML={{ __html: POSTER_BOOT_SCRIPT }} />}
 
-        {/* The morning clip goes on this wrapper, never on the <video>: Chrome
-            mis-composites a clip-path on a VP9 alpha video, washing the frame
-            semi-transparent and flashing dark during transitions. */}
-        <div className={styles.videoClip}>
-          <video
-            ref={videoRef}
-            className={`${styles.videoLayer} ${videoReady ? styles.isReady : ""}`}
-            muted
-            playsInline
-            preload="auto"
-            disablePictureInPicture
-            disableRemotePlayback
-            aria-hidden="true"
-          />
-        </div>
+        <video
+          ref={videoRef}
+          className={`${styles.videoLayer} ${videoReady ? styles.isReady : ""}`}
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          aria-hidden="true"
+        />
 
         <div className={styles.sceneGlare} aria-hidden="true" />
 
