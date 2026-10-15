@@ -169,10 +169,10 @@ html {
   color: var(--boot-fg);
   color-scheme: var(--boot-scheme);
   overflow-x: hidden;
-  /* Reserve the scrollbar gutter across short, long, and loading states so
-     route changes do not shift the page width or flash a scrollbar track. */
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+  /* Always render the scrollbar track, even on routes that fit the viewport,
+     so switching routes never shifts the page width or pops the track in and
+     out. Short pages show the track without a thumb. */
+  overflow-y: scroll;
 }
 
 body {
@@ -184,7 +184,7 @@ body {
   font-size: 17px;
   line-height: 1.62;
   font-family: var(--body);
-  cursor: url("/assets/cursor-default.svg?v=2"), auto;
+  cursor: var(--cursor-default-image), auto;
 }
 
 body * {
@@ -208,7 +208,7 @@ summary,
 [tabindex]:not([tabindex="-1"]),
 [data-cursor="pointer"],
 label[for] {
-  cursor: url("/assets/cursor-pointer.svg?v=1"), pointer !important;
+  cursor: url("/assets/cursor-pointer.svg?v=2"), pointer !important;
 }
 
 /* Ensure SVG and other interactive elements inside links/buttons inherit pointer */
@@ -247,6 +247,7 @@ p {
    -------------------------------------------------------------------------- */
 
 html {
+  --cursor-default-image: url("/assets/cursor-default.svg?v=3");
   --scrollbar-size: 12px;
   --scrollbar-track: var(--canvas);
   --scrollbar-thumb: color-mix(in srgb, var(--line) 70%, var(--surface));
@@ -297,6 +298,137 @@ html::-webkit-scrollbar-corner {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
+}
+
+/* Custom page rail (PageScrollbar) on mouse and trackpad devices. The native
+   thumb snaps whenever a route changes the page height or scroll; this one
+   eases into it. The bootstrap script sets the flag before first paint, and
+   the padding reserves the same gutter the native bar took, so nothing shifts.
+
+   Every moving part is a transform on its own layer, so the compositor runs
+   them even while the main thread is busy mounting the next route:
+     .page-scrollbar__slide  follows the scroll (scroll-driven animation)
+     .page-scrollbar__shift  eases out jumps the page makes (script animation)
+     .page-scrollbar__thumb  scaled to the thumb's length (script animation) */
+.page-scrollbar {
+  display: none;
+}
+
+html[data-scrollbar="custom"] {
+  scrollbar-width: none;
+  padding-right: var(--scrollbar-size);
+}
+
+html[data-scrollbar="custom"]::-webkit-scrollbar {
+  display: none;
+}
+
+html[data-scrollbar="custom"] .page-scrollbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: block;
+  width: var(--scrollbar-size);
+  background: var(--scrollbar-track);
+  border-left: 1px solid var(--scrollbar-rule);
+  /* Keep thumb changes from invalidating anything outside the rail */
+  contain: strict;
+  touch-action: none;
+  user-select: none;
+  /* Hidden until script has measured the page and found something to scroll.
+     When it hides, the gutter stays reserved, so the page keeps its width and
+     the strip shows the page behind. */
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Slides out toward the window edge (ease-in), and back in from it (ease-out). */
+.page-scrollbar[data-ready] {
+  transition:
+    transform 220ms cubic-bezier(0.55, 0, 1, 0.45),
+    opacity 220ms cubic-bezier(0.55, 0, 1, 0.45);
+}
+
+html[data-scrollbar="custom"] .page-scrollbar[data-ready][data-active] {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-scrollbar="custom"] .page-scrollbar[data-active] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  /* PageScrollbar draws the pixel cursor here instead (.page-scrollbar__cursor) */
+  cursor: none;
+}
+
+.page-scrollbar__cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 51;
+  display: none;
+  width: 32px;
+  height: 32px;
+  background: var(--cursor-default-image) no-repeat;
+  pointer-events: none;
+  /* Own layer, so following the mouse moves it without repainting the page */
+  will-change: transform;
+}
+
+.page-scrollbar__cursor[data-visible] {
+  display: block;
+}
+
+.page-scrollbar__slide,
+.page-scrollbar__shift {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.page-scrollbar__slide {
+  /* Fallback for engines without scroll timelines: script writes the progress */
+  transform: translateY(calc(var(--thumb-travel, 0px) * var(--thumb-progress, 0)));
+}
+
+@supports (animation-timeline: scroll()) {
+  .page-scrollbar__slide {
+    animation: page-scrollbar-slide linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes page-scrollbar-slide {
+    from { transform: translateY(0); }
+    to { transform: translateY(var(--thumb-travel, 0px)); }
+  }
+}
+
+/* Full rail height, scaled down from the top to the thumb's length. A flat
+   fill scales without distortion, and the insets leave a sliver of track on
+   each side, like a pixel rail. */
+.page-scrollbar__thumb {
+  position: absolute;
+  inset: 3px;
+  background: var(--scrollbar-thumb);
+  transform-origin: 0 0;
+  pointer-events: auto;
+  will-change: transform;
+  transition: background-color 120ms ease-out;
+}
+
+.page-scrollbar__thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.page-scrollbar[data-dragging] .page-scrollbar__thumb {
+  background: var(--ink);
 }
 
 /* --------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Aldrich, Pixelify_Sans } from "next/font/google";
 import { ThemeProvider } from "./_components/system/ThemeProvider";
 import PageTransition from "./_components/system/PageTransition";
+import PageScrollbar from "./_components/system/PageScrollbar";
 import SiteHeader from "./_components/ui/SiteHeader";
 import { DEFAULT_THEME, THEME_OPTIONS, THEME_PALETTES } from "@/lib/theme";
 import { MOBILE_MAX_WIDTH, roomPosterImageProps } from "@/lib/theme-animation";
@@ -92,6 +93,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         };
         meta.setAttribute("content", palette[theme]);
       }
+      if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        document.documentElement.dataset.scrollbar = "custom";
+      }
       if (window.innerWidth > ${MOBILE_MAX_WIDTH}) {
         const posters = ${JSON.stringify(roomPosters)};
         const poster = posters[theme];
@@ -135,6 +139,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <span className="tablet:text-[0.58rem] tablet:opacity-60"><span className="line-through opacity-50 mr-1.5">Built with love</span>Built with Next.js · 2026</span>
             </footer>
           </div>
+          <PageScrollbar />
         </ThemeProvider>
       </body>
     </html>
