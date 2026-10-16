@@ -1,0 +1,30 @@
+/* Two page-local primitives for the 404 route.
+
+   Both are token-driven so they re-tint with the active theme
+   (morning / afternoon / night) and never hardcode a colour.
+
+   globals.css already collapses every animation to a 0.01ms single iteration
+   under prefers-reduced-motion, so `.statusPulse` resolves to a static dot. */
+
+
+/* Terminal-style signal blink rather than a soft Tailwind pulse: the mark
+   stays solid for most of the cycle and drops out briefly. */
+@keyframes status-pulse {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  71%,
+  84% {
+    opacity: 0.32;
+  }
+  85%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.statusPulse {
+  animation: status-pulse 3.2s ease-in-out infinite;
+}
+
