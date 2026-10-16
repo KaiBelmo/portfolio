@@ -1,16 +1,29 @@
 import type { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/blog";
+import { getPostsWithRevalidation } from "@/lib/blog";
+import { absoluteUrl } from "@/lib/seo";
 
-const siteUrl = "https://www.kaibelmo.dev";
+export const revalidate = 86400;
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/about", "/projects", "/blog", "/contact"];
-  const blogRoutes = getAllPosts().map((post) => `/blog/${post.slug}`);
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const posts = await getPostsWithRevalidation();
+  const latestPost = posts[0] ? new Date(posts[0].published_at) : undefined;
 
-  return [...staticRoutes, ...blogRoutes].map((route) => ({
-    url: `${siteUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route.startsWith("/blog") ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.7,
+  // URLs carry the trailing slash the site serves, so crawlers do not hit a
+  // 308 for every entry. lastModified is only set where a real date exists.
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: absoluteUrl("/"), changeFrequency: "monthly", priority: 1 },
+    { url: absoluteUrl("/about"), changeFrequency: "monthly", priority: 0.8 },
+    { url: absoluteUrl("/projects"), changeFrequency: "monthly", priority: 0.8 },
+    { url: absoluteUrl("/blog"), lastModified: latestPost, changeFrequency: "weekly", priority: 0.7 },
+    { url: absoluteUrl("/contact"), changeFrequency: "yearly", priority: 0.5 },
+  ];
+
+  const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: absoluteUrl(`/blog/${post.slug}`),
+    lastModified: new Date(post.published_at),
+    changeFrequency: "yearly",
+    priority: 0.6,
   }));
+
+  return [...staticRoutes, ...blogRoutes];
 }

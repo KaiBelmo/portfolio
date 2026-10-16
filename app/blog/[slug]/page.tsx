@@ -4,6 +4,7 @@ import ArrowRight from "@/app/_components/ui/ArrowRight";
 import { getAllPosts, getPostBySlugWithRevalidation, formatPostDate } from "@/lib/blog";
 import TableOfContents from "./TableOfContents";
 import type { Metadata } from "next";
+import { OG_IMAGE, SITE_URL, absoluteUrl, pageMetadata } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -18,11 +19,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlugWithRevalidation(slug);
   if (!post) return {};
-  return {
+  return pageMetadata({
     title: `${post.title} | Kai Belmo`,
     description: post.description,
-    alternates: { canonical: `/blog/${post.slug}` },
-  };
+    path: `/blog/${post.slug}`,
+    openGraph: {
+      type: "article",
+      publishedTime: post.published_at,
+      authors: [SITE_URL],
+      tags: post.tags,
+    },
+  });
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -30,8 +37,38 @@ export default async function BlogPostPage({ params }: Props) {
   const post = await getPostBySlugWithRevalidation(slug);
   if (!post) notFound();
 
+  const url = absoluteUrl(`/blog/${post.slug}`);
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "@id": `${url}#article`,
+      headline: post.title,
+      description: post.description,
+      url,
+      mainEntityOfPage: url,
+      datePublished: post.published_at,
+      author: { "@id": `${SITE_URL}/#person` },
+      publisher: { "@id": `${SITE_URL}/#person` },
+      image: `${SITE_URL}${OG_IMAGE.url}`,
+      keywords: post.tags.join(", "),
+      inLanguage: "en",
+      sameAs: post.source,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Blog", item: absoluteUrl("/blog") },
+        { "@type": "ListItem", position: 3, name: post.title, item: url },
+      ],
+    },
+  ];
+
   return (
     <div className="route-shell py-[70px] pb-[120px]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       {/* Breadcrumb */}
       <nav
         aria-label="Breadcrumb"

@@ -125,7 +125,7 @@ export const projects: Project[] = [
     id: "portfolio-w95",
     slug: "portfolio-w95",
     name: "Windows 95 Portfolio",
-    link: "https://portfolio-win95.vercel.app/",
+    link: "https://win95.kaibelmo.dev/",
     githubLink: "https://github.com/KaiBelmo/portfolio-win95",
     category: [
       "Vue.js",

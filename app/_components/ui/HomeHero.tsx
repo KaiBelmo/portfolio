@@ -134,7 +134,7 @@ export default function HomeHero() {
           <p className="m-0 inline-flex min-h-11 max-w-full flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[clamp(0.48rem,0.58vw,0.56rem)] font-normal uppercase leading-[1.2] tracking-[0.06em] text-[color-mix(in_srgb,var(--ink)_82%,#000)] no-underline">
             <span aria-hidden="true" className="block h-px w-[clamp(22px,2.4vw,34px)] flex-none bg-current" />
             <span>Prefer the retro version?</span>
-            <a className="min-w-0 [overflow-wrap:anywhere] text-[color-mix(in_srgb,var(--ink)_70%,#fff)] underline underline-offset-[3px] transition-colors duration-[120ms] ease-out hover:text-accent focus-visible:text-accent" href="https://portfolio-win95.vercel.app/" target="_blank" rel="noreferrer">
+            <a className="min-w-0 [overflow-wrap:anywhere] text-[color-mix(in_srgb,var(--ink)_70%,#fff)] underline underline-offset-[3px] transition-colors duration-[120ms] ease-out hover:text-accent focus-visible:text-accent" href="https://win95.kaibelmo.dev/" target="_blank" rel="noreferrer">
               Open the Windows 95 portfolio.
             </a>
           </p>
@@ -187,7 +187,7 @@ export default function HomeHero() {
               <div className="grid gap-[10px]">
                 {[
                   { label: "Email", href: "mailto:contact@kaibelmo.dev", text: "contact@kaibelmo.dev", external: false },
-                  { label: "LinkedIn", href: "https://www.linkedin.com/in/belmo/", text: "linkedin.com/in/belmo", external: true },
+                  { label: "LinkedIn", href: "https://www.linkedin.com/in/belmo", text: "linkedin.com/in/belmo", external: true },
                   { label: "Resume", href: "/resume.pdf", text: "resume.pdf", external: true },
                 ].map(({ label, href, text, external }) => (
                   <div key={label} className="grid min-h-[2.65rem] content-start gap-1">
@@ -237,7 +237,7 @@ export default function HomeHero() {
               <div className="border border-line">
                 {[
                   { label: "Email", href: "mailto:contact@kaibelmo.dev", text: "contact@kaibelmo.dev", external: false },
-                  { label: "LinkedIn", href: "https://www.linkedin.com/in/belmo/", text: "linkedin.com/in/belmo", external: true },
+                  { label: "LinkedIn", href: "https://www.linkedin.com/in/belmo", text: "linkedin.com/in/belmo", external: true },
                   { label: "Resume", href: "/resume.pdf", text: "resume.pdf", external: true },
                 ].map(({ label, href, text, external }) => (
                   <div key={label} className="grid grid-cols-[56px_1fr] items-baseline gap-2 px-3 py-2 border-b border-line last:border-b-0">

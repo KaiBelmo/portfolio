@@ -8,11 +8,10 @@ import SiteHeader from "./_components/ui/SiteHeader";
 import { DEFAULT_THEME, THEME_OPTIONS, THEME_PALETTES } from "@/lib/theme";
 import { MOBILE_MAX_WIDTH, roomPosterImageProps } from "@/lib/theme-animation";
 
-const siteUrl = "https://www.kaibelmo.dev";
-const siteName = "Kai Belmo";
+import { OG_IMAGE, SITE_NAME as siteName, SITE_URL as siteUrl } from "@/lib/seo";
+
 const title = "Kai Belmo | Software Engineer";
 const description = "Full-stack engineer building expressive web products, developer tools, and low-level experiments.";
-const ogImage = "/og.png";
 
 const bodyFont = Aldrich({
   subsets: ["latin"],
@@ -34,8 +33,10 @@ export const metadata: Metadata = {
   title,
   description,
   applicationName: "Kai Belmo Portfolio",
-  openGraph: { title, description: "Full-stack engineering, open source, and systems work.", url: "/", siteName, images: [{ url: ogImage, alt: "Kai Belmo software engineering portfolio" }], type: "website" },
-  twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+  authors: [{ name: siteName, url: siteUrl }],
+  creator: siteName,
+  openGraph: { title, description, url: "/", siteName, locale: "en_US", images: [OG_IMAGE], type: "website" },
+  twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE.url] },
   robots: { index: true, follow: true },
 };
 

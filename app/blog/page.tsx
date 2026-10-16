@@ -2,13 +2,14 @@ import Link from "next/link";
 import ArrowRight from "@/app/_components/ui/ArrowRight";
 import { getPostsWithRevalidation, formatPostDate } from "@/lib/blog";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Blog | Kai Belmo",
   description:
     "Writing about AI debugging workflows, TypeScript, systems programming, and building calmer software interfaces.",
-  alternates: { canonical: "/blog" },
-};
+  path: "/blog",
+});
 
 // Revalidate the page daily to pick up new Dev.to posts
 export const revalidate = 86400;

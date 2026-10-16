@@ -219,7 +219,7 @@ export default function ContactGrid({ githubActivity }: { githubActivity: Github
         value="@belmo01"
       />
       <ContactCard
-        href="https://www.linkedin.com/in/belmo/"
+        href="https://www.linkedin.com/in/belmo"
         className={`${CARD_CLASS} col-span-1 order-6 compact:col-span-2 lg:col-span-2`}
         icon={LinkedInIcon}
         meta="06 · Network"

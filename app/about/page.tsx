@@ -1,15 +1,17 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { projects } from "@/data/projects";
 import { getPostsWithRevalidation, formatPostDate } from "@/lib/blog";
 import AboutSpaceAnimation from "@/app/_components/ui/AboutSpaceAnimation";
 import styles from "./about.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About | Kai Belmo",
   description: "Kai Belmo's background in full-stack engineering, systems programming, developer tools, and product-minded web work.",
-  alternates: { canonical: "/about" },
-};
+  path: "/about",
+  openGraph: { type: "profile" },
+});
 
 export default async function AboutPage() {
   const posts = (await getPostsWithRevalidation()).slice(0, 3);

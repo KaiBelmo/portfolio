@@ -109,7 +109,7 @@ async function renderMarkdown(content: string): Promise<Pick<BlogPost, "contentH
     `https://dev\\.to/${DEV_TO_USERNAME}/([\\w-]+)`,
     "g"
   );
-  const localizedHtml = contentHtml.replace(devToPostPattern, "/blog/$1");
+  const localizedHtml = contentHtml.replace(devToPostPattern, "/blog/$1/");
 
   let patchedHtml = localizedHtml.replace(
     /<pre><code class="([^"]*\blanguage-([^"\s]+)[^"]*)">/g,
