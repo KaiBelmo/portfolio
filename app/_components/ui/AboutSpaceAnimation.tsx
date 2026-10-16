@@ -934,7 +934,7 @@ export default function AboutSpaceAnimation() {
         const glowColor = blendRGB((palette) => palette.sunGlow);
         const glowAlpha = blendNumber((palette) => palette.sunGlowAlpha);
         const coreAlpha = blendNumber((palette) => palette.sunCoreAlpha);
-        const glowRadius = Math.min(fullGlowRadius, y - 2, width - x - 2);
+        const glowRadius = Math.max(baseRadius * 0.18, Math.min(fullGlowRadius, y - 2, width - x - 2));
         const glow = ctx.createRadialGradient(x, y, baseRadius * 0.18, x, y, glowRadius);
         glow.addColorStop(0, rgbaCss(glowColor, sunAlpha * glowAlpha));
         glow.addColorStop(0.46, rgbaCss(glowColor, sunAlpha * glowAlpha * 0.5));

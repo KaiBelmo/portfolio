@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { projects } from "@/data/projects";
 import { getPostsWithRevalidation, formatPostDate } from "@/lib/blog";
-import AboutSpaceAnimation from "@/app/_components/ui/AboutSpaceAnimation";
+import AboutSpaceAnimation from "@/app/_components/ui/AboutSpaceAnimationLazy";
 import styles from "./about.module.css";
 
 export const metadata: Metadata = pageMetadata({

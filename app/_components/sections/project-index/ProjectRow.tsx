@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useReducedMotion } from "framer-motion";
 import type { Project } from "@/types/project";
 import { actionLabel } from "./constants";
@@ -23,7 +23,7 @@ export default function ProjectRow({
   const reduceMotion = !!useReducedMotion();
 
   return (
-    <motion.article
+    <m.article
       data-scroll-reveal
       data-scroll-reveal-state="visible"
       suppressHydrationWarning
@@ -80,6 +80,6 @@ export default function ProjectRow({
           </span>
         </span>
       </button>
-    </motion.article>
+    </m.article>
   );
 }

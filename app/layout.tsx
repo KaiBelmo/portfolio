@@ -3,7 +3,8 @@ import type { Metadata, Viewport } from "next";
 import { Aldrich, Pixelify_Sans } from "next/font/google";
 import { ThemeProvider } from "./_components/system/ThemeProvider";
 import PageTransition from "./_components/system/PageTransition";
-import PageScrollbar from "./_components/system/PageScrollbar";
+import PageScrollbar from "./_components/system/PageScrollbarLazy";
+import MotionProvider from "./_components/system/MotionProvider";
 import SiteHeader from "./_components/ui/SiteHeader";
 import { DEFAULT_THEME, THEME_OPTIONS, THEME_PALETTES } from "@/lib/theme";
 import { MOBILE_MAX_WIDTH, roomPosterImageProps } from "@/lib/theme-animation";
@@ -129,19 +130,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body>
-        <ThemeProvider>
-          <div className="site-shell">
-            <SiteHeader />
-            <main id="main">
-              <PageTransition>{children}</PageTransition>
-            </main>
-            <footer className="relative z-[1] mt-auto flex justify-between bg-sys-bg px-7 py-[22px] font-mono text-[0.68rem] uppercase text-sys-muted transition-[background] duration-160 ease-out before:pointer-events-none before:absolute before:left-1/2 before:top-0 before:h-px before:w-screen before:-translate-x-1/2 before:bg-[color-mix(in_srgb,var(--sys-line)_40%,transparent)] [html:has(.app[data-theme-transitioning='true'])_&]:bg-transparent [html:has(.app[data-theme-transitioning='true'])_&]:backdrop-filter-none [html:has(.app[data-theme-transitioning='true'])_&]:transition-[background-color,border-color] [html:has(.app[data-theme-transitioning='true'])_&]:duration-240 [html:has(.app[data-theme-transitioning='true'])_&]:ease-out tablet:flex-col tablet:items-start tablet:gap-2 tablet:px-[18px] tablet:py-[20px]">
-              <span>KAI BELMO / SOFTWARE ENGINEER</span>
-              <span className="tablet:text-[0.58rem] tablet:opacity-60"><span className="line-through opacity-50 mr-1.5">Built with love</span>Built with Next.js · 2026</span>
-            </footer>
-          </div>
-          <PageScrollbar />
-        </ThemeProvider>
+        <MotionProvider>
+          <ThemeProvider>
+            <div className="site-shell">
+              <SiteHeader />
+              <main id="main">
+                <PageTransition>{children}</PageTransition>
+              </main>
+              <footer className="relative z-[1] mt-auto flex justify-between bg-sys-bg px-7 py-[22px] font-mono text-[0.68rem] uppercase text-sys-muted transition-[background] duration-160 ease-out before:pointer-events-none before:absolute before:left-1/2 before:top-0 before:h-px before:w-screen before:-translate-x-1/2 before:bg-[color-mix(in_srgb,var(--sys-line)_40%,transparent)] [html:has(.app[data-theme-transitioning='true'])_&]:bg-transparent [html:has(.app[data-theme-transitioning='true'])_&]:backdrop-filter-none [html:has(.app[data-theme-transitioning='true'])_&]:transition-[background-color,border-color] [html:has(.app[data-theme-transitioning='true'])_&]:duration-240 [html:has(.app[data-theme-transitioning='true'])_&]:ease-out tablet:flex-col tablet:items-start tablet:gap-2 tablet:px-[18px] tablet:py-[20px]">
+                <span>KAI BELMO / SOFTWARE ENGINEER</span>
+                <span className="tablet:text-[0.58rem]"><span className="line-through opacity-50 mr-1.5">Built with love</span>Built with Next.js · 2026</span>
+              </footer>
+            </div>
+            <PageScrollbar />
+          </ThemeProvider>
+        </MotionProvider>
       </body>
     </html>
   );

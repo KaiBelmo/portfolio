@@ -28,7 +28,10 @@ import {
   warmRoomPoster,
   warmRoomTransitionAssets,
 } from "@/lib/theme-animation";
-import ThemeBackgroundFlare from "../ui/ThemeBackgroundFlare";
+import dynamic from "next/dynamic";
+
+// Only paints during a theme time-lapse, so it loads after hydration.
+const ThemeBackgroundFlare = dynamic(() => import("../ui/ThemeBackgroundFlare"), { ssr: false });
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;

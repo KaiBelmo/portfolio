@@ -66,15 +66,15 @@ function ContactCard({
     >
       <div className="flex items-start justify-between gap-4">
         <span className={CARD_ICON_CLASS}>{icon}</span>
-        <span className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted opacity-60">{meta}</span>
+        <span className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted">{meta}</span>
       </div>
       <div className="flex flex-col gap-3">
         {children}
         <div className="flex items-end justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="m-0 text-2xl font-bold text-ink transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent mobile:text-xl">
+            <h2 className="m-0 text-2xl font-bold text-ink transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent mobile:text-xl">
               {title}
-            </h3>
+            </h2>
             <p className="m-0 mt-2 truncate font-mono text-[0.88rem] tracking-[0.02em] text-muted">{value}</p>
           </div>
           <span className={CARD_ARROW_CLASS}>{ArrowIcon}</span>
@@ -140,8 +140,8 @@ function PgpCard() {
         </p>
         <p
           className="m-0 flex flex-wrap gap-x-2.5 gap-y-1 font-mono text-[clamp(0.68rem,1vw,0.82rem)] tracking-[0.05em] text-ink"
-          aria-label={`PGP fingerprint ${NORMALIZED_PGP_FINGERPRINT}`}
         >
+          <span className="sr-only">{`PGP fingerprint ${NORMALIZED_PGP_FINGERPRINT}`}</span>
           {PGP_FINGERPRINT_GROUPS.map((group, index) => (
             <span key={`${group}-${index}`} className={index === 5 ? "mobile:ml-2" : undefined} aria-hidden="true">
               {group}

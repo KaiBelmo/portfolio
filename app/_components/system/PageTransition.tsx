@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
   AnimatePresence,
-  motion,
+  m,
   useReducedMotion,
   type Variants,
 } from "framer-motion";
@@ -130,7 +130,7 @@ export default function PageTransition({
   return (
     <div className="t-page-slide">
       <AnimatePresence mode="wait" initial={false}>
-        <motion.div
+        <m.div
           className="t-page-slide__page"
           key={pathname}
           variants={variants}
@@ -141,7 +141,7 @@ export default function PageTransition({
           <ScrollReveal>
             <FrozenRoute context={routerContext}>{children}</FrozenRoute>
           </ScrollReveal>
-        </motion.div>
+        </m.div>
       </AnimatePresence>
     </div>
   );

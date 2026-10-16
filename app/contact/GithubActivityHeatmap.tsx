@@ -90,6 +90,7 @@ function Heatmap({ activity }: { activity: GithubActivity }) {
           <div
             key={day.date}
             title={`${day.contributionCount} contributions on ${day.date}`}
+            role="img"
             aria-label={`${day.contributionCount} contributions on ${day.date}`}
             className="h-[var(--heatmap-cell)] w-[var(--heatmap-cell)] rounded-[2px]"
             style={HEATMAP_COLORS[intensity]}
@@ -115,7 +116,7 @@ export default function GithubActivityHeatmap({ activity }: { activity: GithubAc
       <div className="min-w-[var(--heatmap-layout-width)]">
         <div className="grid items-start gap-x-3 grid-cols-[var(--heatmap-label-width)_var(--heatmap-grid-width)]">
           <span aria-hidden="true" />
-          <div className="relative mb-2 h-4 w-[var(--heatmap-grid-width)] font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted opacity-60">
+          <div className="relative mb-2 h-4 w-[var(--heatmap-grid-width)] font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted">
             {getMonthLabels(activity).map(({ label, column }) => (
               <span
                 key={`${label}-${column}`}

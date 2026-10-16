@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion, type Variants } from "framer-motion";
 import { useTheme } from "../system/ThemeProvider";
 import styles from "./SiteHeader.module.css";
 
@@ -235,7 +235,7 @@ export default function SiteHeader() {
       <AnimatePresence initial={false}>
         {open && (
           <>
-            <motion.div
+            <m.div
               className={styles.navBackdrop}
               aria-hidden="true"
               initial={reduceMotion ? false : { opacity: 0 }}
@@ -244,7 +244,7 @@ export default function SiteHeader() {
               transition={{ duration: reduceMotion ? 0 : 0.12 }}
               onClick={() => closeMenu(true)}
             />
-            <motion.nav
+            <m.nav
               id="site-mobile-navigation"
               className={`${styles.siteNav} ${styles.mobileNav}`}
               aria-label="Primary navigation"
@@ -257,7 +257,7 @@ export default function SiteHeader() {
                 {links.map(([to, label], index) => {
                   const isActive = pathname === to || (to !== "/" && pathname.startsWith(to));
                   return (
-                    <motion.div
+                    <m.div
                       key={to}
                       className={styles.navItem}
                       variants={menuItemVariants}
@@ -273,11 +273,11 @@ export default function SiteHeader() {
                         <span className={styles.navLinkLabel}>{label}</span>
                         <span className={styles.bracketRight} aria-hidden="true">]</span>
                       </Link>
-                    </motion.div>
+                    </m.div>
                   );
                 })}
               </div>
-              <motion.div className={styles.mobileNavFooter} variants={menuItemVariants}>
+              <m.div className={styles.mobileNavFooter} variants={menuItemVariants}>
                 <div className={styles.mobileThemePicker}>
                   <span className={styles.mobileThemeLabel}>Theme</span>
                   <div className={styles.mobileThemeOptions}>
@@ -312,8 +312,8 @@ export default function SiteHeader() {
                     </button>
                   </div>
                 </div>
-              </motion.div>
-            </motion.nav>
+              </m.div>
+            </m.nav>
           </>
         )}
       </AnimatePresence>

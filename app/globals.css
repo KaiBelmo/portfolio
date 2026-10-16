@@ -85,7 +85,7 @@ html[data-theme="night"] {
   --muted: #244d4b;
   --line: #4f6030;
   --line-strong: #242629;
-  --accent: #a85b12;
+  --accent: #8f4d0e;
   --accent-2: #4f6030;
   --signal: #244d4b;
   --scene-wash: rgb(142 166 207 / 20%);
@@ -580,7 +580,7 @@ html[data-scrollbar="custom"] .page-scrollbar[data-active] {
 @property --muted { syntax: "<color>"; inherits: true; initial-value: #244d4b; }
 @property --line { syntax: "<color>"; inherits: true; initial-value: #4f6030; }
 @property --line-strong { syntax: "<color>"; inherits: true; initial-value: #242629; }
-@property --accent { syntax: "<color>"; inherits: true; initial-value: #a85b12; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #8f4d0e; }
 @property --accent-2 { syntax: "<color>"; inherits: true; initial-value: #4f6030; }
 @property --signal { syntax: "<color>"; inherits: true; initial-value: #244d4b; }
 @property --scene-wash { syntax: "<color>"; inherits: true; initial-value: rgb(142 166 207 / 20%); }
@@ -708,8 +708,8 @@ html {
   font-family: var(--mono);
   font-size: 0.88em;
   padding: 0.15em 0.4em;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--surface-soft) 76%, transparent);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
   border: 1px solid color-mix(in srgb, var(--line) 62%, transparent);
 }
 
@@ -810,6 +810,32 @@ html {
   color: color-mix(in srgb, var(--ink) 72%, var(--surface));
 }
 
+[data-theme="morning"] .blog-prose .hljs-keyword,
+[data-theme="morning"] .blog-prose .hljs-selector-tag,
+[data-theme="morning"] .blog-prose .hljs-title.function_,
+[data-theme="morning"] .blog-prose .hljs-built_in {
+  color: #7a3f08;
+}
+
+[data-theme="morning"] .blog-prose .hljs-string,
+[data-theme="morning"] .blog-prose .hljs-template-string,
+[data-theme="morning"] .blog-prose .hljs-regexp,
+[data-theme="morning"] .blog-prose .hljs-attr {
+  color: #244d4b;
+}
+
+[data-theme="morning"] .blog-prose .hljs-number,
+[data-theme="morning"] .blog-prose .hljs-literal,
+[data-theme="morning"] .blog-prose .hljs-symbol,
+[data-theme="morning"] .blog-prose .hljs-variable {
+  color: #5a3e8a;
+}
+
+[data-theme="morning"] .blog-prose .hljs-comment,
+[data-theme="morning"] .blog-prose .hljs-quote {
+  color: #3d5450;
+}
+
 [data-theme="afternoon"] .blog-prose pre {
   background: color-mix(in srgb, #34283a 78%, var(--canvas));
   border-color: color-mix(in srgb, var(--accent) 50%, #34283a);
@@ -841,6 +867,13 @@ html {
   color: #d79a79;
 }
 
+[data-theme="afternoon"] .blog-prose .hljs-title,
+[data-theme="afternoon"] .blog-prose .hljs-name,
+[data-theme="afternoon"] .blog-prose .hljs-property,
+[data-theme="afternoon"] .blog-prose .hljs-attribute {
+  color: #f6d7a8;
+}
+
 [data-theme="afternoon"] .blog-prose .hljs-comment,
 [data-theme="afternoon"] .blog-prose .hljs-quote {
   color: #c7a0b5;
@@ -868,6 +901,13 @@ html {
 [data-theme="night"] .blog-prose .hljs-regexp,
 [data-theme="night"] .blog-prose .hljs-attr {
   color: #b6d58a;
+}
+
+[data-theme="night"] .blog-prose .hljs-title,
+[data-theme="night"] .blog-prose .hljs-name,
+[data-theme="night"] .blog-prose .hljs-property,
+[data-theme="night"] .blog-prose .hljs-attribute {
+  color: #ffd58a;
 }
 
 [data-theme="night"] .blog-prose .hljs-number,

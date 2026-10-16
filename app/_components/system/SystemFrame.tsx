@@ -21,7 +21,7 @@ export default function SystemFrame({
           <span className="inline-block h-1.5 w-1.5 bg-sys-signal shadow-[0_0_4px_var(--sys-signal)]" />
           {title}
         </span>
-        <span className="border border-sys-line bg-sys-raised px-2 py-0.5 font-bold text-sys-cream">
+        <span className="border border-sys-line bg-sys-surface px-2 py-0.5 font-bold text-sys-cream">
           {classification}
         </span>
       </div>

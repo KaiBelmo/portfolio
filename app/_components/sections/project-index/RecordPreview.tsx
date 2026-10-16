@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useReducedMotion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import type { Project } from "@/types/project";
@@ -20,7 +20,7 @@ export default function RecordPreview({ project }: { project: Project }) {
   );
 
   return (
-    <motion.aside
+    <m.aside
       key={project.id}
       className="sticky top-[100px] w-full overflow-hidden border border-sys-line-strong tablet:hidden"
       aria-label={`${project.name} preview`}
@@ -91,6 +91,6 @@ export default function RecordPreview({ project }: { project: Project }) {
           </div>
         </div>
       </SystemFrame>
-    </motion.aside>
+    </m.aside>
   );
 }

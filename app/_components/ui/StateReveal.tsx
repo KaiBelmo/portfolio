@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import type { HTMLMotionProps } from "framer-motion";
 import { stateRevealVariants, stateTransition } from "./stateAnimations";
 
@@ -20,7 +20,7 @@ export default function StateReveal({
   return (
     <AnimatePresence initial={false} mode="wait">
       {show && (
-        <motion.div
+        <m.div
           {...props}
           style={{ overflow: "hidden", ...props.style }}
           variants={stateRevealVariants}
@@ -30,7 +30,7 @@ export default function StateReveal({
           transition={stateTransition(reduceMotion, duration)}
         >
           {children}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

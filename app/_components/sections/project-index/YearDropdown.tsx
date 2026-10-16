@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import {
   dropdownFrameClass,
   dropdownMenuClass,
@@ -53,7 +53,7 @@ export default function YearDropdown({
       </button>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <m.div
             className={dropdownMenuClass}
             role="listbox"
             aria-label={label}
@@ -79,7 +79,7 @@ export default function YearDropdown({
                 {item === "All" ? label : item}
               </button>
             ))}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

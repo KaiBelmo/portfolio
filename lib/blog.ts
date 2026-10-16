@@ -94,8 +94,11 @@ async function renderMarkdown(content: string): Promise<Pick<BlogPost, "contentH
   const mdHeadings: TocEntry[] = [];
   const mdHeadingRegex = /^(#{2,3})\s+(.+)$/gm;
   let mdMatch: RegExpExecArray | null;
+  // The page title is the h1, so a post may never jump straight to h3.
+  let previousLevel = 1;
   while ((mdMatch = mdHeadingRegex.exec(content)) !== null) {
-    const level = mdMatch[1].length as 2 | 3;
+    const level = Math.min(mdMatch[1].length, previousLevel + 1) as 2 | 3;
+    previousLevel = level;
     const text = mdMatch[2].trim();
     const id = text
       .toLowerCase()
@@ -120,7 +123,7 @@ async function renderMarkdown(content: string): Promise<Pick<BlogPost, "contentH
     const entry = mdHeadings[hIdx];
     hIdx++;
     if (!entry) return `<h${lvl}>${inner}</h${lvl}>`;
-    return `<h${lvl} id="${entry.id}">${inner}</h${lvl}>`;
+    return `<h${entry.level} id="${entry.id}">${inner}</h${entry.level}>`;
   });
 
   return { contentHtml: patchedHtml, toc: mdHeadings };

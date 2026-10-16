@@ -266,7 +266,7 @@ export default function HomeHero() {
           <div ref={cardRef} className={`${styles.sceneCard} relative border-none shadow-[0_8px_24px_color-mix(in_srgb,var(--shadow)_24%,transparent)] [transform-style:preserve-3d]`}>
             <div className="absolute z-[4] top-3.5 right-3.5 grid gap-[3px] px-[11px] py-2 text-surface bg-ink font-mono text-[0.5rem] font-bold tracking-[0.07em] uppercase shadow-pixel-accent">
               <span>Workspace / {roomAnimation ? roomAnimation.to : theme}</span>
-              <span className="text-[color-mix(in_srgb,var(--surface)_66%,transparent)]">{roomAnimation ? "Time-lapse running" : "Explore — hover or tab through objects"}</span>
+              <span className="text-[var(--surface)]">{roomAnimation ? "Time-lapse running" : "Explore — hover or tab through objects"}</span>
             </div>
             <RoomScene
               theme={theme}
